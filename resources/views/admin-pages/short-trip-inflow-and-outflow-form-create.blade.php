@@ -23,8 +23,16 @@
             <div class="card-body">
               <h5 class="card-title">Short Trip Inflow and Outflow Form</h5>
               <!-- Floating Labels Form -->
-              <form class="row g-3 "  action="#" method="POST">
+              <form class="row g-3 "  action="{{route('short-trip-inflow-and-outflow.store')}}" method="POST">
                 @csrf
+
+                {{--  input for transaction_status = "trading"  --}}
+                <div class="col-md-5" hidden>
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="transaction_status" name="transaction_status"  value="short_trip" >
+                    <label for="transaction_status">Date</label>
+                  </div>
+                </div>
 
                 <div class="col-md-3">
                   <div class="form-floating">
@@ -60,11 +68,11 @@
                       <div class="form-control" placeholder="In/Out">
                           <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
                           <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inflow_outflow" id="inlineRadio1" value="in">
+                            <input class="form-check-input" type="radio" name="transaction" id="inlineRadio1" value="inflow">
                             <label class="form-check-label" for="inlineRadio1">In</label>
                           </div>
                           <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inflow_outflow" id="inlineRadio2" value="out">
+                            <input class="form-check-input" type="radio" name="transaction" id="inlineRadio2" value="outflow">
                             <label class="form-check-label" for="inlineRadio2">Out</label>
                           </div>
                       </div> 
@@ -144,11 +152,61 @@
                 </div>
 
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                   <button type="reset" class="btn btn-secondary">Reset</button>
                   <a href="{{route('short-trip-inflow-and-outflow.index')}}" class="btn btn-danger">Back</a>
                 </div>
 
+                {{--  Submition status Modal  --}}
+                @if(session('success'))
+                <!-- Success Modal -->
+                <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('success') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                @if(session('error'))
+                <!-- Error Modal -->
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('error') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                // Check if there's a success message in the session
+                @if(session('success'))
+                  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                  successModal.show();
+                  setTimeout(function() {
+                    successModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+
+                // Check if there's an error message in the session
+                @if(session('error'))
+                  const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                  errorModal.show();
+                  setTimeout(function() {
+                    errorModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+                });
+                </script>
               </form>
             </div>
           </div>
@@ -157,7 +215,7 @@
     {{-- End Form --}}
     
 
-    
+ 
     </section>
  
 @endsection

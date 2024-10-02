@@ -24,45 +24,59 @@
                   <p class="text-center small">Enter your personal details to create account</p>
                 </div>
   
-                <form class="row g-3 needs-validation" action="{{route('register_save')}}" method="POST" novalidate>
+                <form class="row g-3 needs-validation" action="{{route('register_save_farmer')}}" method="POST" novalidate>
                   @csrf
-                  <form action="{{route('register_save')}}" method="POST">
-                    @csrf
-                      <div class="col-12">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" id="name" placeholder="Eg. Lebron James" value="{{ old('name') }}">
-                        @error('name')
+
+                    
+                    <div class="col-md-12">
+                      <div class="form-floating">
+                        <input type="text" class="form-control" id="farmer_name" name="farmer_name" placeholder="Name" value="{{ old('farmer_name') }}" required>
+                        <label for="farmer_name">Name</label>
+                        </div>
+                        @error('farmer_name')
                             <span class="text-danger md-3">{{$message}}</span>
                         @enderror
+                    </div>
+                    
+                    <div class="col-md-12">
+                      <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="{{ old('password') }}" required>
+                        <label for="password">Password</label>
                       </div>
-                      <div class="col-12">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" value="{{ old('password') }}">
-                            @error('password')
-                                <span class="text-danger md-3">{{$message}}</span>
-                            @enderror
+                      @error('password')
+                            <span class="text-danger md-3">{{$message}}</span>
+                        @enderror
+                    </div>
+                    
+                    <div class="col-md-12">
+                      <div class="form-floating">
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Re-enter password" value="{{ old('password_confirmation') }}" required>
+                        <label for="password_confirmation">Re-enter password</label>
                       </div>
-                      <div class="col-12">
-                          <label for="password_confirmation" class="form-label">Password</label>
-                          <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" placeholder="Enter your password" value="{{ old('password_confirmation') }}">
-                              @error('password_confirmation')
-                                <span class="text-danger md-3">{{$message}}</span>
-                              @enderror
-                        </div>
-                      <div class="col-12">
-                          <label for="email" class="form-label">Email</label>
-                          <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" value="{{ old('email') }}">
-                              @error('email')
-                                <span class="text-danger md-3">{{$message}}</span>
-                              @enderror
+                      @error('password_confirmation')
+                            <span class="text-danger md-3">{{$message}}</span>
+                        @enderror
+                    </div>
+                    
+                    <div class="col-md-12">
+                      <div class="form-floating">
+                        <input type="text" class="form-control" id="plate_number" name="plate_number" placeholder="Plate number" value="{{ old('plate_number') }}" required>
+                        <label for="plate_number">Plate number</label>
                       </div>
-                      <div class="col-12">
-                          <label for="contact_number" class="form-label">Contact Number</label>
-                          <input type="text" class="form-control" name="contact_number" id="contact_number" placeholder="Enter your contact number" value="{{ old('contact_number') }}">
-                              @error('contact_number')
-                                <span class="text-danger md-3">{{$message}}</span>
-                              @enderror
+                      @error('plate_number')
+                            <span class="text-danger md-3">{{$message}}</span>
+                        @enderror
+                    </div>
+                    
+                    <div class="col-md-12">
+                      <div class="form-floating">
+                        <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="Contact number" value="{{ old('contact_number') }}" required>
+                        <label for="contact_number">Contact number</label>
                       </div>
+                      @error('contact_number')
+                                <span class="text-danger md-3">{{$message}}</span>
+                      @enderror
+                    </div>
                   
                   <div class="col-12">
                     <button class="btn btn-primary w-100" type="submit">Create Account</button>
@@ -71,8 +85,59 @@
                   <div class="col-12">
                     <p class="small mb-0">Already have an account? <a href="{{route('login')}}">Log in</a></p>
                   </div>
+                  
+                  {{--  Submition status Modal  --}}
+                @if(session('success'))
+                <!-- Success Modal -->
+                <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('success') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                @if(session('error'))
+                <!-- Error Modal -->
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('error') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                // Check if there's a success message in the session
+                @if(session('success'))
+                  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                  successModal.show();
+                  setTimeout(function() {
+                    successModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+
+                // Check if there's an error message in the session
+                @if(session('error'))
+                  const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                  errorModal.show();
+                  setTimeout(function() {
+                    errorModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+                });
+                </script>
+                  
                 </form>
-  
               </div>
             </div>
           </div>

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ShortTripInflowAndOutflow;
 use Illuminate\Http\Request;
+use App\Models\Outflow;
+use App\Models\Inflow;
 
 class ShortTripInflowAndOutflowController extends Controller
 {
@@ -12,6 +13,7 @@ class ShortTripInflowAndOutflowController extends Controller
      */
     public function index()
     {
+        
         return view('admin-pages.short-trip-inflow-and-outflow-report');
     }
 
@@ -28,13 +30,54 @@ class ShortTripInflowAndOutflowController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $transaction=$request->string('transaction');
+        try {
+            if($transaction=='inflow'){
+                Inflow::create([
+                  'date' => $request->string('date'),
+                  'time' => $request->string('time'),
+                  'transaction_status' => $request->string('transaction_status'),
+                  'attendant' => $request->string('attendant'),
+                  'plate_number' => $request->string('plate_number'),
+                  'vehicle_type' => $request->string('vehicle_type'),
+                  'name' => $request->string('name'),
+                  'commodity' => $request->string('commodity'),
+                  'volume' => $request->integer('volume'),
+                  'barangay' => $request->string('barangay'),
+                  'municipality' => $request->string('municipality'),
+                  'province' => $request->string('province'),
+                  'region' => $request->string('region'),
+                ]);
+            }
+            else{
+                Outflow::create([
+                    'date' => $request->string('date'),
+                    'time' => $request->string('time'),
+                    'transaction_status' => $request->string('transaction_status'),
+                    'attendant' => $request->string('attendant'),
+                    'plate_number' => $request->string('plate_number'),
+                    'vehicle_type' => $request->string('vehicle_type'),
+                    'name' => $request->string('name'),
+                    'commodity' => $request->string('commodity'),
+                    'volume' => $request->integer('volume'),
+                    'barangay' => $request->string('barangay'),
+                    'municipality' => $request->string('municipality'),
+                    'province' => $request->string('province'),
+                    'region' => $request->string('region'),
+                  ]);
+            }
+        session()->flash('success', 'Short trip transaction added successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to add short trip transaction.');
+        }
+        return redirect()->route('short-trip-inflow-and-outflow.create');
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(ShortTripInflowAndOutflow $shortTripInflowAndOutflow)
+    public function show(Outflow $Outflow)
     {
         //
     }
@@ -42,7 +85,7 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ShortTripInflowAndOutflow $shortTripInflowAndOutflow)
+    public function edit(Outflow $Outflow)
     {
         //
     }
@@ -50,7 +93,7 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ShortTripInflowAndOutflow $shortTripInflowAndOutflow)
+    public function update(Request $request, Outflow $Outflow)
     {
         //
     }
@@ -58,7 +101,7 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ShortTripInflowAndOutflow $shortTripInflowAndOutflow)
+    public function destroy(Outflow $shortTripInflowAndOutflow)
     {
         //
     }

@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trading_inflows', function (Blueprint $table) {
+        Schema::create('inflows', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
+            $table->string('date');
             $table->string('time',length:2);
+            $table->string('transaction_status');
             $table->string('attendant');
             $table->string('plate_number');
             $table->string('vehicle_type');
             $table->string('name');
             $table->string('commodity');
             $table->integer('volume');
-            $table->integer('barangay');
-            $table->integer('municipality');
-            $table->integer('province');
-            $table->integer('region');
+            $table->string('barangay');
+            $table->string('municipality');
+            $table->string('province');
+            $table->string('region');
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trading_inflows');
+        Schema::dropIfExists('inflows');
     }
 };

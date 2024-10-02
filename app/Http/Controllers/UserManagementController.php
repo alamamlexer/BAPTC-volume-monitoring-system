@@ -1,19 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\Outflow;
-
-class TradingOutflowController extends Controller
+use Illuminate\Database\QueryException;
+class UserManagementController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $trading_outflows = Outflow::where('transaction_status','trading')->get();
-        return view('admin-pages.trading-outflow-report',compact('trading_outflows'));
+        $users = User::with('farmers','staffs')->whereIn('type',[1,2])->get();
+        
+        return view('admin-pages.user-management',compact('users'));
     }
 
     /**
@@ -21,7 +21,7 @@ class TradingOutflowController extends Controller
      */
     public function create()
     {
-        return view('admin-pages.trading-outflow-form-create');
+        return view('admin-pages.user-inspector-assistant-create',);
     }
 
     /**
@@ -29,14 +29,7 @@ class TradingOutflowController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            Outflow::create($request->all());
-        session()->flash('success', 'Trading outflow added successfully!');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Failed to add trading outflow.');
-        }
-        
-        return redirect()->route('trading-outflow.create');
+        //
     }
 
     /**
@@ -68,6 +61,18 @@ class TradingOutflowController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try{
+            $user=User::findOrFail($id);
+            $user->delete();
+            session()->flash('success', 'Account deleted successfully.');
+            return redirect()->route('user-management.index');
+        } catch (QueryException $error){
+        
+        if ($error->errorInfo[1]==1451){
+            session()->flash('error','Account was not deleted due to related records');
+            return redirect()->route('user-management.index');
+
+        }
+        }
     }
 }

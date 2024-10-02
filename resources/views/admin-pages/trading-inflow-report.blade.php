@@ -20,7 +20,7 @@
             <div class="col-lg-12">
                 <div class="card">
                   <div class="card-body">
-                    <h5 class="card-title">Area Chart</h5>
+                    <h5 class="card-title">Chart</h5>
       
                     <!-- Area Chart -->
                     <div id="areaChart"></div>
@@ -248,128 +248,6 @@
                             ],
                             "dates": [
                               "02 Jun 2017",
-                              "05 Jun 2017",
-                              "06 Jun 2017",
-                              "07 Jun 2017",
-                              "08 Jun 2017",
-                              "09 Jun 2017",
-                              "12 Jun 2017",
-                              "13 Jun 2017",
-                              "14 Jun 2017",
-                              "15 Jun 2017",
-                              "16 Jun 2017",
-                              "19 Jun 2017",
-                              "20 Jun 2017",
-                              "21 Jun 2017",
-                              "22 Jun 2017",
-                              "23 Jun 2017",
-                              "27 Jun 2017",
-                              "28 Jun 2017",
-                              "29 Jun 2017",
-                              "30 Jun 2017",
-                              "03 Jul 2017",
-                              "04 Jul 2017",
-                              "05 Jul 2017",
-                              "06 Jul 2017",
-                              "07 Jul 2017",
-                              "10 Jul 2017",
-                              "11 Jul 2017",
-                              "12 Jul 2017",
-                              "13 Jul 2017",
-                              "14 Jul 2017",
-                              "17 Jul 2017",
-                              "18 Jul 2017",
-                              "19 Jul 2017",
-                              "20 Jul 2017",
-                              "21 Jul 2017",
-                              "24 Jul 2017",
-                              "25 Jul 2017",
-                              "26 Jul 2017",
-                              "27 Jul 2017",
-                              "28 Jul 2017",
-                              "31 Jul 2017",
-                              "01 Aug 2017",
-                              "02 Aug 2017",
-                              "03 Aug 2017",
-                              "04 Aug 2017",
-                              "07 Aug 2017",
-                              "08 Aug 2017",
-                              "09 Aug 2017",
-                              "10 Aug 2017",
-                              "11 Aug 2017",
-                              "14 Aug 2017",
-                              "16 Aug 2017",
-                              "17 Aug 2017",
-                              "18 Aug 2017",
-                              "21 Aug 2017",
-                              "22 Aug 2017",
-                              "23 Aug 2017",
-                              "24 Aug 2017",
-                              "28 Aug 2017",
-                              "29 Aug 2017",
-                              "30 Aug 2017",
-                              "31 Aug 2017",
-                              "01 Sep 2017",
-                              "04 Sep 2017",
-                              "05 Sep 2017",
-                              "06 Sep 2017",
-                              "07 Sep 2017",
-                              "08 Sep 2017",
-                              "11 Sep 2017",
-                              "12 Sep 2017",
-                              "13 Sep 2017",
-                              "14 Sep 2017",
-                              "15 Sep 2017",
-                              "18 Sep 2017",
-                              "19 Sep 2017",
-                              "20 Sep 2017",
-                              "21 Sep 2017",
-                              "22 Sep 2017",
-                              "25 Sep 2017",
-                              "26 Sep 2017",
-                              "27 Sep 2017",
-                              "28 Sep 2017",
-                              "29 Sep 2017",
-                              "03 Oct 2017",
-                              "04 Oct 2017",
-                              "05 Oct 2017",
-                              "06 Oct 2017",
-                              "09 Oct 2017",
-                              "10 Oct 2017",
-                              "11 Oct 2017",
-                              "12 Oct 2017",
-                              "13 Oct 2017",
-                              "16 Oct 2017",
-                              "17 Oct 2017",
-                              "18 Oct 2017",
-                              "19 Oct 2017",
-                              "23 Oct 2017",
-                              "24 Oct 2017",
-                              "25 Oct 2017",
-                              "26 Oct 2017",
-                              "27 Oct 2017",
-                              "30 Oct 2017",
-                              "31 Oct 2017",
-                              "01 Nov 2017",
-                              "02 Nov 2017",
-                              "03 Nov 2017",
-                              "06 Nov 2017",
-                              "07 Nov 2017",
-                              "08 Nov 2017",
-                              "09 Nov 2017",
-                              "10 Nov 2017",
-                              "13 Nov 2017",
-                              "14 Nov 2017",
-                              "15 Nov 2017",
-                              "16 Nov 2017",
-                              "17 Nov 2017",
-                              "20 Nov 2017",
-                              "21 Nov 2017",
-                              "22 Nov 2017",
-                              "23 Nov 2017",
-                              "24 Nov 2017",
-                              "27 Nov 2017",
-                              "28 Nov 2017"
                             ]
                           }
                         }
@@ -421,57 +299,54 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Default Table</h5>
-    
-                  <!-- Default Table -->
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Position</th>
-                        <th scope="col">Age</th>
-                        <th scope="col">Start Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Brandon Jacob</td>
-                        <td>Designer</td>
-                        <td>28</td>
-                        <td>2016-05-25</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Bridie Kessler</td>
-                        <td>Developer</td>
-                        <td>35</td>
-                        <td>2014-12-05</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>Ashleigh Langosh</td>
-                        <td>Finance</td>
-                        <td>45</td>
-                        <td>2011-08-12</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">4</th>
-                        <td>Angus Grady</td>
-                        <td>HR</td>
-                        <td>34</td>
-                        <td>2012-06-11</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">5</th>
-                        <td>Raheem Lehner</td>
-                        <td>Dynamic Division Officer</td>
-                        <td>47</td>
-                        <td>2011-04-19</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <h5 class="card-title">Inflow Table</h5>
+                    <div class="table-responsive">
+                    <!-- Default Table -->
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Date</th>
+                          <th scope="col">AM/PM</th>
+                          <th scope="col">Attendant</th>
+                          <th scope="col">Plate Number</th>
+                          <th scope="col">Vehicle Type</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">Commodity</th>
+                          <th scope="col">Volume</th>
+                          <th scope="col">Production Origin</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {{-- @foreach ($trading_inflows as $trading_inflow)
+                          <td>{{$trading_inflow->id}}</td>
+                          <td>{{$trading_inflow->date}}</td>
+                          <td>{{$trading_inflow->time}}</td>
+                          <td>{{$trading_inflow->attendant}}</td>
+                          <td>{{$trading_inflow->plate_number}}</td>
+                          <td>{{$trading_inflow->vehicle_type}}</td>
+                          <td>{{$trading_inflow->name}}</td>
+                          <td>{{$trading_inflow->commodity}}</td>
+                          <td>{{$trading_inflow->volume}}</td>
+                          <td>{{$trading_inflow->barangay}}, {{$trading_inflow->municipality}}, {{$trading_inflow->province}}, {{$trading_inflow->region}}</td>
+                          <td>
+                            <a class="btn btn-outline-primary m-1" href="{{route('trading-inflow.edit',$trading_inflow->id)}}"><i class="bx bx-revision"></i> Edit</a> 
+                            <div class="float-start">
+                                <form action="{{route('trading-inflow.destroy',$trading_inflow->id)}}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger m-1" onclick="return confirm('Are you sure you want to delete this reservation?')">
+                                        <i class="bx bxs-trash-alt"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        @endforeach --}}
+                      </tbody>
+                    </table>
+                  </div>
+
                   <div class="row mb-3">
                   <div class="col-sm-10">
                       <a href="{{route('trading-inflow.create')}}" class="btn btn-primary">Add New Trading Inflow</a>
@@ -484,6 +359,56 @@
         </div>
     </div>
     
+      {{--  Submition status Modal  --}}
+      @if(session('success'))
+      <!-- Success Modal -->
+      <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+              <p class="mt-3">{{ session('success') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    @endif
+    
+    @if(session('error'))
+      <!-- Error Modal -->
+      <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+              <p class="mt-3">{{ session('error') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    @endif
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if there's a success message in the session
+      @if(session('success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+        setTimeout(function() {
+          successModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+  
+      // Check if there's an error message in the session
+      @if(session('error'))
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+        setTimeout(function() {
+          errorModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+    });
+  </script>
     {{-- End Table --}}
     
     </section>

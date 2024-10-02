@@ -23,8 +23,16 @@
             <div class="card-body">
               <h5 class="card-title">Trading Outflow Form</h5>
               <!-- Floating Labels Form -->
-              <form class="row g-3 "  action="#" method="POST">
+              <form class="row g-3 "  action="{{route('trading-outflow.store')}}" method="POST">
                 @csrf
+
+                {{--  input for transaction_status = "trading"  --}}
+                <div class="col-md-5" hidden>
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="transaction_status" name="transaction_status"  value="trading" >
+                    <label for="transaction_status">Date</label>
+                  </div>
+                </div>
 
                 <div class="col-md-5">
                   <div class="form-floating">
@@ -33,8 +41,6 @@
                   </div>
                 </div>
                 
-
-
                 <div class="col-md-2">
                     <fieldset >
                     <div class="row">
@@ -126,10 +132,62 @@
                 </div>
 
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                   <button type="reset" class="btn btn-secondary">Reset</button>
                   <a href="{{route('trading-outflow.index')}}" class="btn btn-danger">Back</a>
                 </div>
+
+                {{--  Submition status Modal  --}}
+                @if(session('success'))
+                <!-- Success Modal -->
+                <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('success') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                @if(session('error'))
+                <!-- Error Modal -->
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-body text-center">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                        <p class="mt-3">{{ session('error') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                // Check if there's a success message in the session
+                @if(session('success'))
+                  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                  successModal.show();
+                  setTimeout(function() {
+                    successModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+
+                // Check if there's an error message in the session
+                @if(session('error'))
+                  const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                  errorModal.show();
+                  setTimeout(function() {
+                    errorModal.hide();
+                  }, 1000); // 1 second timeout
+                @endif
+                });
+                </script>
+
 
               </form>
             </div>

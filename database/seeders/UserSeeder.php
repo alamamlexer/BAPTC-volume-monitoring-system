@@ -13,19 +13,33 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // $table->id();
+        // $table->unsignedBigInteger('staff_id')->nullable();
+        // $table->unsignedBigInteger('farmer_id')->nullable();
+        // $table->string('username')->unique();
+        // $table->string('password');
+        // $table->boolean('type')->default(false); //false=user,true=admin
         User::create([
-            'name' => 'User',
-            'email' => 'user@gmail.com',
+            'id' => '1',
+            'staff_id' => '1',
+            'username' => 'Lexer',
             'password' => Hash::make('123'),
-            'contact_number' => '0999999999',
-            'type' => 0,
-        ]);
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('123'),
-            'contact_number' => '0999999998',
             'type' => 1,
         ]);
+        User::create([
+            'id' => '2',
+            'staff_id' => '2',
+            'username' => 'Kimjo',
+            'password' => Hash::make('123'),
+            'type' => 1,
+        ]);
+        User::create([
+            'id' => '3',
+            'staff_id' => '3',
+            'username' => 'Trixan',
+            'password' => Hash::make('123'),
+            'type' => 1,
+        ]);
+
     }
 }
