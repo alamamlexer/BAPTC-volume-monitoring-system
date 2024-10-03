@@ -20,8 +20,10 @@ class Vehicle extends Model
     }
     public function locations(): BelongsToMany
     {
-        return $this->belongsToMany(Location::class);
-    }
+        return $this->belongsToMany(Location::class, 'location_vehicles')
+                    ->using(LocationVehicle::class)
+                    ->withTimestamps(); 
+    }   
     protected $fillable = [
         'plate_number',
         'vehicle_name',

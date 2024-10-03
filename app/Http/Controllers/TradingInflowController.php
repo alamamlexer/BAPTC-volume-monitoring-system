@@ -10,6 +10,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleType;
 use App\Models\Commodity;
 use App\Models\Location;
+use App\Models\LocationVehicle;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -68,13 +69,19 @@ class TradingInflowController extends Controller
         ->first();
     
         if (!$location) {
-            // Create the vehicle only if it doesn't exist
-            $location= Location::firstOrCreate([
+            $location= Location::   Create([
                 'barangay' => $validatedData['barangay'],
                 'municipality' => $validatedData['municipality'],
                 'province' => $validatedData['province'],
                 'region' => $validatedData['region'],
             ]);
+        }
+        else{
+            $location = Location::where('barangay', $validatedData['barangay'])
+            ->where('municipality', $validatedData['municipality'])
+            ->where('province', $validatedData['province'])
+            ->where('region', $validatedData['region'])
+            ->first();
         }
                 
         
@@ -83,20 +90,36 @@ class TradingInflowController extends Controller
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
     
         if (!$vehicle) {
-            // Create the vehicle only if it doesn't exist
             $vehicle=Vehicle::create([
                 'plate_number' => $validatedData['plate_number'],
                 'vehicle_name' => $validatedData['name'],
                 'vehicle_type_id' => $validatedData['vehicle_type_id'],
             ]);
         }
+        else{
+            $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
+        }
 
-        $pivot=$vehicle->locations()->attach($location->id, [
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        dd($pivot);
-   
+        //linking the vehicle and the location
+        
+        $location_vehicle = LocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+        ->where('location_id', $location->location_id)
+        ->first();
+        if (!$location_vehicle) {
+            $location_vehicle= LocationVehicle::create([
+                'vehicle_id' => $vehicle->vehicle_id,
+                'location_id' => $location->location_id,
+            ]);
+        }
+        else{
+            $location_vehicle = LocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+            ->where('location_id', $location->location_id)
+            ->first();
+        }
+        
+        
+        
+        
        Transaction::create([
             'date'=> $validatedData['date'],
             'time'=> $validatedData['time'],

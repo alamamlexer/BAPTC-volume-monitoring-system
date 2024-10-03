@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('location_vehicles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('vehicle_id')->constrained('vehicles','vehicle_id');
-            $table->foreignId('location_id')->constrained('locations','location_id');
-            $table->timestamps();
+            $table->id(); 
+            $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id')->onDelete('cascade');
+            $table->foreignId('location_id')->constrained('locations', 'location_id')->onDelete('cascade');
+            $table->timestamps(); 
         });
     }
 
