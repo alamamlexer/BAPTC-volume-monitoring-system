@@ -69,7 +69,7 @@ class TradingInflowController extends Controller
         ->first();
     
         if (!$location) {
-            $location= Location::   Create([
+            Location::   Create([
                 'barangay' => $validatedData['barangay'],
                 'municipality' => $validatedData['municipality'],
                 'province' => $validatedData['province'],
@@ -77,12 +77,17 @@ class TradingInflowController extends Controller
             ]);
         }
         else{
-            $location = Location::where('barangay', $validatedData['barangay'])
+            Location::where('barangay', $validatedData['barangay'])
             ->where('municipality', $validatedData['municipality'])
             ->where('province', $validatedData['province'])
             ->where('region', $validatedData['region'])
             ->first();
         }
+        $location = Location::where('barangay', $validatedData['barangay'])
+        ->where('municipality', $validatedData['municipality'])
+        ->where('province', $validatedData['province'])
+        ->where('region', $validatedData['region'])
+        ->first();
                 
         
         //Storing new vehicle
@@ -90,15 +95,16 @@ class TradingInflowController extends Controller
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
     
         if (!$vehicle) {
-            $vehicle=Vehicle::create([
+            Vehicle::create([
                 'plate_number' => $validatedData['plate_number'],
                 'vehicle_name' => $validatedData['name'],
                 'vehicle_type_id' => $validatedData['vehicle_type_id'],
             ]);
         }
         else{
-            $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
+            Vehicle::where('plate_number', $validatedData['plate_number'])->first();
         }
+        $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
 
         //linking the vehicle and the location
         
@@ -116,7 +122,7 @@ class TradingInflowController extends Controller
             ->where('location_id', $location->location_id)
             ->first();
         }
-        
+    
         
         
         
