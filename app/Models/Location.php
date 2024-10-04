@@ -16,6 +16,7 @@ class Location extends Model
         'province',
         'region',
     ];
+    protected $primaryKey = 'location_id';
     
     public function comments(): HasMany
     {

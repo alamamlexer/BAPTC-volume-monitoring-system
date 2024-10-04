@@ -15,5 +15,14 @@ class LocationVehicle extends Pivot
      */
     public $incrementing = true;
     protected $table = 'location_vehicles';
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id'); // Adjust if needed
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id'); // Adjust if needed
+    }
     
 }

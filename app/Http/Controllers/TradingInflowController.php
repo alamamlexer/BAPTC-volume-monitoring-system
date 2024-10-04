@@ -35,7 +35,8 @@ class TradingInflowController extends Controller
         $staffs = Staff::all();
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        return view('admin-pages.trading-inflow-form-create',compact('staffs','logged_in_staff','vehicle_types','commodities'));
+        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
+        return view('admin-pages.trading-inflow-form-create',compact('staffs','logged_in_staff','vehicle_types','commodities','location_vehicles'));
     }
 
     /**
@@ -49,7 +50,7 @@ class TradingInflowController extends Controller
             'date' => 'required|date',
             'time' => 'required',
             'staff_id' => 'required|exists:staff,staff_id', 
-            'commodity_id' => 'required|exists:commodities,commodity_id', 
+            'commodity_name' => 'required|exists:commodities,commodity_name', 
             'volume' => 'required|integer', 
             'plate_number' => 'required',
             'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id', 
@@ -61,7 +62,6 @@ class TradingInflowController extends Controller
         ]);  
         
         //Storing new location 
-        
         $location = Location::where('barangay', $validatedData['barangay'])
         ->where('municipality', $validatedData['municipality'])
         ->where('province', $validatedData['province'])
@@ -91,7 +91,6 @@ class TradingInflowController extends Controller
                 
         
         //Storing new vehicle
-        
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
     
         if (!$vehicle) {
@@ -106,8 +105,7 @@ class TradingInflowController extends Controller
         }
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
 
-        //linking the vehicle and the location
-        
+        //Storing a link in the address and location if there is no existing record
         $location_vehicle = LocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
         ->where('location_id', $location->location_id)
         ->first();
@@ -123,16 +121,17 @@ class TradingInflowController extends Controller
             ->first();
         }
     
+        //Get the commodity_id that corresponds to the commodity selected in the view
+        $commodity=Commodity::where('commodity_name',$validatedData['commodity_name'])->first();
         
-        
-        
+        //Store the transaction
        Transaction::create([
             'date'=> $validatedData['date'],
             'time'=> $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
             'transaction_status'=> $validatedData['transaction_status'],
             'staff_id'=>$validatedData['staff_id'],
-            'commodity_id'=>$validatedData['commodity_id'],
+            'commodity_id'=>$commodity->commodity_id,
             'volume'=>$validatedData['volume'],
             'plate_number'=>$validatedData['plate_number'],
             'vehicle_type_id'=>$validatedData['vehicle_type_id'],
@@ -197,4 +196,5 @@ class TradingInflowController extends Controller
         }
 
     }
+
 }

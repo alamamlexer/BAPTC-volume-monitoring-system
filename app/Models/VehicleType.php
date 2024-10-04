@@ -13,6 +13,6 @@ class VehicleType extends Model
     {
         return $this->hasMany(Vehicle::class)->chaperone();
     }
-    
+   
 
 }
