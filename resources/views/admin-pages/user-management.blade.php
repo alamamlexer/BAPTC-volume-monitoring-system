@@ -45,21 +45,14 @@
                     </thead>
                     <tbody>
                       @foreach ($users as $user)
+                      @if($user->staff_id!=null)
                         <tr>
                           <td>{{$user->id}}</td>
-                          <td>{{$user->username}}</td>
+                          <td>{{$user->staffs->staff_name}}</td>
                           <td>
-                            {{ optional($user->staffs)->contact_number }} 
-                            {{ optional($user->farmers)->contact_number }} 
+                            {{ $user->staffs->contact_number}} 
                           </td>
-                          <td>
-                            <pre>{{ dump($user->staffs->contact_number) }}</pre>  
-                          @if ($user->type == 1)
-                            Farmer
-                          @else
-                            Inspector/Assistant
-                          @endif
-                          </td>
+                          <td>Staff</td>
                           <td> 
                             <div class="float-start">
                               <form action="{{route('user-management.destroy',$user->id)}}" method="POST">
@@ -70,6 +63,31 @@
                             </div>
                           </td>
                         </tr>
+                      
+                      @elseif ($user->farmer_id!=null)
+                        <tr>
+                          <td>{{$user->id}}</td>
+                          <td>{{$user->farmers->farmer_name}}</td>
+                          <td>
+                            {{ $user->farmers->contact_number}} 
+                          </td>
+                          <td>Farmer</td>
+                          <td> 
+                            <div class="float-start">
+                              <form action="{{route('user-management.destroy',$user->id)}}" method="POST">
+                                  @csrf
+                                  @method('DELETE')
+                                  <button type="submit" class="btn btn-outline-danger"onclick="return confirm('Are you sure you want to delete this user?')"><i class="bx bxs-trash-alt"></i> Delete</button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      
+                      @endif
+                      
+                      
+                      
+                        
                       @endforeach
                     </tbody>
                   </table>

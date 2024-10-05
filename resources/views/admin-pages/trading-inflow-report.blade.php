@@ -332,16 +332,18 @@
                           <td>{{$trading_inflow->volume}}</td>
                           <td>{{$trading_inflow->barangay}}, {{$trading_inflow->municipality}}, {{$trading_inflow->province}}, {{$trading_inflow->region}}</td>
                           <td>
-                            <a class="btn btn-outline-primary m-1" href="{{route('trading-inflow.edit',$trading_inflow->id)}}"><i class="bx bx-revision"></i> Edit</a> 
-                            <div class="float-start">
-                                <form action="{{route('trading-inflow.destroy',$trading_inflow->id)}}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger m-1" onclick="return confirm('Are you sure you want to delete this reservation?')">
-                                        <i class="bx bxs-trash-alt"></i> Delete
-                                    </button>
-                                </form>
-                            </div>
+                              <a href="{{ route('trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
+                                  <i class="bx bxs-edit"></i> Edit
+                              </a>
+                                <div class="float-start">
+                                    <form action="{{route('trading-inflow.destroy',$trading_inflow->id)}}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger m-1" onclick="return confirm('Are you sure you want to delete this reservation?')">
+                                            <i class="bx bxs-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
                         </td>
                         </tr>
                           

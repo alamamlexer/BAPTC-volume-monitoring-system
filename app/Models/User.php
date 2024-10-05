@@ -14,11 +14,11 @@ class User extends Authenticatable
 
    public function farmers(): BelongsTo
     {
-        return $this->belongsTo(Farmer::class);
+        return $this->belongsTo(Farmer::class,'farmer_id');
     }
     public function staffs(): BelongsTo
     {
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Staff::class,'staff_id');
     }
     /**
      * The attributes that are mass assignable.

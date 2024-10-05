@@ -19,4 +19,5 @@ class Farmer extends Model
         'contact_number',
         'password',
     ];
+    protected $primaryKey = 'farmer_id';
 }

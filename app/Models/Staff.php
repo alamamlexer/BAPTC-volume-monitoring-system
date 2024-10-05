@@ -26,4 +26,5 @@ class Staff extends Model
         'password',
     ];
     protected $primaryKey = 'staff_id';
+    protected $table = 'staff';
 }

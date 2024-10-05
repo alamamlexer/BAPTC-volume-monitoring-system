@@ -21,7 +21,7 @@ class TradingInflowController extends Controller
      */
     public function index()
     {
-        $trading_inflows=Transaction::where('transaction_type','trading_inflow')
+        $trading_inflows=Transaction::where('transaction_type','trading inflow')
                             ->with(['staff','commodity','vehicle_type'])
                             ->get();
         return view('admin-pages.trading-inflow-report', compact('trading_inflows'));
@@ -161,19 +161,92 @@ class TradingInflowController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Inflow $trading_inflow)
+    public function edit(Transaction $trading_inflow)
     {
-        return view('admin-pages.trading-inflow-form-edit',compact('trading_inflow'));
+        $staffs = Staff::all(); // Fetch all staff
+        $commodities = Commodity::all();
+        $vehicle_types = VehicleType::all();
+        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
+        $logged_in_staff = Auth::id();
+
+        $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
+        return view('admin-pages.trading-inflow-form-edit', compact('transactions', 'trading_inflow', 'staffs', 'logged_in_staff', 'commodities', 'vehicle_types', 'location_vehicles'));
+ 
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Inflow $trading_inflow)
+    public function update(Request $request, Transaction $trading_inflow)
     {
-        $trading_inflow->update($request->all());
-        session()->flash('success', 'Trading inflow transaction updated!');
-        
+        $validatedData = $request->validate([
+            'transaction_status' => 'required',
+            'transaction_type' => 'required',
+            'date' => 'required|date',
+            'time' => 'required',
+            'staff_id' => 'required|exists:staff,staff_id',
+            'commodity_name' => 'required|exists:commodities,commodity_name',
+            'volume' => 'required|integer',
+            'plate_number' => 'required',
+            'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id',
+            'name' => 'required',
+            'barangay' => 'required',
+            'municipality' => 'required',
+            'province' => 'required',
+            'region' => 'required',
+        ]);
+
+        // Find or create location
+        $location = Location::firstOrCreate(
+            [
+                'barangay' => $validatedData['barangay'],
+                'municipality' => $validatedData['municipality'],
+                'province' => $validatedData['province'],
+                'region' => $validatedData['region'],
+            ]
+        );
+
+        // Find or create vehicle
+        $vehicle = Vehicle::firstOrCreate(
+            [
+                'plate_number' => $validatedData['plate_number'],
+            ],
+            [
+                'vehicle_name' => $validatedData['name'],
+                'vehicle_type_id' => $validatedData['vehicle_type_id'],
+            ]
+        );
+
+        // Find or create location_vehicle relationship
+        $location_vehicle = LocationVehicle::firstOrCreate(
+            [
+                'vehicle_id' => $vehicle->vehicle_id,
+                'location_id' => $location->location_id,
+            ]
+        );
+
+        // Find the corresponding commodity
+        $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
+
+        // Update the transaction
+        $trading_inflow->update([
+            'date' => $validatedData['date'],
+            'time' => $validatedData['time'],
+            'transaction_type' => $validatedData['transaction_type'],
+            'transaction_status' => $validatedData['transaction_status'],
+            'staff_id' => $validatedData['staff_id'],
+            'commodity_id' => $commodity->commodity_id,
+            'volume' => $validatedData['volume'],
+            'plate_number' => $validatedData['plate_number'],
+            'vehicle_type_id' => $validatedData['vehicle_type_id'],
+            'name' => $validatedData['name'],
+            'barangay' => $location->barangay,
+            'municipality' => $location->municipality,
+            'province' => $location->province,
+            'region' => $location->region,
+        ]);
+
+        session()->flash('success', 'Trading inflow updated successfully!');
         return redirect()->route('trading-inflow.index');
     }
 
@@ -182,19 +255,27 @@ class TradingInflowController extends Controller
      */
     public function destroy(string $id)
     {
-        try{
-            $inflow=Inflow::findOrFail($id);
-            $inflow->delete();
-            session()->flash('success', 'Trading inflow transaction deleted successfully.');
-            return redirect()->route('trading-inflow.index');
-        } catch (QueryException $error){
-        
-        if ($error->errorInfo[1]==1451){
-            session()->flash('error','Trading inflow transaction was not deleted due to related records');
-            return redirect()->route('trading-inflow.index');
+        try {
+            // Find the transaction by ID
+            $trading_inflow = Transaction::findOrFail($id);
 
+            // Delete the transaction
+            $trading_inflow->delete();
+
+            // Flash success message
+            session()->flash('success', 'Trading inflow deleted successfully!');
+        } catch (QueryException $e) {
+            // Handle any errors, e.g., if the transaction can't be deleted
+            session()->flash('error', 'Error deleting trading inflow: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-        }
+
+        // Redirect to the index page or the relevant page
+        return redirect()->route('trading-inflow.index');
+    
+
 
     }
 

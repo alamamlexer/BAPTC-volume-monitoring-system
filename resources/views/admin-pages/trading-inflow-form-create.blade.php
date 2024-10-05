@@ -101,8 +101,7 @@
                                     <li class="no-records list-group-item" style="display: none; cursor: default;">Commodity
                                         does not exist in the records</li>
                                     @foreach ($commodities as $commodity)
-                                        <li class="list-group-item list-group-item-action input-item">
-                                            {{ $commodity->commodity_name }}</li>
+                                        <li class="list-group-item list-group-item-action input-item">{{ $commodity->commodity_name }}</li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -139,10 +138,7 @@
                                                     data-municipality="{{ $location_vehicle->location->municipality }}"
                                                     data-province="{{ $location_vehicle->location->province }}"
                                                     data-region="{{ $location_vehicle->location->region }}">
-                                                    {{ $location_vehicle->vehicle->plate_number }}
-                                                    ({{ $location_vehicle->vehicle->vehicle_name }}) -
-                                                    {{ $location_vehicle->location->barangay }}
-                                                </li>
+                                                    {{ $location_vehicle->vehicle->plate_number }} ({{ $location_vehicle->vehicle->vehicle_name }}) - {{ $location_vehicle->location->barangay }}</li>
                                             @endif
                                         @endforeach
                                     @endif
@@ -341,7 +337,7 @@
                                     input.addEventListener('blur', function() {
                                         setTimeout(() => { // Timeout to allow the click event to register
                                             dropdown.style.display = 'none';
-                                        }, 100); // Adjust timeout as necessary
+                                        }, 300); // Adjust timeout as necessary
                                     });
 
                                     // Hide dropdown when clicking outside

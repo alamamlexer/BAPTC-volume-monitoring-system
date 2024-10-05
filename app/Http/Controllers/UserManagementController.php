@@ -13,6 +13,7 @@ class UserManagementController extends Controller
     {
         $users = User::with('farmers','staffs')->whereIn('type',[1,2])->get();
         
+        
         return view('admin-pages.user-management',compact('users'));
     }
 
@@ -29,7 +30,22 @@ class UserManagementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'transaction_status' => 'required',
+            'transaction_type' => 'required',
+            'date' => 'required|date',
+            'time' => 'required',
+            'staff_id' => 'required|exists:staff,staff_id', 
+            'commodity_name' => 'required|exists:commodities,commodity_name', 
+            'volume' => 'required|integer', 
+            'plate_number' => 'required',
+            'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id', 
+            'name' => 'required',
+            'barangay' => 'required',
+            'municipality' => 'required',
+            'province' => 'required',
+            'region' => 'required',
+        ]);  
     }
 
     /**
