@@ -319,15 +319,16 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {{-- @foreach ($trading_inflows as $trading_inflow)
+                        @foreach ($trading_inflows as $trading_inflow)
+                        <tr>
                           <td>{{$trading_inflow->id}}</td>
                           <td>{{$trading_inflow->date}}</td>
                           <td>{{$trading_inflow->time}}</td>
-                          <td>{{$trading_inflow->attendant}}</td>
+                          <td>{{$trading_inflow->staff->staff_name }}</td>
                           <td>{{$trading_inflow->plate_number}}</td>
-                          <td>{{$trading_inflow->vehicle_type}}</td>
+                          <td>{{$trading_inflow->vehicle_type->vehicle_type_name }}</td>
                           <td>{{$trading_inflow->name}}</td>
-                          <td>{{$trading_inflow->commodity}}</td>
+                          <td>{{$trading_inflow->commodity->commodity_name}}</td>
                           <td>{{$trading_inflow->volume}}</td>
                           <td>{{$trading_inflow->barangay}}, {{$trading_inflow->municipality}}, {{$trading_inflow->province}}, {{$trading_inflow->region}}</td>
                           <td>
@@ -342,7 +343,9 @@
                                 </form>
                             </div>
                         </td>
-                        @endforeach --}}
+                        </tr>
+                          
+                        @endforeach
                       </tbody>
                     </table>
                   </div>

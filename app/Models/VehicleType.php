@@ -14,5 +14,5 @@ class VehicleType extends Model
         return $this->hasMany(Vehicle::class)->chaperone();
     }
    
-
+    protected $primaryKey = 'vehicle_type_id';
 }

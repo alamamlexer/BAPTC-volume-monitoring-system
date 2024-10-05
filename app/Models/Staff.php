@@ -25,4 +25,5 @@ class Staff extends Model
         'contact_number',
         'password',
     ];
+    protected $primaryKey = 'staff_id';
 }

@@ -12,16 +12,21 @@ class Transaction extends Model
     
     public function vehicles(): BelongsTo
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
-    public function commodities(): BelongsTo
+    public function staff(): BelongsTo
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Staff::class, 'staff_id');
     }
-    public function location(): BelongsTo
+    public function commodity(): BelongsTo
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Commodity::class, 'commodity_id');
     }
+    public function vehicle_type(): BelongsTo
+    {
+        return $this->belongsTo(VehicleType::class, 'vehicle_type_id');
+    }
+
     
     protected $fillable = [
         'date',

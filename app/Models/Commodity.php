@@ -17,4 +17,5 @@ class Commodity extends Model
     protected $fillable = [
         'commodity_name',
     ];
+    protected $primaryKey = 'commodity_id';
 }

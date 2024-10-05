@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Vehicle extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'vehicle_id';
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'vehicle_id', 'staff_id');
@@ -30,4 +30,5 @@ class Vehicle extends Model
         'vehicle_name',
         'vehicle_type_id',
     ];
+    protected $primaryKey = 'vehicle_id';
 }

@@ -21,9 +21,10 @@ class TradingInflowController extends Controller
      */
     public function index()
     {
-        // $trading_inflows=Inflow::where('transaction_type','trading_inflow')
-        //                     ->get();
-        return view('admin-pages.trading-inflow-report');
+        $trading_inflows=Transaction::where('transaction_type','trading_inflow')
+                            ->with(['staff','commodity','vehicle_type'])
+                            ->get();
+        return view('admin-pages.trading-inflow-report', compact('trading_inflows'));
     }
 
     /**
