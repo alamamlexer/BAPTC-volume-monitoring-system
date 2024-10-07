@@ -446,14 +446,27 @@
                       <td>{{$trading_outflow->id}}</td>
                       <td>{{$trading_outflow->date}}</td>
                       <td>{{$trading_outflow->time}}</td>
-                      <td>{{$trading_outflow->attendant}}</td>
+                      <td>{{$trading_outflow->staff->staff_name }}</td>
                       <td>{{$trading_outflow->plate_number}}</td>
-                      <td>{{$trading_outflow->vehicle_type}}</td>
+                      <td>{{$trading_outflow->vehicle_type->vehicle_type_name }}</td>
                       <td>{{$trading_outflow->name}}</td>
-                      <td>{{$trading_outflow->commodity}}</td>
+                      <td>{{$trading_outflow->commodity->commodity_name}}</td>
                       <td>{{$trading_outflow->volume}}</td>
                       <td>{{$trading_outflow->barangay}}, {{$trading_outflow->municipality}}, {{$trading_outflow->province}}, {{$trading_outflow->region}}</td>
-                      
+                      <td>
+                              <a href="{{ route('trading-outflow.edit', $trading_outflow->id) }}" class="btn btn-outline-primary m-1">
+                                  <i class="bx bxs-edit"></i> Edit
+                              </a>
+                                <div class="float-start">
+                                    <form action="{{route('trading-outflow.destroy',$trading_outflow->id)}}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger m-1" onclick="return confirm('Are you sure you want to delete this reservation?')">
+                                            <i class="bx bxs-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                        </td>
                       </tr>
                     @endforeach
                     </tbody>
@@ -468,7 +481,57 @@
                 </div>
               </div>
         </div>
-    </div>
+    </div> {{--  Submition status Modal  --}}
+      @if(session('success'))
+      <!-- Success Modal -->
+      <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+              <p class="mt-3">{{ session('success') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    @endif
+    
+    @if(session('error'))
+      <!-- Error Modal -->
+      <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+              <p class="mt-3">{{ session('error') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    @endif
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if there's a success message in the session
+      @if(session('success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+        setTimeout(function() {
+          successModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+  
+      // Check if there's an error message in the session
+      @if(session('error'))
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+        setTimeout(function() {
+          errorModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+    });
+  </script>
+   
     
     {{-- End Table --}}
     

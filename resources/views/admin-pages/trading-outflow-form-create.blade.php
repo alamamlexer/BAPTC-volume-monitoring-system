@@ -20,7 +20,7 @@
           <div class="col-lg-12">
               <div class="card">
                   <div class="card-body">
-                      <h5 class="card-title">Trading Inflow Form</h5>
+                      <h5 class="card-title">Trading Outflow Form</h5>
                       <!-- Floating Labels Form -->
                       <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
                           @csrf
@@ -100,8 +100,7 @@
                                   <li class="no-records list-group-item" style="display: none; cursor: default;">Commodity
                                       does not exist in the records</li>
                                   @foreach ($commodities as $commodity)
-                                      <li class="list-group-item list-group-item-action input-item">
-                                          {{ $commodity->commodity_name }}</li>
+                                      <li class="list-group-item list-group-item-action input-item">{{ $commodity->commodity_name }}</li>
                                   @endforeach
                               </ul>
                           </div>
