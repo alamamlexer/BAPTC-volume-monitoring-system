@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('transaction_status'); 
             $table->foreignId('staff_id')->constrained('staff','staff_id');  
             $table->foreignId('commodity_id')->constrained('commodities','commodity_id'); 
-            $table->integer('volume');
+            $table->decimal('volume', 10, 2);
             $table->string('plate_number'); 
             $table->foreignId('vehicle_type_id')->constrained('vehicle_types','vehicle_type_id'); 
             $table->string('name'); 

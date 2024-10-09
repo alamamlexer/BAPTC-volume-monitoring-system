@@ -478,7 +478,7 @@
 
                   <div class="row mb-3">
                   <div class="col-sm-10">
-                      <a href="{{route('trading-inflow.create')}}" class="btn btn-primary">Add New Trading Inflow</a>
+                      <a href="{{route('short-trip-inflow-and-outflow.create')}}" class="btn btn-primary">Add New Short Trip </a>
                   </div>
                   </div>
                 </div>

@@ -23,7 +23,7 @@
         <div class="card-body">
           <h5 class="card-title">Trading Outflow Form</h5>
           <!-- Floating Labels Form -->
-          <form class="row g-3" action="{{ route('trading-outflow.update', $trading_outflow->id) }}" method="POST">
+          <form class="row g-3" action="{{ route('trading-outflow.update', $short_trip->id) }}" method="POST">
           @csrf
           @method('PUT')
 
@@ -44,131 +44,158 @@
               </div>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-3">
               <div class="form-floating">
-                <input type="date" class="form-control" id="date" name="date"
-                  placeholder="Date" value="<?php echo date('Y-m-d'); ?>" required>
-                <label for="date">Date</label>
+                  <input type="date" class="form-control" id="date" name="date"
+                      placeholder="Date" value="{{$trading_outflow->date}}" required>
+                  <label for="date">Date</label>
+                  @if ($errors->has('date'))
+                  <span class="text-danger">{{ $errors->first('date') }}</span>
+              @endif
               </div>
-            </div>
+          </div>
 
-            <div class="col-md-2">
+          <div class="col-md-2">
               <div class="form-control" required>
-                <fieldset>
-                  <legend class="col-form-label col-sm-3 pt-0">Time</legend>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="time" id="inlineRadio1"
-                      value="AM">
-                    <label class="form-check-label" for="inlineRadio1">AM</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="time" id="inlineRadio2"
-                      value="PM">
-                    <label class="form-check-label" for="inlineRadio2">PM</label>
-                  </div>
-                </fieldset>
+                  <fieldset>
+                      <legend class="col-form-label col-sm-3 pt-0">Time</legend>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="time" id="inlineRadio1"
+                              value="AM">
+                          <label class="form-check-label" for="inlineRadio1">AM</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="time" id="inlineRadio2"
+                              value="PM">
+                          <label class="form-check-label" for="inlineRadio2">PM</label>
+                      </div>
+                  </fieldset>
+                  @if ($errors->has('time'))
+                  <span class="text-danger">{{ $errors->first('time') }}</span>
+              @endif
               </div>
-            </div>
+          </div>
 
-            <div class="col-md-5">
+          <div class="col-md-5">
               <div class="form-floating">
-                <select class="form-select" id="staff_id" name="staff_id" required>
-                  @foreach ($staffs as $staff)
-                  @if ($staff->staff_id == $logged_in_staff)
-                  <option value="{{ $staff->staff_id }}" selected>
-                    {{ $staff->staff_name }}
-                  </option>
+                  <select class="form-select" id="staff_id" name="staff_id" required>
+                      @foreach ($staffs as $staff)
+                          @if ($staff->staff_id == $logged_in_staff)
+                              <option value="{{ $staff->staff_id }}" selected>
+                                  {{ $staff->staff_name }}
+                              </option>
+                          @else
+                              <option value="{{ $staff->staff_id }}">
+                                  {{ $staff->staff_name }}
+                              </option>
+                          @endif
+                      @endforeach
+                  </select>
+                  <label for="staff_id">Attendant</label>
+                  @if ($errors->has('staff_id'))
+                  <span class="text-danger">{{ $errors->first('staff_id') }}</span>
+              @endif
+              </div>
+          </div>
+
+          <div class="col-md-6 position-relative" data-col="6">
+              <div class="form-floating">
+                  <input type="text" class="form-control filter-input" name="commodity_name"
+                      placeholder="Select or type commodity..." required aria-label="Commodity"
+                      autocomplete="off" data-dropdown="commodityDropdown" value="{{$trading_outflow->commodity->commodity_name}}">
+                  <label for="commodity_name">Commodity</label>
+                  @if ($errors->has('commodity_name'))
+                  <span class="text-danger">{{ $errors->first('commodity_name') }}</span>
+              @endif
+              </div>
+              <ul class="dropdown-list list-group position-absolute w-100"
+                  style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
+                  data-dropdown="commodityDropdown">
+                  <li class="no-records list-group-item" style="display: none; cursor: default;">Commodity
+                      does not exist in the records</li>
+                  @foreach ($commodities as $commodity)
+                      <li class="list-group-item list-group-item-action input-item">{{ $commodity->commodity_name }}</li>
+                  @endforeach
+              </ul>
+          </div>
+
+          <div class="col-md-6">
+              <div class="form-floating">
+                  <input type="text" class="form-control" id="volume" name="volume"
+                      placeholder="Volume(kg)" value="{{$trading_outflow->volume}}" required>
+                  <label for="volume">Volume(kg)</label>
+                  @if ($errors->has('volume'))
+                  <span class="text-danger">{{ $errors->first('volume') }}</span>
+              @endif
+              </div>
+          </div>
+
+          <div class="col-md-5 position-relative" data-col="5">
+              <div class="form-floating">
+                  <input type="text" class="form-control filter-input" name="plate_number"
+                      placeholder="Select or type plate number..." required aria-label="Plate Number"
+                      autocomplete="off" data-dropdown="plateDropdown" value="{{$trading_outflow->plate_number}}">
+                  <label for="plate_number">Plate Number</label>
+                  @if ($errors->has('plate_number'))
+                  <span class="text-danger">{{ $errors->first('plate_number') }}</span>
+              @endif
+              </div>
+              <ul class="dropdown-list list-group position-absolute w-100"
+                  style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
+                  data-dropdown="plateDropdown">
+                  @if ($location_vehicles->isEmpty())
+                      <li class="no-records list-group-item" style="cursor: default;">No records in the
+                          location vehicles</li>
                   @else
-                  <option value="{{ $staff->staff_id }}">
-                    {{ $staff->staff_name }}
-                  </option>
+                      @foreach ($location_vehicles as $location_vehicle)
+                          @if ($location_vehicle->vehicle_id)
+                              <li class="list-group-item list-group-item-action input-item"
+                                  data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
+                                  data-name="{{ $location_vehicle->vehicle->vehicle_name }}"
+                                  data-vehicle_type_id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
+                                  data-barangay="{{ $location_vehicle->location->barangay }}"
+                                  data-municipality="{{ $location_vehicle->location->municipality }}"
+                                  data-province="{{ $location_vehicle->location->province }}"
+                                  data-region="{{ $location_vehicle->location->region }}">
+                                  {{ $location_vehicle->vehicle->plate_number }}
+                                  ({{ $location_vehicle->vehicle->vehicle_name }}) -
+                                  {{ $location_vehicle->location->barangay }}
+                              </li>
+                          @endif
+                      @endforeach
                   @endif
-                  @endforeach
-                </select>
-                <label for="staff_id">Attendant</label>
-              </div>
-            </div>
-
-            <div class="col-md-6 position-relative" data-col="6">
-              <div class="form-floating">
-                <input type="text" class="form-control filter-input" name="commodity_name"
-                  placeholder="Select or type commodity..." required aria-label="Commodity"
-                  autocomplete="off" data-dropdown="commodityDropdown" value="{{$trading_outflow->commodity->commodity_name}}">
-                <label for="commodity_name">Commodity</label>
-              </div>
-              <ul class="dropdown-list list-group position-absolute w-100"
-                style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
-                data-dropdown="commodityDropdown">
-                <li class="no-records list-group-item" style="display: none; cursor: default;">Commodity
-                  does not exist in the records</li>
-                @foreach ($commodities as $commodity)
-                <li class="list-group-item list-group-item-action input-item">{{ $commodity->commodity_name }}</li>
-                @endforeach
+                  <li class="no-records list-group-item" style="display: none; cursor: default;">No
+                      existing record/s for this plate number, fill the following to create a new record
+                  </li>
               </ul>
-            </div>
+          </div>
 
-            <div class="col-md-6">
+          <div class="col-md-2">
               <div class="form-floating">
-                <input type="text" class="form-control" id="volume" name="volume"
-                  placeholder="Volume(kg)" value="{{$trading_outflow->volume}}" required>
-                <label for="volume">Volume(kg)</label>
+                  <select class="form-select" id="vehicle_type_id" name="vehicle_type_id" required>
+                      @foreach ($vehicle_types as $vehicle_type)
+                      <option value="{{ $vehicle_type->vehicle_type_id }}" {{ $trading_outflow->vehicle_type_id == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
+                              {{ $vehicle_type->vehicle_type_name }}
+                          </option>
+                      @endforeach
+                  </select>
+                  <label for="vehicle_type">Vehicle Type</label>
+                  @if ($errors->has('vehicle_type_id'))
+                  <span class="text-danger">{{ $errors->first('vehicle_type_id') }}</span>
+              @endif
               </div>
-            </div>
-
-            <div class="col-md-5 position-relative" data-col="5">
-              <div class="form-floating">
-                <input type="text" class="form-control filter-input" name="plate_number"
-                  placeholder="Select or type plate number..." required aria-label="Plate Number"
-                  autocomplete="off" data-dropdown="plateDropdown" value="{{$trading_outflow->plate_number}}">
-                <label for="plate_number">Plate Number</label>
-              </div>
-              <ul class="dropdown-list list-group position-absolute w-100"
-                style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
-                data-dropdown="plateDropdown">
-                @if ($location_vehicles->isEmpty())
-                <li class="no-records list-group-item" style="cursor: default;">No records in the
-                  location vehicles</li>
-                @else
-                @foreach ($location_vehicles as $location_vehicle)
-                @if ($location_vehicle->vehicle_id)
-                <li class="list-group-item list-group-item-action input-item"
-                  data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
-                  data-name="{{ $location_vehicle->vehicle->vehicle_name }}"
-                  data-vehicle_type_id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
-                  data-barangay="{{ $location_vehicle->location->barangay }}"
-                  data-municipality="{{ $location_vehicle->location->municipality }}"
-                  data-province="{{ $location_vehicle->location->province }}"
-                  data-region="{{ $location_vehicle->location->region }}"> {{ $location_vehicle->vehicle->plate_number }} - ({{ $location_vehicle->vehicle->vehicle_name }}) - {{ $location_vehicle->location->barangay }}</li>
-                @endif
-                @endforeach
-                @endif
-                <li class="no-records list-group-item" style="display: none; cursor: default;">No
-                  existing record/s for this plate number, fill the following to create a new record
-                </li>
-              </ul>
-            </div>
-
-            <div class="col-md-2">
-              <div class="form-floating">
-                <select class="form-select" id="vehicle_type_id" name="vehicle_type_id" required>
-                  @foreach ($vehicle_types as $vehicle_type)
-                  <option value="{{ $vehicle_type->vehicle_type_id }}" {{ $trading_outflow->vehicle_type_id == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
-                    {{ $vehicle_type->vehicle_type_name }}
-                  </option>
-                  @endforeach
-                </select>
-
-                <label for="vehicle_type">Vehicle Type</label>
-              </div>
-            </div>
+          </div>
 
 
 
-            <div class="col-md-5">
+          <div class="col-md-5">
               <div class="form-floating">
                 <input type="text" class="form-control" id="name" name="name"
                   placeholder="Name(optional) " value="{{$trading_outflow->name }}">
                 <label for="name">Name(optional)</label>
+                @if ($errors->has('name'))
+                  <span class="text-danger">{{ $errors->first('name') }}</span>
+              @endif
               </div>
             </div>
 
@@ -177,6 +204,9 @@
                 <input type="text" class="form-control" id="barangay" name="barangay"
                   placeholder="Barangay" value="{{$trading_outflow->barangay }}" required>
                 <label for="barangay">Barangay</label>
+                @if ($errors->has('barangay'))
+                  <span class="text-danger">{{ $errors->first('barangay') }}</span>
+              @endif
               </div>
             </div>
 
@@ -185,6 +215,9 @@
                 <input type="text" class="form-control" id="municipality" name="municipality"
                   placeholder="Municipality" value="{{$trading_outflow->municipality }}" required>
                 <label for="municipality">Municipality</label>
+                @if ($errors->has('municipality'))
+                <span class="text-danger">{{ $errors->first('municipality') }}</span>
+            @endif
               </div>
             </div>
 
@@ -193,6 +226,9 @@
                 <input type="text" class="form-control" id="province" name="province"
                   placeholder="Province" value="{{$trading_outflow->province }}" required>
                 <label for="province">Province</label>
+                @if ($errors->has('province'))
+                  <span class="text-danger">{{ $errors->first('province') }}</span>
+              @endif
               </div>
             </div>
 
@@ -201,6 +237,9 @@
                 <input type="text" class="form-control" id="region" name="region"
                   placeholder="Region" value="{{$trading_outflow->region }}" required>
                 <label for="region">Region</label>
+                @if ($errors->has('region'))
+                  <span class="text-danger">{{ $errors->first('region') }}</span>
+              @endif
               </div>
             </div>
 

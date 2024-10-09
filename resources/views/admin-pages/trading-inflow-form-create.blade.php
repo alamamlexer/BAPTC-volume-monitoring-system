@@ -46,8 +46,11 @@
                             <div class="col-md-5">
                                 <div class="form-floating">
                                     <input type="date" class="form-control" id="date" name="date"
-                                        placeholder="Date" value="<?php echo date('Y-m-d'); ?>" required>
+                                        placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required>
                                     <label for="date">Date</label>
+                                    @if ($errors->has('date'))
+                                        <span class="text-danger">{{ $errors->first('date') }}</span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -56,16 +59,19 @@
                                     <fieldset>
                                         <legend class="col-form-label col-sm-3 pt-0">Time</legend>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio1"
-                                                value="AM">
+                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio1" value="AM"
+                                                {{ old('time') == 'AM' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="inlineRadio1">AM</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio2"
-                                                value="PM">
+                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio2" value="PM"
+                                                {{ old('time') == 'PM' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="inlineRadio2">PM</label>
                                         </div>
                                     </fieldset>
+                                    @if ($errors->has('time'))
+                                    <span class="text-danger">{{ $errors->first('time') }}</span>
+                                @endif
                                 </div>
                             </div>
 
@@ -85,15 +91,21 @@
                                         @endforeach
                                     </select>
                                     <label for="staff_id">Attendant</label>
+                                    @if ($errors->has('staff_id'))
+                                    <span class="text-danger">{{ $errors->first('staff_id') }}</span>
+                                @endif
                                 </div>
                             </div>
 
                             <div class="col-md-6 position-relative" data-col="6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control filter-input" name="commodity_name"
+                                    <input type="text" class="form-control filter-input" name="commodity_name" 
                                         placeholder="Select or type commodity..." required aria-label="Commodity"
-                                        autocomplete="off" data-dropdown="commodityDropdown">
+                                        autocomplete="off" data-dropdown="commodityDropdown" value="{{ old('commodity_name') }}">
                                     <label for="commodity_name">Commodity</label>
+                                    @if ($errors->has('commodity_name'))
+                                    <span class="text-danger">{{ $errors->first('commodity_name') }}</span>
+                                @endif
                                 </div>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
@@ -109,8 +121,11 @@
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="volume" name="volume"
-                                        placeholder="Volume(kg)" required>
+                                        placeholder="Volume(kg)" value="{{ old('volume') }}" required>
                                     <label for="volume">Volume(kg)</label>
+                                    @if ($errors->has('volume'))
+                                    <span class="text-danger">{{ $errors->first('volume') }}</span>
+                                @endif
                                 </div>
                             </div>
 
@@ -118,8 +133,11 @@
                                 <div class="form-floating">
                                     <input type="text" class="form-control filter-input" name="plate_number"
                                         placeholder="Select or type plate number..." required aria-label="Plate Number"
-                                        autocomplete="off" data-dropdown="plateDropdown">
+                                        autocomplete="off" data-dropdown="plateDropdown" value="{{ old('plate_number') }}">
                                     <label for="plate_number">Plate Number</label>
+                                    @if ($errors->has('plate_number'))
+                                    <span class="text-danger">{{ $errors->first('plate_number') }}</span>
+                                @endif
                                 </div>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
@@ -152,12 +170,15 @@
                                 <div class="form-floating">
                                     <select class="form-select" id="vehicle_type_id" name="vehicle_type_id" required>
                                         @foreach ($vehicle_types as $vehicle_type)
-                                            <option value="{{ $vehicle_type->vehicle_type_id }}">
+                                            <option value="{{ $vehicle_type->vehicle_type_id }}" {{ old('vehicle_type_id') == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
                                                 {{ $vehicle_type->vehicle_type_name }}
                                             </option>
                                         @endforeach
                                     </select>
                                     <label for="vehicle_type">Vehicle Type</label>
+                                    @if ($errors->has('vehicle_type_id'))
+                                    <span class="text-danger">{{ $errors->first('vehicle_type_id') }}</span>
+                                @endif
                                 </div>
                             </div>
 
@@ -166,40 +187,55 @@
                             <div class="col-md-5">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="name" name="name"
-                                        placeholder="Name(optional)">
+                                        placeholder="Name(optional)" value="{{ old('name') }}">
                                     <label for="name">Name(optional)</label>
+                                    @if ($errors->has('name'))
+                                    <span class="text-danger">{{ $errors->first('name') }}</span>
+                                @endif
                                 </div>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="barangay" name="barangay"
-                                        placeholder="Barangay" required>
+                                        placeholder="Barangay" value="{{ old('barangay') }}" required>
                                     <label for="barangay">Barangay</label>
+                                    @if ($errors->has('barangay'))
+                                    <span class="text-danger">{{ $errors->first('barangay') }}</span>
+                                @endif
                                 </div>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="municipality" name="municipality"
-                                        placeholder="Municipality" required>
+                                        placeholder="Municipality" value="{{ old('municipality') }}" required>
                                     <label for="municipality">Municipality</label>
+                                    @if ($errors->has('municipality'))
+                                    <span class="text-danger">{{ $errors->first('municipality') }}</span>
+                                @endif
                                 </div>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="province" name="province"
-                                        placeholder="Province" required>
+                                        placeholder="Province" value="{{ old('province') }}" required>
                                     <label for="province">Province</label>
+                                    @if ($errors->has('province'))
+                                    <span class="text-danger">{{ $errors->first('province') }}</span>
+                                @endif
                                 </div>
                             </div>
 
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="region" name="region"
-                                        placeholder="Region" required>
+                                        placeholder="Region" value="{{ old('region') }}" required>
                                     <label for="region">Region</label>
+                                    @if ($errors->has('region'))
+                                    <span class="text-danger">{{ $errors->first('region') }}</span>
+                                @endif
                                 </div>
                             </div>
 

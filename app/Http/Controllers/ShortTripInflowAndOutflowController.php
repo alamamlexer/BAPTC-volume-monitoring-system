@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Transaction;
 use App\Models\Staff;
 use App\Models\Vehicle;
@@ -52,7 +51,7 @@ class ShortTripInflowAndOutflowController extends Controller
             'time' => 'required',
             'staff_id' => 'required|exists:staff,staff_id', 
             'commodity_name' => 'required|exists:commodities,commodity_name', 
-            'volume' => 'required|integer', 
+            'volume' => 'required|numeric', 
             'plate_number' => 'required',
             'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id', 
             'name' => 'required',
@@ -181,9 +180,78 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $Outflow)
+    public function update(Request $request, Transaction $short_trip)
     {
-        //
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'transaction_status' => 'required',
+            'transaction_type' => 'required',
+            'date' => 'required|date',
+            'time' => 'required',
+            'staff_id' => 'required|exists:staff,staff_id',
+            'commodity_name' => 'required|exists:commodities,commodity_name',
+            'volume' => 'required|integer',
+            'plate_number' => 'required',
+            'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id',
+            'name' => 'required',
+            'barangay' => 'required',
+            'municipality' => 'required',
+            'province' => 'required',
+            'region' => 'required',
+        ]);
+
+        // Find or create location
+        $location = Location::firstOrCreate(
+            [
+                'barangay' => $validatedData['barangay'],
+                'municipality' => $validatedData['municipality'],
+                'province' => $validatedData['province'],
+                'region' => $validatedData['region'],
+            ]
+        );
+
+        // Find or create vehicle
+        $vehicle = Vehicle::firstOrCreate(
+            [
+                'plate_number' => $validatedData['plate_number'],
+            ],
+            [
+                'vehicle_name' => $validatedData['name'],
+                'vehicle_type_id' => $validatedData['vehicle_type_id'],
+            ]
+        );
+
+        // Find or create location_vehicle relationship
+        $location_vehicle = LocationVehicle::firstOrCreate(
+            [
+                'vehicle_id' => $vehicle->vehicle_id,
+                'location_id' => $location->location_id,
+            ]
+        );
+
+        // Find the corresponding commodity
+        $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
+
+        // Update the transaction
+        $short_trip->update([
+            'date' => $validatedData['date'],
+            'time' => $validatedData['time'],
+            'transaction_type' => $validatedData['transaction_type'],
+            'transaction_status' => $validatedData['transaction_status'],
+            'staff_id' => $validatedData['staff_id'],
+            'commodity_id' => $commodity->commodity_id,
+            'volume' => $validatedData['volume'],
+            'plate_number' => $validatedData['plate_number'],
+            'vehicle_type_id' => $validatedData['vehicle_type_id'],
+            'name' => $validatedData['name'],
+            'barangay' => $location->barangay,
+            'municipality' => $location->municipality,
+            'province' => $location->province,
+            'region' => $location->region,
+        ]);
+
+        session()->flash('success', 'Short trip transaction updated successfully!');
+        return redirect()->route('short-trip-inflow-and-outflow.index');
     }
 
     /**

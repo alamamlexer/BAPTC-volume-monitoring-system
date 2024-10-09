@@ -32,39 +32,35 @@
                     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
                     <script>
                         document.addEventListener("DOMContentLoaded", () => {
+                            const totalVolumeData = @json($totalVolumeData);
                             const series = @json($chartData);
+
+                            // Add Total Volume as the first series
+                            const combinedSeries = [{
+                                name: 'Total Volume',
+                                data: totalVolumeData
+                            }, ...series];
+
                             const dates = @json($dates);
 
-                            new ApexCharts(document.querySelector("#areaChart"), {
-                                series: series,
+                            // Initialize Trading Inflow Chart
+                            const inflowChart = new ApexCharts(document.querySelector("#areaChart"), {
+                                series: combinedSeries,
                                 chart: {
-                                    type: 'line', // Changed from 'area' to 'line'
+                                    type: 'line',
                                     height: 350,
-                                    zoom: {
-                                        enabled: false
-                                    }
+                                    zoom: { enabled: false }
                                 },
-                                dataLabels: {
-                                    enabled: false
-                                },
-                                stroke: {
-                                    curve: 'straight' // Set curve to 'straight'
-                                },
-                                subtitle: {
-                                    text: 'Volume of Trading Inflows by Commodity',
-                                    align: 'left'
-                                },
+                                dataLabels: { enabled: false },
+                                stroke: { curve: 'straight' },
+                                subtitle: { text: 'Volume of Trading Inflows by Commodity', align: 'left' },
                                 labels: dates,
-                                xaxis: {
-                                    type: 'datetime',
-                                },
-                                yaxis: {
-                                    opposite: true
-                                },
-                                legend: {
-                                    horizontalAlign: 'left'
-                                }
-                            }).render();
+                                xaxis: { type: 'datetime' },
+                                yaxis: { opposite: true },
+                                legend: { horizontalAlign: 'left' }
+                            });
+
+                            inflowChart.render();
                         });
                     </script>
                 </div>
