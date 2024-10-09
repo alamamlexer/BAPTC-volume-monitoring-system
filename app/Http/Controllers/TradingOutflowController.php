@@ -166,7 +166,6 @@ class TradingOutflowController extends Controller
         $vehicle_types = VehicleType::all();
         $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $logged_in_staff = Auth::id();
-
         $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
         return view('admin-pages.trading-outflow-form-edit', compact('transactions', 'trading_outflow', 'staffs', 'logged_in_staff', 'commodities', 'vehicle_types', 'location_vehicles'));
     }

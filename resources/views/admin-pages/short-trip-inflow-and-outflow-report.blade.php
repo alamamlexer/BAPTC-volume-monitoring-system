@@ -488,6 +488,55 @@
         </div>
     </div>
     
+    @if(session('success'))
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('success') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
+  
+  @if(session('error'))
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('error') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's a success message in the session
+    @if(session('success'))
+      const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+      successModal.show();
+      setTimeout(function() {
+        successModal.hide();
+      }, 1000); // 1 second timeout
+    @endif
+
+    // Check if there's an error message in the session
+    @if(session('error'))
+      const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+      errorModal.show();
+      setTimeout(function() {
+        errorModal.hide();
+      }, 1000); // 1 second timeout
+    @endif
+  });
+</script>
     {{-- End Table --}}
     
     </section>

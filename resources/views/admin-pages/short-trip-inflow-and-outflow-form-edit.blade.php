@@ -23,7 +23,8 @@
         <div class="card-body">
           <h5 class="card-title">Trading Inflow Form</h5>
           <!-- Floating Labels Form -->
-          <form class="row g-3" action="{{ route('short-trip-inflow-and-outflow.update', $short_trip->id) }}" method="POST">
+          <form class="row g-3" action="{{ route('short-trip-inflow-and-outflow.update', $short_trip_inflow_and_outflow->id) }}" method="POST">
+          
             @csrf
             @method('PUT')
 
@@ -42,11 +43,11 @@
                 <div class="form-control" placeholder="In/Out">
                     <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_inflow" value="short trip inflow"  {{ $short_trip->vehicle_type_id == 'transaction_type' ? 'selected' : '' }} required>
+                      <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_inflow" value="short trip inflow"  {{ $short_trip_inflow_and_outflow->transaction_type == 'short trip inflow' ? 'checked' : '' }} required>
                       <label class="form-check-label" for="short_trip_inflow">In</label>
                     </div>
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_outflow" value="short trip outflow"  {{ $short_trip->vehicle_type_id == 'transaction_type' ? 'selected' : '' }} required>
+                      <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_outflow" value="short trip outflow"  {{ $short_trip_inflow_and_outflow->transaction_type == 'short trip outflow' ? 'checked' : '' }} required>
                       <label class="form-check-label" for="short_trip_outflow">Out</label>
                     </div>
                     @if ($errors->has('transaction_type'))
@@ -62,7 +63,7 @@
             <div class="col-md-3">
                 <div class="form-floating">
                     <input type="date" class="form-control" id="date" name="date"
-                        placeholder="Date" value="{{$short_trip->date}}" required>
+                        placeholder="Date" value="{{$short_trip_inflow_and_outflow->date}}" required>
                     <label for="date">Date</label>
                     @if ($errors->has('date'))
                     <span class="text-danger">{{ $errors->first('date') }}</span>
@@ -117,7 +118,7 @@
                 <div class="form-floating">
                     <input type="text" class="form-control filter-input" name="commodity_name"
                         placeholder="Select or type commodity..." required aria-label="Commodity"
-                        autocomplete="off" data-dropdown="commodityDropdown" value="{{$short_trip->commodity->commodity_name}}">
+                        autocomplete="off" data-dropdown="commodityDropdown" value="{{$short_trip_inflow_and_outflow->commodity->commodity_name}}">
                     <label for="commodity_name">Commodity</label>
                     @if ($errors->has('commodity_name'))
                     <span class="text-danger">{{ $errors->first('commodity_name') }}</span>
@@ -137,7 +138,7 @@
             <div class="col-md-6">
                 <div class="form-floating">
                     <input type="text" class="form-control" id="volume" name="volume"
-                        placeholder="Volume(kg)" value="{{$short_trip->volume}}" required>
+                        placeholder="Volume(kg)" value="{{$short_trip_inflow_and_outflow->volume}}" required>
                     <label for="volume">Volume(kg)</label>
                     @if ($errors->has('volume'))
                     <span class="text-danger">{{ $errors->first('volume') }}</span>
@@ -149,7 +150,7 @@
                 <div class="form-floating">
                     <input type="text" class="form-control filter-input" name="plate_number"
                         placeholder="Select or type plate number..." required aria-label="Plate Number"
-                        autocomplete="off" data-dropdown="plateDropdown" value="{{$short_trip->plate_number}}">
+                        autocomplete="off" data-dropdown="plateDropdown" value="{{$short_trip_inflow_and_outflow->plate_number}}">
                     <label for="plate_number">Plate Number</label>
                     @if ($errors->has('plate_number'))
                     <span class="text-danger">{{ $errors->first('plate_number') }}</span>
@@ -189,7 +190,7 @@
                 <div class="form-floating">
                     <select class="form-select" id="vehicle_type_id" name="vehicle_type_id" required>
                         @foreach ($vehicle_types as $vehicle_type)
-                        <option value="{{ $vehicle_type->vehicle_type_id }}" {{ $short_trip->vehicle_type_id == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
+                        <option value="{{ $vehicle_type->vehicle_type_id }}" {{ $short_trip_inflow_and_outflow->vehicle_type_id == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
                                 {{ $vehicle_type->vehicle_type_name }}
                             </option>
                         @endforeach
@@ -206,7 +207,7 @@
             <div class="col-md-5">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="name" name="name"
-                    placeholder="Name(optional) " value="{{$short_trip->name }}">
+                    placeholder="Name(optional) " value="{{$short_trip_inflow_and_outflow->name }}">
                   <label for="name">Name(optional)</label>
                   @if ($errors->has('name'))
                     <span class="text-danger">{{ $errors->first('name') }}</span>
@@ -217,7 +218,7 @@
               <div class="col-md-3">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="barangay" name="barangay"
-                    placeholder="Barangay" value="{{$short_trip->barangay }}" required>
+                    placeholder="Barangay" value="{{$short_trip_inflow_and_outflow->barangay }}" required>
                   <label for="barangay">Barangay</label>
                   @if ($errors->has('barangay'))
                     <span class="text-danger">{{ $errors->first('barangay') }}</span>
@@ -228,7 +229,7 @@
               <div class="col-md-3">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="municipality" name="municipality"
-                    placeholder="Municipality" value="{{$short_trip->municipality }}" required>
+                    placeholder="Municipality" value="{{$short_trip_inflow_and_outflow->municipality }}" required>
                   <label for="municipality">Municipality</label>
                   @if ($errors->has('municipality'))
                   <span class="text-danger">{{ $errors->first('municipality') }}</span>
@@ -239,7 +240,7 @@
               <div class="col-md-3">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="province" name="province"
-                    placeholder="Province" value="{{$short_trip->province }}" required>
+                    placeholder="Province" value="{{$short_trip_inflow_and_outflow->province }}" required>
                   <label for="province">Province</label>
                   @if ($errors->has('province'))
                     <span class="text-danger">{{ $errors->first('province') }}</span>
@@ -250,7 +251,7 @@
               <div class="col-md-3">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="region" name="region"
-                    placeholder="Region" value="{{$short_trip->region }}" required>
+                    placeholder="Region" value="{{$short_trip_inflow_and_outflow->region }}" required>
                   <label for="region">Region</label>
                   @if ($errors->has('region'))
                     <span class="text-danger">{{ $errors->first('region') }}</span>

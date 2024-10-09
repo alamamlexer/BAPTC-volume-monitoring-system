@@ -11,6 +11,7 @@ use App\Models\Commodity;
 use App\Models\Location;
 use App\Models\LocationVehicle;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 
 class ShortTripInflowAndOutflowController extends Controller
 {
@@ -22,6 +23,7 @@ class ShortTripInflowAndOutflowController extends Controller
         $short_trips = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
                         ->with(['staff', 'commodity', 'vehicle_type'])
                         ->get();
+                       
         return view('admin-pages.short-trip-inflow-and-outflow-report', compact('short_trips'));
     }
 
@@ -161,18 +163,17 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transaction $short_trip)
+    public function edit(Transaction $short_trip_inflow_and_outflow)
     {
-        
+    
     
         $staffs = Staff::all(); 
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
         $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $logged_in_staff = Auth::id();
-
         $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
-        return view('admin-pages.short-trip-inflow-and-outflow-form-edit', compact('transactions', 'short_trip', 'staffs', 'logged_in_staff', 'commodities', 'vehicle_types', 'location_vehicles'));
+        return view('admin-pages.short-trip-inflow-and-outflow-form-edit', compact('transactions', 'short_trip_inflow_and_outflow', 'staffs', 'logged_in_staff', 'commodities', 'vehicle_types', 'location_vehicles'));
  
     
     }
@@ -180,7 +181,7 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $short_trip)
+    public function update(Request $request, Transaction $short_trip_inflow_and_outflow)
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
@@ -190,7 +191,7 @@ class ShortTripInflowAndOutflowController extends Controller
             'time' => 'required',
             'staff_id' => 'required|exists:staff,staff_id',
             'commodity_name' => 'required|exists:commodities,commodity_name',
-            'volume' => 'required|integer',
+            'volume' => 'required|numeric',
             'plate_number' => 'required',
             'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id',
             'name' => 'required',
@@ -233,7 +234,7 @@ class ShortTripInflowAndOutflowController extends Controller
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
 
         // Update the transaction
-        $short_trip->update([
+        $short_trip_inflow_and_outflow->update([
             'date' => $validatedData['date'],
             'time' => $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
@@ -257,8 +258,29 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $shortTripInflowAndOutflow)
+    public function destroy(string $id)
     {
-        //
+   
+        try {
+            // Find the transaction by ID
+            $short_trip = Transaction::findOrFail($id);
+
+            // Delete the transaction
+            $short_trip->delete();
+
+            // Flash success message
+            session()->flash('success', 'Trading outflow deleted successfully!');
+        } catch (QueryException $e) {
+            // Handle any errors, e.g., if the transaction can't be deleted
+            session()->flash('error', 'Error deleting trading inflow: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
+        }
+
+        // Redirect to the index page or the relevant page
+        return redirect()->route('short-trip-inflow-and-outflow.index');
+    
     }
-}
+    }
+

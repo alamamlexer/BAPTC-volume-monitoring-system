@@ -13,7 +13,6 @@
   </nav>
 </div>
 <!-- End Page Title -->
-
 <section class="section">
 
   {{-- Form --}}
@@ -23,7 +22,7 @@
         <div class="card-body">
           <h5 class="card-title">Trading Outflow Form</h5>
           <!-- Floating Labels Form -->
-          <form class="row g-3" action="{{ route('trading-outflow.update', $short_trip->id) }}" method="POST">
+          <form class="row g-3" action="{{ route('trading-outflow.update', $trading_outflow->id) }}" method="POST">
           @csrf
           @method('PUT')
 
