@@ -421,60 +421,64 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Default Table</h5>
-    
-                  <!-- Default Table -->
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Position</th>
-                        <th scope="col">Age</th>
-                        <th scope="col">Start Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Brandon Jacob</td>
-                        <td>Designer</td>
-                        <td>28</td>
-                        <td>2016-05-25</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Bridie Kessler</td>
-                        <td>Developer</td>
-                        <td>35</td>
-                        <td>2014-12-05</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>Ashleigh Langosh</td>
-                        <td>Finance</td>
-                        <td>45</td>
-                        <td>2011-08-12</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">4</th>
-                        <td>Angus Grady</td>
-                        <td>HR</td>
-                        <td>34</td>
-                        <td>2012-06-11</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">5</th>
-                        <td>Raheem Lehner</td>
-                        <td>Dynamic Division Officer</td>
-                        <td>47</td>
-                        <td>2011-04-19</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <h5 class="card-title">Short Trip Table</h5>
+                    <div class="table-responsive">
+                    <!-- Default Table -->
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Date</th>
+                          <th scope="col">A/PM</th>
+                          <th scope="col">In/Out</th>
+                          <th scope="col">Attendant</th>
+                          <th scope="col">Plate Number</th>
+                          <th scope="col">Vehicle Type</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">Commodity</th>
+                          <th scope="col">Volume</th>
+                          <th scope="col">Production Origin</th>
+                          <th scope="col">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach ($short_trips as $short_trip)
+                        <tr>
+                          <td>{{$short_trip->id}}</td>
+                          <td>{{$short_trip->date}}</td>
+                          <td>{{$short_trip->time}}</td>
+                          <td>{{$short_trip->transaction_type}}</td>
+                          <td>{{$short_trip->staff->staff_name }}</td>
+                          <td>{{$short_trip->plate_number}}</td>
+                          <td>{{$short_trip->vehicle_type->vehicle_type_name }}</td>
+                          <td>{{$short_trip->name}}</td>
+                          <td>{{$short_trip->commodity->commodity_name}}</td>
+                          <td>{{$short_trip->volume}}</td>
+                          <td>{{$short_trip->barangay}}, {{$short_trip->municipality}}, {{$short_trip->province}}, {{$short_trip->region}}</td>
+                          <td>
+                              <a href="{{ route('short-trip-inflow-and-outflow.edit', $short_trip->id) }}" class="btn btn-outline-primary m-1">
+                                  <i class="bx bxs-edit"></i> Edit
+                              </a>
+                                <div class="float-start">
+                                    <form action="{{route('short-trip-inflow-and-outflow.destroy',$short_trip->id)}}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger m-1" onclick="return confirm('Are you sure you want to delete this reservation?')">
+                                            <i class="bx bxs-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                        </td>
+                        </tr>
+                          
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+
                   <div class="row mb-3">
                   <div class="col-sm-10">
-                      <a href="{{route('short-trip-inflow-and-outflow.create')}}" class="btn btn-primary">Add New Short Trip Transaction</a>
+                      <a href="{{route('trading-inflow.create')}}" class="btn btn-primary">Add New Trading Inflow</a>
                   </div>
                   </div>
                 </div>

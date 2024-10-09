@@ -22,7 +22,7 @@
                   <div class="card-body">
                       <h5 class="card-title">Trading Outflow Form</h5>
                       <!-- Floating Labels Form -->
-                      <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
+                      <form class="row g-3 " action="{{ route('trading-outflow.store') }}" method="POST">
                           @csrf
 
                           {{--  input for transaction_status = "trading"  --}}
@@ -208,7 +208,7 @@
                           <div class="text-center">
                               <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                               <button type="reset" class="btn btn-secondary">Reset</button>
-                              <a href="{{ route('trading-inflow.index') }}" class="btn btn-danger">Back</a>
+                              <a href="{{ route('trading-outflow.index') }}" class="btn btn-danger">Back</a>
                           </div>
 
 

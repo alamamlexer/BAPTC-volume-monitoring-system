@@ -28,6 +28,7 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
     Route::get('/admin-dashboard',[AdminDashboardController::class,'admin_dashboard'])->name('admin_dashboard');
 
     Route::resource('trading-inflow', TradingInflowController::class);
+    Route::get('/get-transaction-volume', [TradingInflowController::class, 'getTransactionVolume']);
 
     Route::resource('trading-outflow', TradingOutflowController::class);
     

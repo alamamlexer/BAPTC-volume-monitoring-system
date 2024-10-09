@@ -17,12 +17,12 @@ class LocationVehicle extends Pivot
     protected $table = 'location_vehicles';
     public function vehicle()
     {
-        return $this->belongsTo(Vehicle::class, 'vehicle_id'); // Adjust if needed
+        return $this->belongsTo(Vehicle::class, 'vehicle_id'); 
     }
 
     public function location()
     {
-        return $this->belongsTo(Location::class, 'location_id'); // Adjust if needed
+        return $this->belongsTo(Location::class, 'location_id'); 
     }
     
 }

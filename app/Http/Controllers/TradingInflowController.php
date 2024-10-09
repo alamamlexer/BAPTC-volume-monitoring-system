@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
-use App\Models\Inflow;
 use App\Models\Transaction;
 use App\Models\Staff;
 use App\Models\Vehicle;
@@ -12,6 +11,7 @@ use App\Models\Commodity;
 use App\Models\Location;
 use App\Models\LocationVehicle;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class TradingInflowController extends Controller
@@ -328,5 +328,107 @@ class TradingInflowController extends Controller
         // Redirect to the index page or the relevant page
         return redirect()->route('trading-inflow.index');
     }
+    public function getTransactionVolume(Request $request)
+{
+    // Get the desired time frame from the request (default to 'daily')
+    $timeFrame = $request->get('time_frame', 'daily');
+
+    // Initialize an empty array to hold the data
+    $volumes = [];
+    $dates = [];
+
+    // Query the transaction data based on the selected time frame
+    if ($timeFrame === 'daily') {
+        // Daily aggregation
+        $transactions = Transaction::select(DB::raw('DATE(date) as date'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->date;
+        }
+    } elseif ($timeFrame === 'monthly') {
+        // Monthly aggregation
+        $transactions = Transaction::select(DB::raw('DATE_FORMAT(date, "%Y-%m") as month'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->month;
+        }
+    } elseif ($timeFrame === 'yearly') {
+        // Yearly aggregation
+        $transactions = Transaction::select(DB::raw('YEAR(date) as year'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->year;
+        }
+    }
+    public function getTransactionVolume(Request $request)
+{
+    // Get the desired time frame from the request (default to 'daily')
+    $timeFrame = $request->get('time_frame', 'daily');
+
+    // Initialize an empty array to hold the data
+    $volumes = [];
+    $dates = [];
+
+    // Query the transaction data based on the selected time frame
+    if ($timeFrame === 'daily') {
+        // Daily aggregation
+        $transactions = Transaction::select(DB::raw('DATE(date) as date'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->date;
+        }
+    } elseif ($timeFrame === 'monthly') {
+        // Monthly aggregation
+        $transactions = Transaction::select(DB::raw('DATE_FORMAT(date, "%Y-%m") as month'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->month;
+        }
+    } elseif ($timeFrame === 'yearly') {
+        // Yearly aggregation
+        $transactions = Transaction::select(DB::raw('YEAR(date) as year'), DB::raw('SUM(volume) as total_volume'))
+            ->where('transaction_type', 'short trip inflow')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+        
+        foreach ($transactions as $transaction) {
+            $volumes[] = (float) $transaction->total_volume;
+            $dates[] = $transaction->year;
+        }
+    }
+
+    // Return the aggregated data as a JSON response
+    return response()->json(['dates' => $dates, 'volumes' => $volumes]);
+}
+
+    // Return the aggregated data as a JSON response
+    return response()->json(['dates' => $dates, 'volumes' => $volumes]);
+}
 
 }
