@@ -372,7 +372,7 @@
                                   input.addEventListener('blur', function() {
                                       setTimeout(() => { // Timeout to allow the click event to register
                                           dropdown.style.display = 'none';
-                                      }, 100); // Adjust timeout as necessary
+                                      }, 300); // Adjust timeout as necessary
                                   });
 
                                   // Hide dropdown when clicking outside
