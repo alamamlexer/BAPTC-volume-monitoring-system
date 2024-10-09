@@ -19,14 +19,67 @@ class TradingInflowController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $trading_inflows=Transaction::where('transaction_type','trading inflow')
-                            ->with(['staff','commodity','vehicle_type'])
-                            ->get();
-        return view('admin-pages.trading-inflow-report', compact('trading_inflows'));
+        // Get start and end dates from request, with defaults
+        $startDate = $request->input('start_date', \Carbon\Carbon::now()->startOfMonth());
+        $endDate = $request->input('end_date', \Carbon\Carbon::now());
+    
+        // Fetch trading inflows within the date range
+        $trading_inflows = Transaction::where('transaction_type', 'trading inflow')
+                                    ->whereBetween('date', [$startDate, $endDate])
+                                    ->with(['staff', 'commodity', 'vehicle_type'])
+                                    ->get();
+    
+        $volumes = [];
+        $dates = [];
+    
+        foreach ($trading_inflows as $inflow) {
+            $date = \Carbon\Carbon::parse($inflow->date)->toDateString();
+            $commodity = $inflow->commodity->commodity_name;
+    
+            if (!isset($volumes[$commodity][$date])) {
+                $volumes[$commodity][$date] = 0;
+                $dates[] = $date; // Collect unique dates
+            }
+    
+            $volumes[$commodity][$date] += $inflow->volume;
+        }
+    
+        // Create a range of dates for the specified period
+        $dateRange = [];
+        for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
+            $dateRange[] = $date->toDateString();
+        }
+    
+        // Fill in missing dates with zeros
+        foreach ($volumes as $commodity => $data) {
+            foreach ($dateRange as $date) {
+                if (!isset($data[$date])) {
+                    $data[$date] = 0; // Fill missing dates with 0 volume
+                }
+            }
+            ksort($data); // Sort by date
+            $volumes[$commodity] = $data;
+        }
+    
+        // Prepare data for the chart
+        $chartData = [];
+        foreach ($volumes as $commodity => $data) {
+            $chartData[] = [
+                'name' => $commodity,
+                'data' => array_values($data),
+            ];
+        }
+    
+        // Sort the unique dates
+        $dates = array_unique(array_merge($dates, $dateRange));
+        sort($dates);
+    
+        // Pass the variables to the view
+        return view('admin-pages.trading-inflow-report', compact('trading_inflows', 'chartData', 'dates', 'startDate', 'endDate'));
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -274,9 +327,6 @@ class TradingInflowController extends Controller
 
         // Redirect to the index page or the relevant page
         return redirect()->route('trading-inflow.index');
-    
-
-
     }
 
 }
