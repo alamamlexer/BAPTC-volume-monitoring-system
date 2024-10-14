@@ -29,73 +29,80 @@ class ShortTripInflowAndOutflowController extends Controller
                         ->with(['staff', 'commodity', 'vehicle_type'])
                         ->get();
         
-                // Fetch all commodities
-                $commodities = Commodity::all();
+                
+    // Fetch all commodities
+    $commodities = Commodity::all();
+
+    // Fetch all staff members
+    $staffs = Staff::all();
+
+    // Fetch distinct production origins
+    $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+        ->distinct()
+        ->get()
+        ->map(function ($location) {
+            return [
+                'barangay' => $location->barangay,
+                'municipality' => $location->municipality,
+                'province' => $location->province,
+                'region' => $location->region,
+                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+            ];
+        });
+
+    $volumes = [];
+    $totalVolumes = [];
+    $dates = [];
+
+            foreach ($short_trips as $short_trip) {
+                $date = \Carbon\Carbon::parse($short_trip->date)->toDateString();
+                $commodity = $short_trip->commodity->commodity_name;
         
-                $volumes = [];
-                $totalVolumes = []; // For total volume across all commodities
-                $dates = [];
+                if (!isset($volumes[$commodity][$date])) {
+                    $volumes[$commodity][$date] = 0;
+                    $dates[] = $date;
+                }
         
-                foreach ($short_trips as $short_trip) {
-                    $date = \Carbon\Carbon::parse($short_trip->date)->toDateString();
-                    $commodity = $short_trip->commodity->commodity_name;
+                $volumes[$commodity][$date] += $short_trip->volume;
         
-                    // Initialize volumes for the commodity
-                    if (!isset($volumes[$commodity][$date])) {
-                        $volumes[$commodity][$date] = 0;
-                        $dates[] = $date; // Collect unique dates
+                if (!isset($totalVolumes[$date])) {
+                    $totalVolumes[$date] = 0;
+                }
+                $totalVolumes[$date] += $short_trip->volume;
+            }
+        
+            $dateRange = [];
+            for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
+                $dateRange[] = $date->toDateString();
+            }
+        
+            foreach ($volumes as $commodity => $data) {
+                foreach ($dateRange as $date) {
+                    if (!isset($data[$date])) {
+                        $data[$date] = 0;
                     }
-        
-                    $volumes[$commodity][$date] += $short_trip->volume;
-        
-                    // Initialize total volume for the date
-                    if (!isset($totalVolumes[$date])) {
-                        $totalVolumes[$date] = 0;
-                    }
-                    $totalVolumes[$date] += $short_trip->volume; // Aggregate total volume
                 }
+                ksort($data);
+                $volumes[$commodity] = $data;
+            }
         
-                // Create a range of dates for the specified period
-                $dateRange = [];
-                for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
-                    $dateRange[] = $date->toDateString();
-                }
+            $chartData = [];
+            foreach ($volumes as $commodity => $data) {
+                $chartData[] = [
+                    'name' => $commodity,
+                    'data' => array_values($data),
+                ];
+            }
         
-                // Fill in missing dates with zeros
-                foreach ($volumes as $commodity => $data) {
-                    foreach ($dateRange as $date) {
-                        if (!isset($data[$date])) {
-                            $data[$date] = 0; // Fill missing dates with 0 volume
-                        }
-                    }
-                    ksort($data); // Sort by date
-                    $volumes[$commodity] = $data;
-                }
+            $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
+                return $totalVolumes[$date] ?? 0;
+            }, $dateRange));
         
-                // Prepare data for the chart
-                $chartData = [];
-                foreach ($volumes as $commodity => $data) {
-                    $chartData[] = [
-                        'name' => $commodity,
-                        'data' => array_values($data),
-                    ];
-                }
-        
-                // Prepare total volume data for chart
-                $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
-                    return $totalVolumes[$date] ?? 0; // Get total volume or 0 if not set
-                }, $dateRange));
-        
-                // Sort the unique dates
-                $dates = array_unique(array_merge($dates, $dateRange));
-                sort($dates);
-        
+            $dates = array_unique(array_merge($dates, $dateRange));
+            sort($dates);
                 // Pass the variables to the view
-                return view('admin-pages.short-trip-inflow-and-outflow-report', compact('short_trips', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData'));
-        
-                       
-   
-    }
+                return view('admin-pages.short-trip-inflow-and-outflow-report', compact('short_trips', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -243,7 +250,7 @@ class ShortTripInflowAndOutflowController extends Controller
         $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $logged_in_staff = Auth::id();
         $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
-        return view('admin-pages.short-trip-inflow-and-outflow-form-edit', compact('transactions', 'short_trip_inflow_and_outflow', 'staffs', 'logged_in_staff', 'commodities', 'vehicle_types', 'location_vehicles'));
+        return view('admin-pages.short-trip-inflow-and-outflow-form-edit', compact('transactions',  'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
  
     
     }

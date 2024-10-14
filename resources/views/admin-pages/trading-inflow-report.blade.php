@@ -65,65 +65,65 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-<th scope="col">Date</th>
-
-<th scope="col">
-    <div style="display: flex; align-items: center;">
-        <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
-        <select id="amPmFilter" class="form-select" 
-                style="border: none; font-weight: bold;">
-            <option value="">AM/PM</option>
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
-        </select>
-    </div>
-</th>
-
-<th scope="col">
-    <div style="display: flex; align-items: center;">
-        <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
-        <select id="attendantFilter" class="form-select" 
-                style="border: none; font-weight: bold;">
-            <option value="">All</option>
-            @foreach ($staffs as $staff)
-                <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
-            @endforeach
-        </select>
-    </div>
-</th>
-
-<th scope="col">Plate Number</th>
-<th scope="col">Name</th>
-
-<th scope="col">
-    <div style="display: flex; align-items: center;">
-        <label for="commodityFilter" class="form-label" style="margin-right: 5px;">Commodity:</label>
-        <select id="commodityFilter" class="form-select" 
-                style="border: none; font-weight: bold;">
-            <option value="">All</option>
-            @foreach ($commodities as $commodity)
-                <option value="{{ $commodity->commodity_id }}">{{ $commodity->commodity_name }}</option>
-            @endforeach
-        </select>
-    </div>
-</th>
-
-<th scope="col">Volume</th>
-
-<th scope="col">
-    <div style="display: flex; align-items: center;">
-        <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
-        <select id="productionOriginFilter" class="form-select" 
-                style="border: none; font-weight: bold;">
-            <option value="">All</option>
-            @foreach ($productionOrigins as $origin)
-                <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
-            @endforeach
-        </select>
-    </div>
-</th>
-
-<th scope="col">Action</th>
+                                    <th scope="col">Date</th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
+                                            <select id="amPmFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">AM/PM</option>
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
+                                            <select id="attendantFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($staffs as $staff)
+                                                    <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">Plate Number</th>
+                                    <th scope="col">Name</th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="commodityFilter" class="form-label" style="margin-right: 5px;">Commodity:</label>
+                                            <select id="commodityFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($commodities as $commodity)
+                                                    <option value="{{ $commodity->commodity_id }}">{{ $commodity->commodity_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">Volume</th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
+                                            <select id="productionOriginFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($productionOrigins as $origin)
+                                                    <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="inflowTableBody">
@@ -148,7 +148,6 @@
                             </tbody>
                         </table>
                     </div>
-
                     <div class="row mb-3">
                         <div class="col-sm-10">
                             <a href="{{ route('trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
@@ -161,17 +160,32 @@
 
     <!-- Success Modal -->
     @if(session('success'))
+    {{--  Success Modal --}}
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <h5>{{ session('success') }}</h5>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('success') }}</p>
+          </div>
         </div>
+      </div>
     </div>
-    @endif
+  @endif
+  
+  @if(session('error'))
+    {{--   Error Modal  --}}
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('error') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
 </section>
 
 <script>
@@ -281,5 +295,27 @@
         inflowChart.render();
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if there's a success message in the session
+      @if(session('success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+        setTimeout(function() {
+          successModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+  
+      // Check if there's an error message in the session
+      @if(session('error'))
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+        setTimeout(function() {
+          errorModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+    });
+  </script>
 
 @endsection
