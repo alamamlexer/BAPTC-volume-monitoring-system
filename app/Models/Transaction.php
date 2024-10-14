@@ -27,7 +27,10 @@ class Transaction extends Model
         return $this->belongsTo(VehicleType::class, 'vehicle_type_id');
     }
 
-    
+    public function getAddressAttribute()
+{
+    return $this->barangay . ', ' . $this->municipality . ', ' . $this->province . ', ' . $this->region;
+}
     protected $fillable = [
         'date',
         'time',

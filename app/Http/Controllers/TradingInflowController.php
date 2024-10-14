@@ -20,82 +20,93 @@ class TradingInflowController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        // Get start and end dates from request, with defaults
-        $startDate = $request->input('start_date', \Carbon\Carbon::now()->startOfMonth());
-        $endDate = $request->input('end_date', \Carbon\Carbon::now());
+{
+    // Get start and end dates from request, with defaults
+    $startDate = $request->input('start_date', \Carbon\Carbon::now()->startOfMonth());
+    $endDate = $request->input('end_date', \Carbon\Carbon::now());
 
-        // Fetch trading inflows within the date range
-        $trading_inflows = Transaction::where('transaction_type', 'trading inflow')
-            ->whereBetween('date', [$startDate, $endDate])
-            ->with(['staff', 'commodity', 'vehicle_type'])
-            ->get();
+    // Fetch trading inflows within the date range
+    $trading_inflows = Transaction::where('transaction_type', 'trading inflow')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->with(['staff', 'commodity', 'vehicle_type'])
+        ->get();
 
-        // Fetch all commodities
-        $commodities = Commodity::all();
+    // Fetch all commodities
+    $commodities = Commodity::all();
 
-        $volumes = [];
-        $totalVolumes = []; // For total volume across all commodities
-        $dates = [];
+    // Fetch all staff members
+    $staffs = Staff::all();
 
-        foreach ($trading_inflows as $inflow) {
-            $date = \Carbon\Carbon::parse($inflow->date)->toDateString();
-            $commodity = $inflow->commodity->commodity_name;
-
-            // Initialize volumes for the commodity
-            if (!isset($volumes[$commodity][$date])) {
-                $volumes[$commodity][$date] = 0;
-                $dates[] = $date; // Collect unique dates
-            }
-
-            $volumes[$commodity][$date] += $inflow->volume;
-
-            // Initialize total volume for the date
-            if (!isset($totalVolumes[$date])) {
-                $totalVolumes[$date] = 0;
-            }
-            $totalVolumes[$date] += $inflow->volume; // Aggregate total volume
-        }
-
-        // Create a range of dates for the specified period
-        $dateRange = [];
-        for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
-            $dateRange[] = $date->toDateString();
-        }
-
-        // Fill in missing dates with zeros
-        foreach ($volumes as $commodity => $data) {
-            foreach ($dateRange as $date) {
-                if (!isset($data[$date])) {
-                    $data[$date] = 0; // Fill missing dates with 0 volume
-                }
-            }
-            ksort($data); // Sort by date
-            $volumes[$commodity] = $data;
-        }
-
-        // Prepare data for the chart
-        $chartData = [];
-        foreach ($volumes as $commodity => $data) {
-            $chartData[] = [
-                'name' => $commodity,
-                'data' => array_values($data),
+    // Fetch distinct production origins
+    $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+        ->distinct()
+        ->get()
+        ->map(function ($location) {
+            return [
+                'barangay' => $location->barangay,
+                'municipality' => $location->municipality,
+                'province' => $location->province,
+                'region' => $location->region,
+                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
             ];
+        });
+
+    $volumes = [];
+    $totalVolumes = [];
+    $dates = [];
+
+    foreach ($trading_inflows as $inflow) {
+        $date = \Carbon\Carbon::parse($inflow->date)->toDateString();
+        $commodity = $inflow->commodity->commodity_name;
+
+        if (!isset($volumes[$commodity][$date])) {
+            $volumes[$commodity][$date] = 0;
+            $dates[] = $date;
         }
 
-        // Prepare total volume data for chart
-        $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
-            return $totalVolumes[$date] ?? 0; // Get total volume or 0 if not set
-        }, $dateRange));
+        $volumes[$commodity][$date] += $inflow->volume;
 
-        // Sort the unique dates
-        $dates = array_unique(array_merge($dates, $dateRange));
-        sort($dates);
-
-        // Pass the variables to the view
-        return view('admin-pages.trading-inflow-report', compact('trading_inflows', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData'));
+        if (!isset($totalVolumes[$date])) {
+            $totalVolumes[$date] = 0;
+        }
+        $totalVolumes[$date] += $inflow->volume;
     }
 
+    $dateRange = [];
+    for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
+        $dateRange[] = $date->toDateString();
+    }
+
+    foreach ($volumes as $commodity => $data) {
+        foreach ($dateRange as $date) {
+            if (!isset($data[$date])) {
+                $data[$date] = 0;
+            }
+        }
+        ksort($data);
+        $volumes[$commodity] = $data;
+    }
+
+    $chartData = [];
+    foreach ($volumes as $commodity => $data) {
+        $chartData[] = [
+            'name' => $commodity,
+            'data' => array_values($data),
+        ];
+    }
+
+    $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
+        return $totalVolumes[$date] ?? 0;
+    }, $dateRange));
+
+    $dates = array_unique(array_merge($dates, $dateRange));
+    sort($dates);
+
+    return view('admin-pages.trading-inflow-report', compact('trading_inflows', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+}
+
+    
+    
     
     /**
      * Show the form for creating a new resource.
@@ -325,25 +336,25 @@ class TradingInflowController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            // Find the transaction by ID
-            $trading_inflow = Transaction::findOrFail($id);
+        // try {
+        //     // Find the transaction by ID
+        //     $trading_inflow = Transaction::findOrFail($id);
 
-            // Delete the transaction
-            $trading_inflow->delete();
+        //     // Delete the transaction
+        //     $trading_inflow->delete();
 
-            // Flash success message
-            session()->flash('success', 'Trading inflow deleted successfully!');
-        } catch (QueryException $e) {
-            // Handle any errors, e.g., if the transaction can't be deleted
-            session()->flash('error', 'Error deleting trading inflow: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            // Handle any other exceptions
-            session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
-        }
+        //     // Flash success message
+        //     session()->flash('success', 'Trading inflow deleted successfully!');
+        // } catch (QueryException $e) {
+        //     // Handle any errors, e.g., if the transaction can't be deleted
+        //     session()->flash('error', 'Error deleting trading inflow: ' . $e->getMessage());
+        // } catch (\Exception $e) {
+        //     // Handle any other exceptions
+        //     session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
+        // }
 
-        // Redirect to the index page or the relevant page
-        return redirect()->route('trading-inflow.index');
+        // // Redirect to the index page or the relevant page
+        // return redirect()->route('trading-inflow.index');
     }
     
 

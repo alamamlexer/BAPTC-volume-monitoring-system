@@ -19,12 +19,92 @@ class TradingOutflowController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $trading_outflows=Transaction::where('transaction_type','trading outflow')
+                // Get start and end dates from request, with defaults
+                $startDate = $request->input('start_date', \Carbon\Carbon::now()->startOfMonth());
+                $endDate = $request->input('end_date', \Carbon\Carbon::now());
+        
+                // Fetch trading inflows within the date range
+                $trading_outflows=Transaction::where('transaction_type','trading outflow')
                             ->with(['staff','commodity','vehicle_type'])
                             ->get();
-        return view('admin-pages.trading-outflow-report',compact('trading_outflows'));
+        
+    // Fetch all commodities
+    $commodities = Commodity::all();
+
+    // Fetch all staff members
+    $staffs = Staff::all();
+
+    // Fetch distinct production origins
+    $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+        ->distinct()
+        ->get()
+        ->map(function ($location) {
+            return [
+                'barangay' => $location->barangay,
+                'municipality' => $location->municipality,
+                'province' => $location->province,
+                'region' => $location->region,
+                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+            ];
+        });
+
+    $volumes = [];
+    $totalVolumes = [];
+    $dates = [];
+
+    foreach ($trading_outflows as $outflow) {
+        $date = \Carbon\Carbon::parse($outflow->date)->toDateString();
+        $commodity = $outflow->commodity->commodity_name;
+
+        if (!isset($volumes[$commodity][$date])) {
+            $volumes[$commodity][$date] = 0;
+            $dates[] = $date;
+        }
+
+        $volumes[$commodity][$date] += $outflow->volume;
+
+        if (!isset($totalVolumes[$date])) {
+            $totalVolumes[$date] = 0;
+        }
+        $totalVolumes[$date] += $outflow->volume;
+    }
+
+    $dateRange = [];
+    for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
+        $dateRange[] = $date->toDateString();
+    }
+
+    foreach ($volumes as $commodity => $data) {
+        foreach ($dateRange as $date) {
+            if (!isset($data[$date])) {
+                $data[$date] = 0;
+            }
+        }
+        ksort($data);
+        $volumes[$commodity] = $data;
+    }
+
+    $chartData = [];
+    foreach ($volumes as $commodity => $data) {
+        $chartData[] = [
+            'name' => $commodity,
+            'data' => array_values($data),
+        ];
+    }
+
+    $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
+        return $totalVolumes[$date] ?? 0;
+    }, $dateRange));
+
+    $dates = array_unique(array_merge($dates, $dateRange));
+    sort($dates);
+
+                // Pass the variables to the view
+                return view('admin-pages.trading-outflow-report', compact('trading_outflows' , 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+
+
     }
 
     /**

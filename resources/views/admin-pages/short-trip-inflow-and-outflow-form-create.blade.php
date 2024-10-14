@@ -35,7 +35,7 @@
                 </div>
                 
 
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="form-floating">
                     <input type="date" class="form-control" id="date" name="date"
                         placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required>
@@ -72,7 +72,7 @@
             <div class="col-md-2">
                 <div class="form-control" required>
                     <fieldset>
-                        <legend class="col-form-label col-sm-3 pt-0">Time</legend>
+                        <legend class="col-form-label col-sm-5 pt-0">Time</legend>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="time" id="inlineRadio1" value="AM"
                                 {{ old('time') == 'AM' ? 'checked' : '' }}>

@@ -8,6 +8,7 @@ use App\Http\Controllers\TradingInflowController;
 use App\Http\Controllers\TradingOutflowController;
 use App\Http\Controllers\ShortTripInflowAndOutflowController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\HomeController;
 
 
 Route::controller(AuthenticationController::class)->group(function(){
@@ -16,7 +17,7 @@ Route::controller(AuthenticationController::class)->group(function(){
     Route::post('/register-save-farmer','register_save_farmer')->name('register_save_farmer');
     Route::post('/register-save-staff','register_save_staff')->name('register_save_staff');
     
-    Route::get('/','login')->name('login');
+    Route::get('login')->name('login');
     Route::post('/login-action','login_action')->name('login_action');
     
     Route::post('logout','logout')->name('logout');
@@ -42,5 +43,7 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     
 });
 
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/login', [HomeController::class, 'showLoginForm'])->name('login');
 
 
