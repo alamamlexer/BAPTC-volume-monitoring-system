@@ -139,7 +139,7 @@
                                 </tr>
                             </thead>
                             <tbody id="shortTripTableBody">
-                              @foreach ($short_trips as $short_trip)
+                              @foreach ($short_trips_table as $short_trip)
                               <tr data-date="{{ $short_trip->date }}" 
                                   data-am-pm="{{ $short_trip->time }}" 
                                   data-attendant="{{ $short_trip->staff->staff_id }}" 
@@ -172,6 +172,25 @@
                             <a href="{{ route('short-trip-inflow-and-outflow.create') }}" class="btn btn-primary">Add New Short Trip</a>
                         </div>
                     </div>
+                    
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {{ $short_trips_table->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" href="#" data-page="{{ $short_trips_table->currentPage() - 1 }}">Previous</a>
+                            </li>
+                            
+                            @for ($i = 1; $i <= $short_trips_table->lastPage(); $i++)
+                                <li class="page-item {{ $i == $short_trips_table->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                                </li>
+                            @endfor
+                            
+                            <li class="page-item {{ $short_trips_table->hasMorePages() ? '' : 'disabled' }}">
+                                <a class="page-link" href="#" data-page="{{ $short_trips_table->currentPage() + 1 }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
                 </div>
             </div>
         </div>
@@ -208,77 +227,113 @@
 </section>
 
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    const amPmFilter = document.getElementById('amPmFilter');
-    const attendantFilter = document.getElementById('attendantFilter');
-    const commodityFilter = document.getElementById('commodityFilter');
-    const productionOriginFilter = document.getElementById('productionOriginFilter');
-    const transactionTypeFilter = document.getElementById('transactionTypeFilter'); // New
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-    const tableRows = document.querySelectorAll('#shortTripTableBody tr');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load Page function
+        function loadPage(page) {
+            const url = `{{ route('short-trip-inflow-and-outflow.index') }}?page=${page}`; 
 
-    function filterTable() {
-        const selectedAmPm = amPmFilter.value;
-        const selectedAttendant = attendantFilter.value;
-        const selectedCommodity = commodityFilter.value;
-        const selectedProductionOrigin = productionOriginFilter.value;
-        const selectedTransactionType = transactionTypeFilter.value; // Get selected value
-        const startDate = new Date(startDateInput.value);
-        const endDate = new Date(endDateInput.value);
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const newTableBody = doc.querySelector('#shortTripTableBody');
+                    const newPagination = doc.querySelector('.pagination');
 
-        tableRows.forEach(row => {
-            const rowDate = new Date(row.dataset.date);
-            const rowAmPm = row.dataset.amPm;
-            const rowAttendant = row.dataset.attendant;
-            const rowCommodity = row.dataset.commodity;
-            const rowProductionOrigin = row.dataset.productionOrigin;
-            const rowTransactionType = row.dataset.transactionType; // Fetch transaction type
+                    // Update the table body and pagination
+                    document.querySelector('#shortTripTableBody').innerHTML = newTableBody.innerHTML;
+                    document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
 
-            const isDateInRange = (!startDateInput.value || rowDate >= startDate) && 
-                                  (!endDateInput.value || rowDate <= endDate);
-            const isAmPmMatch = !selectedAmPm || rowAmPm.startsWith(selectedAmPm);
-            const isAttendantMatch = !selectedAttendant || rowAttendant === selectedAttendant;
-            const isCommodityMatch = !selectedCommodity || rowCommodity === selectedCommodity;
-            const isProductionOriginMatch = !selectedProductionOrigin || rowProductionOrigin.includes(selectedProductionOrigin);
-            const isTransactionTypeMatch = !selectedTransactionType || rowTransactionType === selectedTransactionType;
+                    // Prevent the page from jumping to the top
+                    scrollToTable();
+                })
+                .catch(error => console.error('Error loading page:', error));
+        }
 
-            // Show row if all conditions match, otherwise hide it
-            if (isDateInRange && isAmPmMatch && isAttendantMatch && 
-                isCommodityMatch && isProductionOriginMatch && isTransactionTypeMatch) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
+        // Function to smoothly scroll to the table position
+        function scrollToTable() {
+            const table = document.querySelector('.table-responsive');
+            if (table) {
+                table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Event delegation for pagination links
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.page-link')) {
+                e.preventDefault(); // Prevent default anchor click behavior
+                const page = e.target.getAttribute('data-page');
+                if (page) {
+                    loadPage(page);
+                }
             }
         });
-    }
 
-    // Add event listeners to the filters
-    amPmFilter.addEventListener('change', filterTable);
-    attendantFilter.addEventListener('change', filterTable);
-    commodityFilter.addEventListener('change', filterTable);
-    productionOriginFilter.addEventListener('change', filterTable);
-    transactionTypeFilter.addEventListener('change', filterTable); // New listener
-    startDateInput.addEventListener('change', filterTable);
-    endDateInput.addEventListener('change', filterTable);
+        // Filters setup
+const amPmFilter = document.getElementById('amPmFilter');
+const attendantFilter = document.getElementById('attendantFilter');
+const commodityFilter = document.getElementById('commodityFilter');
+const productionOriginFilter = document.getElementById('productionOriginFilter');
+const transactionTypeFilter = document.getElementById('transactionTypeFilter'); // New filter
+const startDateInput = document.getElementById('startDate');
+const endDateInput = document.getElementById('endDate');
+const tableRows = document.querySelectorAll('#shortTripTableBody tr');
 
-    // Reset filters button
-    document.getElementById('resetFilters').addEventListener('click', () => {
-        amPmFilter.value = '';
-        attendantFilter.value = '';
-        commodityFilter.value = '';
-        productionOriginFilter.value = '';
-        transactionTypeFilter.value = ''; // Reset transaction type filter
-        startDateInput.value = '';
-        endDateInput.value = '';
-        filterTable(); // Apply reset
+function filterTable() {
+    const selectedAmPm = amPmFilter.value;
+    const selectedAttendant = attendantFilter.value;
+    const selectedCommodity = commodityFilter.value;
+    const selectedProductionOrigin = productionOriginFilter.value;
+    const selectedTransactionType = transactionTypeFilter.value; // Get the selected transaction type
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+
+    tableRows.forEach(row => {
+        const rowDate = new Date(row.dataset.date);
+        const rowAmPm = row.dataset.amPm;
+        const rowAttendant = row.dataset.attendant;
+        const rowCommodity = row.dataset.commodity;
+        const rowProductionOrigin = row.dataset.productionOrigin;
+        const rowTransactionType = row.dataset.transactionType; // Get the transaction type from data attribute
+
+        const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
+        const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
+        const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
+        const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
+        const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
+        const isTransactionTypeMatch = !selectedTransactionType || (rowTransactionType === selectedTransactionType); // Check transaction type
+
+        if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isTransactionTypeMatch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
+}
+
+// Event listeners for all filters
+amPmFilter.addEventListener('change', filterTable);
+attendantFilter.addEventListener('change', filterTable);
+commodityFilter.addEventListener('change', filterTable);
+productionOriginFilter.addEventListener('change', filterTable);
+transactionTypeFilter.addEventListener('change', filterTable); // Add event listener for transaction type
+startDateInput.addEventListener('change', filterTable);
+endDateInput.addEventListener('change', filterTable);
+
+// Reset filters button
+document.getElementById('resetFilters').addEventListener('click', () => {
+    amPmFilter.value = '';
+    attendantFilter.value = '';
+    commodityFilter.value = '';
+    productionOriginFilter.value = '';
+    transactionTypeFilter.value = ''; // Reset transaction type filter
+    startDateInput.value = '';
+    endDateInput.value = '';
+    filterTable(); // Apply reset
 });
 
-</script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+        // Initialize Trading Inflow Chart
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
 
@@ -290,8 +345,7 @@
 
         const dates = @json($dates);
 
-        // Initialize Trading Inflow Chart
-        const outflowChart = new ApexCharts(document.querySelector("#areaChart"), {
+        const inflowChart = new ApexCharts(document.querySelector("#areaChart"), {
             series: combinedSeries,
             chart: {
                 type: 'line',
@@ -307,7 +361,7 @@
                 curve: 'straight'
             },
             subtitle: {
-                text: 'Volume of Short Trips by Commodity',
+                text: 'Volume of ShortTrip by Commodity',
                 align: 'left'
             },
             labels: dates,
@@ -322,30 +376,26 @@
             }
         });
 
-        outflowChart.render();
+        inflowChart.render();
+
+        // Check for success message in session
+        @if(session('success'))
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            setTimeout(function() {
+                successModal.hide();
+            }, 1000); // 1 second timeout
+        @endif
+  
+        // Check for error message in session
+        @if(session('error'))
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            errorModal.show();
+            setTimeout(function() {
+                errorModal.hide();
+            }, 1000); // 1 second timeout
+        @endif
     });
 </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check if there's a success message in the session
-      @if(session('success'))
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-        setTimeout(function() {
-          successModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-  
-      // Check if there's an error message in the session
-      @if(session('error'))
-        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-        errorModal.show();
-        setTimeout(function() {
-          errorModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-    });
-  </script>
 
 @endsection

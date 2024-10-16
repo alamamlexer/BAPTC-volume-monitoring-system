@@ -30,6 +30,12 @@ class TradingInflowController extends Controller
         ->whereBetween('date', [$startDate, $endDate])
         ->with(['staff', 'commodity', 'vehicle_type'])
         ->get();
+    
+     // Fetch trading inflows within the date range
+     $trading_inflows_table = Transaction::where('transaction_type', 'trading inflow')
+     ->whereBetween('date', [$startDate, $endDate])
+     ->with(['staff', 'commodity', 'vehicle_type'])
+     ->paginate(5);
 
     // Fetch all commodities
     $commodities = Commodity::all();
@@ -102,7 +108,7 @@ class TradingInflowController extends Controller
     $dates = array_unique(array_merge($dates, $dateRange));
     sort($dates);
 
-    return view('admin-pages.trading-inflow-report', compact('trading_inflows', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+    return view('admin-pages.trading-inflow-report', compact('trading_inflows','trading_inflows_table', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
 }
 
     

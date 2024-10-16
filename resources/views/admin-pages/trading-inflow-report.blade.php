@@ -127,7 +127,7 @@
                                 </tr>
                             </thead>
                             <tbody id="inflowTableBody">
-                                @foreach ($trading_inflows as $trading_inflow)
+                                @foreach ($trading_inflows_table as $trading_inflow)
                                 <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}">
                                     <td>{{ $trading_inflow->id }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
@@ -153,6 +153,25 @@
                             <a href="{{ route('trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
                         </div>
                     </div>
+                    
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {{ $trading_inflows_table->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() - 1 }}">Previous</a>
+                            </li>
+                            
+                            @for ($i = 1; $i <= $trading_inflows_table->lastPage(); $i++)
+                                <li class="page-item {{ $i == $trading_inflows_table->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                                </li>
+                            @endfor
+                            
+                            <li class="page-item {{ $trading_inflows_table->hasMorePages() ? '' : 'disabled' }}">
+                                <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() + 1 }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
                 </div>
             </div>
         </div>
@@ -187,6 +206,56 @@
     </div>
   @endif
 </section>
+
+<script>
+    function loadPage(page) {
+        const url = `{{ route('trading-inflow.index') }}?page=${page}`; 
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+                const newTableBody = doc.querySelector('#inflowTableBody');
+                const newPagination = doc.querySelector('.pagination');
+
+                // Update the table body and pagination
+                document.querySelector('#inflowTableBody').innerHTML = newTableBody.innerHTML;
+                document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+
+                // Prevent the page from jumping to the top
+                scrollToTable();
+            })
+            .catch(error => console.error('Error loading page:', error));
+    }
+
+    // Function to smoothly scroll to the table position
+    function scrollToTable() {
+        const table = document.querySelector('.table-responsive');
+        if (table) {
+            table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Event delegation for pagination links
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.page-link')) {
+            e.preventDefault(); // Prevent default anchor click behavior
+            const page = e.target.getAttribute('data-page');
+            if (page) {
+                loadPage(page);
+            }
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

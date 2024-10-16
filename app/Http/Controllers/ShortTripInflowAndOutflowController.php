@@ -28,6 +28,10 @@ class ShortTripInflowAndOutflowController extends Controller
                 $short_trips = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
                         ->with(['staff', 'commodity', 'vehicle_type'])
                         ->get();
+                        
+                $short_trips_table = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
+                ->with(['staff', 'commodity', 'vehicle_type'])
+                ->paginate(5);
         
                 
     // Fetch all commodities
@@ -101,7 +105,7 @@ class ShortTripInflowAndOutflowController extends Controller
             $dates = array_unique(array_merge($dates, $dateRange));
             sort($dates);
                 // Pass the variables to the view
-                return view('admin-pages.short-trip-inflow-and-outflow-report', compact('short_trips', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+                return view('admin-pages.short-trip-inflow-and-outflow-report', compact('short_trips','short_trips_table', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
 }
 
     /**

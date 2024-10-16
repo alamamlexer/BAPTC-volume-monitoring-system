@@ -29,6 +29,11 @@ class TradingOutflowController extends Controller
                 $trading_outflows=Transaction::where('transaction_type','trading outflow')
                             ->with(['staff','commodity','vehicle_type'])
                             ->get();
+                            
+                // Fetch trading inflows within the date range
+                $trading_outflows_table=Transaction::where('transaction_type','trading outflow')
+                ->with(['staff','commodity','vehicle_type'])
+                ->paginate(5);
         
     // Fetch all commodities
     $commodities = Commodity::all();
@@ -102,7 +107,7 @@ class TradingOutflowController extends Controller
     sort($dates);
 
                 // Pass the variables to the view
-                return view('admin-pages.trading-outflow-report', compact('trading_outflows' , 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+                return view('admin-pages.trading-outflow-report', compact('trading_outflows' ,'trading_outflows_table', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
 
 
     }

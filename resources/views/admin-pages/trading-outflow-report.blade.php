@@ -127,7 +127,7 @@
                                 </tr>
                             </thead>
                             <tbody id="outflowTableBody">
-                                @foreach ($trading_outflows as $trading_outflow)
+                                @foreach ($trading_outflows_table as $trading_outflow)
                                 <tr data-date="{{ $trading_outflow->date }}" data-am-pm="{{ $trading_outflow->time }}" data-attendant="{{ $trading_outflow->staff->staff_id }}" data-commodity="{{ $trading_outflow->commodity->commodity_id }}" data-production-origin="{{ $trading_outflow->barangay }}">
                                     <td>{{ $trading_outflow->id }}</td>
                                     <td>{{ $trading_outflow->date }}</td>
@@ -154,10 +154,30 @@
                             <a href="{{ route('trading-outflow.create') }}" class="btn btn-primary">Add New Trading Outflow</a>
                         </div>
                     </div>
+                    
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {{ $trading_outflows_table->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" href="#" data-page="{{ $trading_outflows_table->currentPage() - 1 }}">Previous</a>
+                            </li>
+                            
+                            @for ($i = 1; $i <= $trading_outflows_table->lastPage(); $i++)
+                                <li class="page-item {{ $i == $trading_outflows_table->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                                </li>
+                            @endfor
+                            
+                            <li class="page-item {{ $trading_outflows_table->hasMorePages() ? '' : 'disabled' }}">
+                                <a class="page-link" href="#" data-page="{{ $trading_outflows_table->currentPage() + 1 }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Success Modal -->
     @if(session('success'))
@@ -189,8 +209,51 @@
   @endif
 </section>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Load Page function
+        function loadPage(page) {
+            const url = `{{ route('trading-outflow.index') }}?page=${page}`; 
+
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const newTableBody = doc.querySelector('#ouflowTableBody');
+                    const newPagination = doc.querySelector('.pagination');
+
+                    // Update the table body and pagination
+                    document.querySelector('#outflowTableBody').innerHTML = newTableBody.innerHTML;
+                    document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+
+                    // Prevent the page from jumping to the top
+                    scrollToTable();
+                })
+                .catch(error => console.error('Error loading page:', error));
+        }
+
+        // Function to smoothly scroll to the table position
+        function scrollToTable() {
+            const table = document.querySelector('.table-responsive');
+            if (table) {
+                table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Event delegation for pagination links
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.page-link')) {
+                e.preventDefault(); // Prevent default anchor click behavior
+                const page = e.target.getAttribute('data-page');
+                if (page) {
+                    loadPage(page);
+                }
+            }
+        });
+
+        // Filters setup
         const amPmFilter = document.getElementById('amPmFilter');
         const attendantFilter = document.getElementById('attendantFilter');
         const commodityFilter = document.getElementById('commodityFilter');
@@ -245,11 +308,8 @@
             endDateInput.value = '';
             filterTable(); // Apply reset
         });
-    });
-</script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+        // Initialize Trading Inflow Chart
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
 
@@ -261,8 +321,7 @@
 
         const dates = @json($dates);
 
-        // Initialize Trading Inflow Chart
-        const outflowChart = new ApexCharts(document.querySelector("#areaChart"), {
+        const inflowChart = new ApexCharts(document.querySelector("#areaChart"), {
             series: combinedSeries,
             chart: {
                 type: 'line',
@@ -278,7 +337,7 @@
                 curve: 'straight'
             },
             subtitle: {
-                text: 'Volume of Trading Outflows by Commodity',
+                text: 'Volume of Trading Ouflow by Commodity',
                 align: 'left'
             },
             labels: dates,
@@ -293,30 +352,26 @@
             }
         });
 
-        outflowChart.render();
+        inflowChart.render();
+
+        // Check for success message in session
+        @if(session('success'))
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            setTimeout(function() {
+                successModal.hide();
+            }, 1000); // 1 second timeout
+        @endif
+  
+        // Check for error message in session
+        @if(session('error'))
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            errorModal.show();
+            setTimeout(function() {
+                errorModal.hide();
+            }, 1000); // 1 second timeout
+        @endif
     });
 </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check if there's a success message in the session
-      @if(session('success'))
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-        setTimeout(function() {
-          successModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-  
-      // Check if there's an error message in the session
-      @if(session('error'))
-        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-        errorModal.show();
-        setTimeout(function() {
-          errorModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-    });
-  </script>
 
 @endsection
