@@ -260,7 +260,7 @@
         const productionOriginFilter = document.getElementById('productionOriginFilter');
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#outflowTableBody` tr');
+        const tableRows = document.querySelectorAll('#outflowTableBody tr');
 
         function filterTable() {
             const selectedAmPm = amPmFilter.value;
