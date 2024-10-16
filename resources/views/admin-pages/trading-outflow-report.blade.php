@@ -221,7 +221,7 @@
                 .then(data => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data, 'text/html');
-                    const newTableBody = doc.querySelector('#ouflowTableBody');
+                    const newTableBody = doc.querySelector('#outflowTableBody');
                     const newPagination = doc.querySelector('.pagination');
 
                     // Update the table body and pagination
@@ -260,7 +260,7 @@
         const productionOriginFilter = document.getElementById('productionOriginFilter');
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#outflowTableBody tr');
+        const tableRows = document.querySelectorAll('#outflowTableBody` tr');
 
         function filterTable() {
             const selectedAmPm = amPmFilter.value;
