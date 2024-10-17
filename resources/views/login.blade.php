@@ -49,7 +49,7 @@
           
                           <div class="col-md-12">
                             <div class="form-floating">
-                              <input type="text" class="form-control" id="password" name="password" placeholder="Password" value="{{ old('password') }}" required>
+                              <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="{{ old('password') }}" required>
                               <label for="password">Password</label>
                               </div>
                               @error('password')

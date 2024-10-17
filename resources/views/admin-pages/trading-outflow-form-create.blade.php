@@ -150,7 +150,7 @@
                                             <li class="list-group-item list-group-item-action input-item"
                                                 data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
                                                 data-name="{{ $location_vehicle->vehicle->vehicle_name }}"
-                                                data-vehicle_type_id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
+                                                data-vehicle_type_id="{{ $location_vehicle->location->region }}"
                                                 data-barangay="{{ $location_vehicle->location->barangay }}"
                                                 data-municipality="{{ $location_vehicle->location->municipality }}"
                                                 data-province="{{ $location_vehicle->location->province }}"

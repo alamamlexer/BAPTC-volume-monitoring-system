@@ -31,7 +31,7 @@
             <div class="col-md-5" hidden>
               <div class="form-floating">
                 <input type="text" class="form-control" id="transaction_status"
-                  name="transaction_status" value="regular">
+                  name="transaction_status" value="{{$trading_inflow->transaction_status}}">
                 <label for="transaction_status"></label>
               </div>
             </div>
@@ -39,7 +39,7 @@
             <div class="col-md-5" hidden>
               <div class="form-floating">
                 <input type="text" class="form-control" id="transaction_type" name="transaction_type"
-                  value="trading inflow">
+                  value="{{$trading_inflow->transaction_type}}">
                 <label for="transaction_type"></label>
               </div>
             </div>

@@ -29,7 +29,8 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
     Route::get('/admin-dashboard',[AdminDashboardController::class,'admin_dashboard'])->name('admin_dashboard');
 
     Route::resource('trading-inflow', TradingInflowController::class);
-
+    Route::post('/trading-inflow/submit', [TradingInflowController::class, 'submit'])->name('trading-inflow.submit');
+    
     Route::resource('trading-outflow', TradingOutflowController::class);
     
     Route::resource('short-trip-inflow-and-outflow', ShortTripInflowAndOutflowController::class);

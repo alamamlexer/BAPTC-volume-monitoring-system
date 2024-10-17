@@ -20,9 +20,9 @@ return new class extends Migration
             $table->foreignId('staff_id')->constrained('staff','staff_id');  
             $table->foreignId('commodity_id')->constrained('commodities','commodity_id'); 
             $table->decimal('volume', 10, 2);
-            $table->string('plate_number'); 
-            $table->foreignId('vehicle_type_id')->constrained('vehicle_types','vehicle_type_id'); 
-            $table->string('name'); 
+            $table->string('plate_number')->nullable();
+            $table->foreignId('vehicle_type_id')->nullable()->constrained('vehicle_types','vehicle_type_id'); 
+            $table->string('name')->nullable();
             $table->string('barangay'); 
             $table->string('municipality'); 
             $table->string('province'); 

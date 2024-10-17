@@ -320,48 +320,52 @@
     document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
-
-        // Add Total Volume as the first series
-        const combinedSeries = [{
-            name: 'Total Volume',
-            data: totalVolumeData
-        }, ...series];
-
         const dates = @json($dates);
 
-        // Initialize Trading Inflow Chart
-        const inflowChart = new ApexCharts(document.querySelector("#areaChart"), {
-            series: combinedSeries,
-            chart: {
-                type: 'line',
-                height: 350,
-                zoom: {
-                    enabled: false
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'straight'
-            },
-            subtitle: {
-                text: 'Volume of Trading Inflows by Commodity',
-                align: 'left'
-            },
-            labels: dates,
-            xaxis: {
-                type: 'datetime'
-            },
-            yaxis: {
-                opposite: true
-            },
-            legend: {
-                horizontalAlign: 'left'
-            }
+        const highchartsSeries = series.map(commodity => ({
+            name: commodity.name,
+            data: commodity.data
+        }));
+
+        // Add total volume series
+        highchartsSeries.unshift({
+            name: 'Total Volume',
+            data: totalVolumeData
         });
 
-        inflowChart.render();
+        Highcharts.chart('areaChart', {
+            chart: {
+                type: 'line',
+                height: 350
+            },
+            title: {
+                text: 'Volume of Trading Inflows by Commodity'
+            },
+            subtitle: {
+                text: 'Data from your trading inflow records'
+            },
+            xAxis: {
+                categories: dates,
+                title: {
+                    text: 'Date'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Volume'
+                }
+            },
+            series: highchartsSeries,
+            tooltip: {
+                shared: true,
+                valueSuffix: ' units'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            }
+        });
     });
 </script>
 
