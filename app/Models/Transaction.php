@@ -26,6 +26,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(VehicleType::class, 'vehicle_type_id');
     }
+    public function facilitator(): BelongsTo
+    {
+        return $this->belongsTo(Facilitator::class, 'facilitator_id');
+    }
 
     public function getAddressAttribute()
 {
@@ -41,6 +45,7 @@ class Transaction extends Model
         'volume',
         'plate_number',
         'vehicle_type_id',
+        'facilitator_id',
         'name',
         'barangay',
         'municipality',

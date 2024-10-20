@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('plate_number')->nullable();
             $table->foreignId('vehicle_type_id')->nullable()->constrained('vehicle_types','vehicle_type_id'); 
             $table->string('name')->nullable();
+            $table->foreignId('facilitator_id')->nullable()->constrained('facilitators','facilitator_id'); 
             $table->string('barangay'); 
             $table->string('municipality'); 
             $table->string('province'); 

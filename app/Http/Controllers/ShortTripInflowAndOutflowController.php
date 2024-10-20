@@ -10,7 +10,10 @@ use App\Models\VehicleType;
 use App\Models\Commodity;
 use App\Models\Location;
 use App\Models\LocationVehicle;
+use App\Models\Facilitator;
+use App\Models\FacilitatorLocationVehicle;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 
 class ShortTripInflowAndOutflowController extends Controller
@@ -21,8 +24,8 @@ class ShortTripInflowAndOutflowController extends Controller
     public function index(Request $request)
     {
                 // Get start and end dates from request, with defaults
-                $startDate = $request->input('start_date', \Carbon\Carbon::now()->startOfMonth());
-                $endDate = $request->input('end_date', \Carbon\Carbon::now());
+                $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
+                $endDate = $request->input('end_date', Carbon::now());
         
                 // Fetch trading inflows within the date range
                 $short_trips = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
@@ -39,6 +42,9 @@ class ShortTripInflowAndOutflowController extends Controller
 
     // Fetch all staff members
     $staffs = Staff::all();
+
+// Fetch all facilitator members
+$facilitators = Facilitator::all();
 
     // Fetch distinct production origins
     $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
@@ -59,7 +65,7 @@ class ShortTripInflowAndOutflowController extends Controller
     $dates = [];
 
             foreach ($short_trips as $short_trip) {
-                $date = \Carbon\Carbon::parse($short_trip->date)->toDateString();
+                $date = Carbon::parse($short_trip->date)->toDateString();
                 $commodity = $short_trip->commodity->commodity_name;
         
                 if (!isset($volumes[$commodity][$date])) {
@@ -76,7 +82,7 @@ class ShortTripInflowAndOutflowController extends Controller
             }
         
             $dateRange = [];
-            for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
+            for ($date = Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
                 $dateRange[] = $date->toDateString();
             }
         
@@ -113,12 +119,37 @@ class ShortTripInflowAndOutflowController extends Controller
      */
     public function create()
     {
+        $currentDate = Carbon::today()->toDateString(); 
+
+        $temporary_transactions= Transaction::where('transaction_status', 'temporary')
+                                            ->whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
+                                            ->where('date', $currentDate) 
+                                            ->with(['staff', 'commodity', 'vehicle_type','facilitator'])
+                                            ->paginate(5);
+                                             // Fetch all commodities
+    
+        $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+        ->distinct()
+        ->get()
+        ->map(function ($location) {
+            return [
+                'barangay' => $location->barangay,
+                'municipality' => $location->municipality,
+                'province' => $location->province,
+                'region' => $location->region,
+                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+            ];
+        });
+        $facilitators = Facilitator::all();
         $logged_in_staff=Auth::id();
         $staffs = Staff::all();
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
-        return view('admin-pages.short-trip-inflow-and-outflow-form-create',compact('staffs','logged_in_staff','vehicle_types','commodities','location_vehicles'));
+        $location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location'])->get();
+        $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location','facilitator'])->get();
+        return view('admin-pages.short-trip-inflow-and-outflow-form-create',compact('staffs','temporary_transactions','productionOrigins','facilitator_location_vehicles','facilitators','logged_in_staff','vehicle_types','commodities','location_vehicles'));
+        
+      
         
     }
 
@@ -135,9 +166,10 @@ class ShortTripInflowAndOutflowController extends Controller
             'staff_id' => 'required|exists:staff,staff_id', 
             'commodity_name' => 'required|exists:commodities,commodity_name', 
             'volume' => 'required|numeric', 
-            'plate_number' => 'required',
-            'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id', 
-            'name' => 'required',
+            'plate_number' => 'nullable|string',  
+            'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id', 
+            'facilitator_id'=>'nullable|exists:facilitators,facilitator_id', 
+            'name' => 'nullable|string', 
             'barangay' => 'required',
             'municipality' => 'required',
             'province' => 'required',
@@ -218,6 +250,7 @@ class ShortTripInflowAndOutflowController extends Controller
             'volume'=>$validatedData['volume'],
             'plate_number'=>$validatedData['plate_number'],
             'vehicle_type_id'=>$validatedData['vehicle_type_id'],
+            'facilitator_id'=>$validatedData['facilitator_id'],
             'name'=>$validatedData['name'],
             'barangay' => $location->barangay,
             'municipality' => $location->municipality,
@@ -236,6 +269,7 @@ class ShortTripInflowAndOutflowController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show(Transaction $Outflow)
     {
         //
@@ -363,5 +397,22 @@ class ShortTripInflowAndOutflowController extends Controller
         return redirect()->route('short-trip-inflow-and-outflow.index');
     
     }
+    public function submit(){
+        $userId = Auth::id();
+        $temporary_transactions=Transaction::where('transaction_status','temporary')
+                                            ->whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
+                                           ->where('staff_id',$userId)
+                                        ->update([
+                        'transaction_status' => 'regular',
+                    ]);
+        if ($temporary_transactions > 0) {
+           session()->flash('success', 'Short trip submitted!');
+        }
+        else{
+             session()->flash('error', 'No short trip added!'); 
+        }
+        return redirect()->route('short-trip-inflow-and-outflow.index');
+          }
+    
     }
 

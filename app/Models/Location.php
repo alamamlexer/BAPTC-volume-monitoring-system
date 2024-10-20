@@ -18,14 +18,23 @@ class Location extends Model
     ];
     protected $primaryKey = 'location_id';
     
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Transaction::class)->chaperone();
-    }
+
+    // public function vehicles(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Vehicle::class, 'location_vehicles')
+    //                 ->using(LocationVehicle::class)
+    //                 ->withTimestamps(); 
+    // }
     public function vehicles(): BelongsToMany
     {
-        return $this->belongsToMany(Vehicle::class, 'location_vehicles')
-                    ->using(LocationVehicle::class)
+        return $this->belongsToMany(Vehicle::class, 'facilitator_location_vehicles')
+                    ->using(FacilitatorLocationVehicle::class)
+                    ->withTimestamps(); 
+    }
+    public function facilitator(): BelongsToMany
+    {
+        return $this->belongsToMany(Facilitator::class, 'facilitator_location_vehicles')
+                    ->using(FacilitatorLocationVehicle::class)
                     ->withTimestamps(); 
     }
     

@@ -42,7 +42,6 @@
                     <h5 class="card-title">Inflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
-                        <!-- Filter Fields -->
                         <div class="col-md-2">
                             <label for="startDate" class="form-label">Start Date</label>
                             <input type="date" id="startDate" class="form-control" />
@@ -51,17 +50,12 @@
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="date" id="endDate" class="form-control" />
                         </div>
-                    </div>
-
-
-                        <div class="row mb-3">
-                            <div class="col-sm-10">
-                                <button id="resetFilters" class="btn btn-secondary">Display all</button>
-                            </div>
+                        <div class="col-md-2">
+                            <button id="resetFilters" class="btn btn-secondary">Display all</button>
                         </div>
-
+                    </div>
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table" id="">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -112,6 +106,19 @@
                                     
                                     <th scope="col">
                                         <div style="display: flex; align-items: center;">
+                                            <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;">Facilitator:</label>
+                                            <select id="facilitatorFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($facilitators as $facilitator)
+                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
                                             <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
                                             <select id="productionOriginFilter" class="form-select" 
                                                     style="border: none; font-weight: bold;">
@@ -126,10 +133,10 @@
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="inflowTableBody">
+                            <tbody id="TableBody">
                                 @foreach ($trading_inflows_table as $trading_inflow)
-                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}">
-                                    <td>{{ $trading_inflow->id }}</td>
+                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}"> >
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
                                     <td>{{ $trading_inflow->time }}</td>
                                     <td>{{ $trading_inflow->staff->staff_name }}</td>
@@ -137,6 +144,7 @@
                                     <td>{{ $trading_inflow->name }}</td>
                                     <td>{{ $trading_inflow->commodity->commodity_name }}</td>
                                     <td>{{ $trading_inflow->volume }}</td>
+                                    <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
                                     <td>{{ $trading_inflow->barangay }}, {{ $trading_inflow->municipality }}, {{ $trading_inflow->province }}, {{ $trading_inflow->region }}</td>
                                     <td>
                                         <a href="{{ route('trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
@@ -159,18 +167,18 @@
                             <li class="page-item {{ $trading_inflows_table->onFirstPage() ? 'disabled' : '' }}">
                                 <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() - 1 }}">Previous</a>
                             </li>
-                            
+                    
                             @for ($i = 1; $i <= $trading_inflows_table->lastPage(); $i++)
                                 <li class="page-item {{ $i == $trading_inflows_table->currentPage() ? 'active' : '' }}">
                                     <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
                                 </li>
                             @endfor
-                            
+                    
                             <li class="page-item {{ $trading_inflows_table->hasMorePages() ? '' : 'disabled' }}">
                                 <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() + 1 }}">Next</a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav>                    
                     
                 </div>
             </div>
@@ -216,11 +224,11 @@
             .then(data => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(data, 'text/html');
-                const newTableBody = doc.querySelector('#inflowTableBody');
+                const newTableBody = doc.querySelector('#TableBody');
                 const newPagination = doc.querySelector('.pagination');
 
                 // Update the table body and pagination
-                document.querySelector('#inflowTableBody').innerHTML = newTableBody.innerHTML;
+                document.querySelector('#TableBody').innerHTML = newTableBody.innerHTML;
                 document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
 
                 // Prevent the page from jumping to the top
@@ -258,37 +266,41 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
         const amPmFilter = document.getElementById('amPmFilter');
         const attendantFilter = document.getElementById('attendantFilter');
         const commodityFilter = document.getElementById('commodityFilter');
         const productionOriginFilter = document.getElementById('productionOriginFilter');
+        const facilitatorFilter = document.getElementById('facilitatorFilter'); // Add this line
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#inflowTableBody tr');
+        const tableRows = document.querySelectorAll('#TableBody tr');
 
         function filterTable() {
             const selectedAmPm = amPmFilter.value;
             const selectedAttendant = attendantFilter.value;
             const selectedCommodity = commodityFilter.value;
             const selectedProductionOrigin = productionOriginFilter.value;
+            const selectedFacilitator = facilitatorFilter.value; // This is now initialized
             const startDate = new Date(startDateInput.value);
             const endDate = new Date(endDateInput.value);
-
+        
             tableRows.forEach(row => {
                 const rowDate = new Date(row.dataset.date);
                 const rowAmPm = row.dataset.amPm;
                 const rowAttendant = row.dataset.attendant;
                 const rowCommodity = row.dataset.commodity;
                 const rowProductionOrigin = row.dataset.productionOrigin;
-
+                const rowFacilitator = row.dataset.facilitator; // This is now initialized
+        
                 const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
                 const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
                 const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
                 const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
                 const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
-
-                if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch) {
+                const isFacilitatorMatch = !selectedFacilitator || (rowFacilitator === selectedFacilitator); // This is now initialized
+        
+                if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isFacilitatorMatch) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -296,10 +308,12 @@
             });
         }
 
+        // Add event listeners for all filters
         amPmFilter.addEventListener('change', filterTable);
         attendantFilter.addEventListener('change', filterTable);
         commodityFilter.addEventListener('change', filterTable);
         productionOriginFilter.addEventListener('change', filterTable);
+        facilitatorFilter.addEventListener('change', filterTable); // Add this line for facilitator filter
         startDateInput.addEventListener('change', filterTable);
         endDateInput.addEventListener('change', filterTable);
 
@@ -309,6 +323,7 @@
             attendantFilter.value = '';
             commodityFilter.value = '';
             productionOriginFilter.value = '';
+            facilitatorFilter.value = ''; // Add this line to reset facilitator filter
             startDateInput.value = '';
             endDateInput.value = '';
             filterTable(); // Apply reset
@@ -320,50 +335,58 @@
     document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
-        const dates = @json($dates);
 
-        const highchartsSeries = series.map(commodity => ({
-            name: commodity.name,
-            data: commodity.data
-        }));
+        // Assuming dates is in the format of "YYYY-MM-DD"
+        const dates = @json($dates).map(date => Date.parse(date)); // Convert to timestamps
 
-        // Add total volume series
-        highchartsSeries.unshift({
+        // Prepare the combined series
+        const combinedSeries = [{
             name: 'Total Volume',
             data: totalVolumeData
-        });
+        }, ...series];
 
+        // Initialize Trading Inflow Chart
         Highcharts.chart('areaChart', {
             chart: {
                 type: 'line',
-                height: 350
+                height: 350,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutBounce'
+                }
             },
             title: {
                 text: 'Volume of Trading Inflows by Commodity'
             },
-            subtitle: {
-                text: 'Data from your trading inflow records'
-            },
             xAxis: {
-                categories: dates,
-                title: {
-                    text: 'Date'
-                }
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %e, %Y' // Format as "Oct 1, 2024"
+                },
+                tickInterval: 24 * 3600 * 1000 // One day
             },
             yAxis: {
                 title: {
                     text: 'Volume'
-                }
+                },
+                opposite: true
             },
-            series: highchartsSeries,
-            tooltip: {
-                shared: true,
-                valueSuffix: ' units'
-            },
+            series: combinedSeries.map((serie, index) => ({
+                ...serie,
+                data: serie.data.map((value, i) => [dates[i], value]) // Pair each data point with its corresponding date
+            })),
             legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle'
+                horizontalAlign: 'left'
+            },
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    marker: {
+                        enabled: false
+                    }
+                }
             }
         });
     });
@@ -390,5 +413,10 @@
       @endif
     });
   </script>
+<script>
+    $(document).ready( function () {
+    $('#reportTable').DataTable();
+} );
 
+</script>
 @endsection

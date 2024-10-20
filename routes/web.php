@@ -34,6 +34,7 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
     Route::resource('trading-outflow', TradingOutflowController::class);
     
     Route::resource('short-trip-inflow-and-outflow', ShortTripInflowAndOutflowController::class);
+    Route::post('/short-trip-inflow-and-outflow/submit', [ShortTripInflowAndOutflowController::class, 'submit'])->name('short-trip-inflow-and-outflow.submit');
     
     Route::resource('user-management', UserManagementController::class);
 });

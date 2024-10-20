@@ -19,12 +19,24 @@ class Vehicle extends Model
     {
         return $this->belongsTo(VehicleType::class);
     }
-    public function locations(): BelongsToMany
+    // public function locations(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Location::class, 'location_vehicles')
+    //                 ->using(LocationVehicle::class)
+    //                 ->withTimestamps(); 
+    // }  
+    public function location(): BelongsToMany
     {
-        return $this->belongsToMany(Location::class, 'location_vehicles')
-                    ->using(LocationVehicle::class)
+        return $this->belongsToMany(Location::class, 'facilitator_location_vehicles')
+                    ->using(FacilitatorLocationVehicle::class)
                     ->withTimestamps(); 
-    }   
+    }
+    public function facilitator(): BelongsToMany
+    {
+        return $this->belongsToMany(Facilitator::class, 'facilitator_location_vehicles')
+                    ->using(FacilitatorLocationVehicle::class)
+                    ->withTimestamps(); 
+    }
     protected $fillable = [
         'plate_number',
         'vehicle_name',
