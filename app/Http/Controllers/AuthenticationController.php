@@ -91,10 +91,10 @@ class AuthenticationController extends Controller
             session()->flash('success', 'Login successful.');
             
             if(Auth::user()->type==0){
-                return redirect()->route('admin_dashboard'); 
+                return redirect()->route('admin.index'); 
             }
             elseif(Auth::user()->type==1){
-                return redirect()->route('admin_dashboard');
+                return redirect()->route('admin.index');
             }
             elseif(Auth::user()->type==2){
                 return redirect()->route('user_dashboard');

@@ -3,6 +3,7 @@
 
 @section('content')
 
+
 <div class="pagetitle">
     <h1>Trading Inflow</h1>
     <nav>
@@ -12,28 +13,77 @@
     </nav>
 </div>
 
-<section class="section">
-    <div class="row mb-4">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Trading Inflow Chart</h5>
-                    <!-- Filter Form -->
-                    <form method="GET" action="{{ route('trading-inflow.index') }}" class="mb-3">
-                        <div class="input-group">
-                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
-                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
-                            <button class="btn btn-primary" type="submit">Filter</button>
-                            <a href="{{ route('trading-inflow.index') }}" class="btn btn-secondary ms-2">Reset</a>
-                        </div>
-                    </form>
+<section class="section dashboard">
 
-                    <!-- Chart Container -->
-                    <div id="areaChart" style="height: 350px;"></div>
+  <div class="row ">
+    <!-- Number of Vehicles -->
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card sales-card">
+            <div class="card-body">
+                <h5 class="card-title">Date and Time</h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-time-fill"></i>
+                    </div>
+                    <div> 
+                        <h6 id="current-date-time" class="ps-3 fs-3 fw-bold"></h6>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card sales-card">
+            <div class="card-body">
+                <h5 class="card-title">Vehicles </h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-car-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                        <h6>{{$today_vehicle}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- End Sales Card -->
+
+    <!-- Revenue Card -->
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card revenue-card">
+            <div class="card-body">
+                <h5 class="card-title">Volume (kg)</h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-scales-2-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                        <h6>{{$today_volume}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- End Revenue Card -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4"> <!-- Added margin bottom for spacing -->
+            <div class="card-body">
+                <h5 class="card-title">Trading Inflow Chart</h5>
+                <!-- Filter Form -->
+                <!-- Chart Container -->
+                <div id="areaChart" style="height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
+
+   
 
     <div class="row">
         <div class="col-lg-12">
@@ -42,17 +92,18 @@
                     <h5 class="card-title">Inflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
+                      <form method="GET" action="{{ route('trading-inflow.index') }}" class="mb-3">
+                        <div class="input-group">
                         <div class="col-md-2">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" id="startDate" class="form-control" />
+                        <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
                         </div>
                         <div class="col-md-2">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" id="endDate" class="form-control" />
+                        <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
                         </div>
-                        <div class="col-md-2">
-                            <button id="resetFilters" class="btn btn-secondary">Display all</button>
+                            <button class="btn btn-primary" type="submit">Filter</button>
+                            <a href="{{ route('trading-inflow.index') }}" class="btn btn-secondary ">Reset</a>
                         </div>
+                    </form>
                     </div>
                     <div class="table-responsive">
                         <table class="table" id="">
@@ -73,18 +124,7 @@
                                         </div>
                                     </th>
                                     
-                                    <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
-                                            <select id="attendantFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($staffs as $staff)
-                                                    <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </th>
+                                    
                                     
                                     <th scope="col">Plate Number</th>
                                     <th scope="col">Name</th>
@@ -104,18 +144,7 @@
                                     
                                     <th scope="col">Volume</th>
                                     
-                                    <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;">Facilitator:</label>
-                                            <select id="facilitatorFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($facilitators as $facilitator)
-                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </th>
+                                    
                                     
                                     <th scope="col">
                                         <div style="display: flex; align-items: center;">
@@ -130,6 +159,32 @@
                                         </div>
                                     </th>
                                     
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator:</label>
+                                            <select id="facilitatorFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($facilitators as $facilitator)
+                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col">
+                                        <div style="display: flex; align-items: center;">
+                                            <label for="attendantFilter" class="form-label" style="margin-right: 5px;">TOI/TOA:</label>
+                                            <select id="attendantFilter" class="form-select" 
+                                                    style="border: none; font-weight: bold;">
+                                                <option value="">All</option>
+                                                @foreach ($staffs as $staff)
+                                                    <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </th>
+                                    
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -139,13 +194,13 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
                                     <td>{{ $trading_inflow->time }}</td>
-                                    <td>{{ $trading_inflow->staff->staff_name }}</td>
                                     <td>{{ $trading_inflow->plate_number }}</td>
                                     <td>{{ $trading_inflow->name }}</td>
                                     <td>{{ $trading_inflow->commodity->commodity_name }}</td>
                                     <td>{{ $trading_inflow->volume }}</td>
-                                    <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
                                     <td>{{ $trading_inflow->barangay }}, {{ $trading_inflow->municipality }}, {{ $trading_inflow->province }}, {{ $trading_inflow->region }}</td>
+                                    <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
+                                    <td>{{ $trading_inflow->staff->staff_name }}</td>
                                     <td>
                                         <a href="{{ route('trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
                                             <i class="bx bxs-edit"></i> Edit
@@ -418,5 +473,31 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#reportTable').DataTable();
 } );
 
+</script>
+<script>
+  function updateDateTime() {
+      const now = new Date();
+      const options = { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit', 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit', 
+          hour12: true // Change this to true for 12-hour format
+      };
+      
+      // Format the date and time
+      const formattedDateTime = now.toLocaleString('en-US', options);
+      
+      // Update the content of the div
+      document.getElementById('current-date-time').textContent = formattedDateTime;
+  }
+
+  // Call updateDateTime every second
+  setInterval(updateDateTime, 1000);
+  
+  // Initial call to set the date and time right away
+  updateDateTime();
 </script>
 @endsection

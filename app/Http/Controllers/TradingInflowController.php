@@ -27,8 +27,8 @@ class TradingInflowController extends Controller
     // For the graph
     
     // Get start and end dates from request, with defaults
-            $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
-            $endDate = $request->input('end_date', Carbon::now());
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
+        $endDate = $request->input('end_date', Carbon::now());
             
             
         $amPmFilter = $request->input('amPmFilter');
@@ -161,8 +161,27 @@ class TradingInflowController extends Controller
     $dates = array_unique(array_merge($dates, $dateRange));
     sort($dates);
 
+
+
+    //total vehicle today
+    $vehicle = Transaction::where('transaction_type', 'trading inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereDate('date', Carbon::today())
+                    ->count('plate_number');
+    $today_vehicle = number_format($vehicle);      
+                    
+    //total volume today
+    $volume = Transaction::where('transaction_type', 'trading inflow')
+    ->where('transaction_status', 'regular')
+    ->whereDate('date', Carbon::today())
+    ->sum('volume');
+    $today_volume = number_format($volume, 2);
     
-    return view('admin-pages.trading-inflow-report', compact('trading_inflows','trading_inflows_table','request','facilitators', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+ 
+   
+    
+    
+    return view('admin-pages.trading-inflow-report', compact('today_volume','today_vehicle','trading_inflows','trading_inflows_table','request','facilitators', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
 }
 
     
@@ -173,6 +192,10 @@ class TradingInflowController extends Controller
      */
     public function create()
     {
+        date_default_timezone_set('Asia/Manila');
+
+        $currentHour = date('H'); // 24-hour format
+        $defaultTime = ($currentHour < 12) ? 'AM' : 'PM';
         
         $currentDate = Carbon::today()->toDateString(); 
 
@@ -203,7 +226,7 @@ class TradingInflowController extends Controller
         $vehicle_types = VehicleType::all();
         $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location','facilitator'])->get();
-        return view('admin-pages.trading-inflow-form-create',compact('staffs','productionOrigins','facilitator_location_vehicles','facilitators','temporary_transactions','logged_in_staff','vehicle_types','commodities','location_vehicles'));
+        return view('admin-pages.trading-inflow-form-create',compact('defaultTime','staffs','productionOrigins','facilitator_location_vehicles','facilitators','temporary_transactions','logged_in_staff','vehicle_types','commodities','location_vehicles'));
     }
 
     /**

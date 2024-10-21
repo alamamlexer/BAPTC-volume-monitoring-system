@@ -46,7 +46,7 @@
                             <div class="col-md-4">
                                 <div class="form-floating">
                                     <input type="date" class="form-control" id="date" name="date"
-                                        placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required>
+                                        placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
                                     <label for="date">Date</label>
                                     @if ($errors->has('date'))
                                         <span class="text-danger">{{ $errors->first('date') }}</span>
@@ -55,23 +55,15 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="form-control" required>
-                                    <fieldset>
-                                        <legend class="col-form-label col-sm-5 pt-0">Time</legend>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio1" value="AM"
-                                                {{ old('time') == 'AM' ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="inlineRadio1">AM</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio2" value="PM"
-                                                {{ old('time') == 'PM' ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="inlineRadio2">PM</label>
-                                        </div>
-                                    </fieldset>
+                                <div class="form-floating">
+                                    <select class="form-select" id="time" name="time" required>
+                                        <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
+                                        <option value="PM" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>PM</option>
+                                    </select>
+                                    <label for="time">Time</label>
                                     @if ($errors->has('time'))
-                                    <span class="text-danger">{{ $errors->first('time') }}</span>
-                                @endif
+                                        <span class="text-danger">{{ $errors->first('time') }}</span>
+                                    @endif
                                 </div>
                             </div>
                             
@@ -569,7 +561,7 @@
     // Reset filters button
     document.getElementById('resetFilters').addEventListener('click', () => {
         amPmFilter.value = '';
-        attendantFilter.value = '';
+        attendantFilter.value = ''; 
         commodityFilter.value = '';
         productionOriginFilter.value = '';
         facilitatorFilter.value = ''; // Reset Facilitator Filter
@@ -597,9 +589,23 @@
                 setTimeout(() => errorModal.hide(), 1000);
                 @endif
             
-                // Auto select AM or PM radio button
-                const currentHour = new Date().getHours();
-                document.getElementById(currentHour < 12 ? 'inlineRadio1' : 'inlineRadio2').checked = true;
+                
+                // Store the selected time in local storage
+                document.querySelector('form').addEventListener('reset', function() {
+                    // Get the selected radio button value
+                    const selectedTime = document.querySelector('input[name="time"]:checked');
+                    if (selectedTime) {
+                        localStorage.setItem('selectedTime', selectedTime.value);
+                    }
+                });
+            
+                // Restore the selected time when the page loads
+                window.addEventListener('load', function() {
+                    const savedTime = localStorage.getItem('selectedTime');
+                    if (savedTime) {
+                        document.querySelector(`input[name="time"][value="${savedTime}"]`).checked = true;
+                    }
+                });
             
                 // Filterable Dropdown Setup
                 function setupFilterableDropdown(inputSelector, dropdownSelector, autofillFields = {}, autofillCallback = null) {
@@ -745,7 +751,24 @@
             });
 
         </script>
+            <script>
+                // Store the selected time in local storage
+                document.querySelector('form').addEventListener('reset', function() {
+                    // Get the selected radio button value
+                    const selectedTime = document.querySelector('input[name="time"]:checked');
+                    if (selectedTime) {
+                        localStorage.setItem('selectedTime', selectedTime.value);
+                    }
+                });
             
+                // Restore the selected time when the page loads
+                window.addEventListener('load', function() {
+                    const savedTime = localStorage.getItem('selectedTime');
+                    if (savedTime) {
+                        document.querySelector(`input[name="time"][value="${savedTime}"]`).checked = true;
+                    }
+                });
+            </script>
     </section>
 
 @endsection

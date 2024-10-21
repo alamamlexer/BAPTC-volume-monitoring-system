@@ -12,10 +12,7 @@
   <!-- Favicons -->
   <link href="{{asset('assets/img/BAPTC_logo.png')}}" rel="icon">
   <link href="{{asset('assets/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
-  
-  
-
-  
+    
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -288,7 +285,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('admin_dashboard')}}">
+        <a class="nav-link collapsed" href="{{route('admin.index')}}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
