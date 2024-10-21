@@ -2,8 +2,9 @@
 @section('page_title','Home')
 @section('content')
 
-<div class="row">
+<div class="row table-responsive">
     <div class="col-md-6">
+    <div class="table">
         <h1>Trading Inflows</h1>
         <table>
             <thead>
@@ -22,7 +23,9 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-6">
+</div>
+<div class="col-md-6">
+    <div class="table">
         <h1>Trading Outflows</h1>
         <table>
             <thead>
@@ -41,5 +44,7 @@
             </tbody>
         </table>
     </div>
-</div>
+    </div>  
+    </div>
+        
 @endsection

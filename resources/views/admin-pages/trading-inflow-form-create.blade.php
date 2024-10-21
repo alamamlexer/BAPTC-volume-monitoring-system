@@ -79,7 +79,7 @@
                                 <div class="form-floating">
                                     <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{ old('facilitator_id') }}">
                                     <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name" 
-                                        placeholder="Select or type facilitator..." required aria-label="Facilitator"
+                                        placeholder="Select or type facilitator..."  aria-label="Facilitator"
                                         autocomplete="off" data-dropdown="facilitatorDropdown" value="{{ old('facilitator_name') }}">
                                     <label for="facilitator_name">Facilitator</label>
                                     @if ($errors->has('facilitator_name'))
