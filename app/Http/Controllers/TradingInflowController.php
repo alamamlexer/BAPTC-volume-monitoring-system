@@ -53,29 +53,24 @@ class TradingInflowController extends Controller
             ->whereBetween('date', [$startDate, $endDate])
             ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
     
+            $staffId = $request->input('staff_id');
+            $timeFilter = $request->input('time_filter');
+            $commodityId = $request->input('commodity_filter');
+            $municipality = $request->input('municipality_filter');
+            
         // Apply filters if provided
-        if (!empty($amPmFilter) ) {
-            $query->where('time',$amPmFilter);
+        if ($staffId) {
+            $query->where('staff_id', $staffId);
         }
-        if (!empty($attendantFilter)) {
-            $query->where('staff_id', $attendantFilter);
+        if ($timeFilter) {
+            $query->where('time', $timeFilter);
         }
-        if (!empty($commodityFilter)) {
-            $query->where('commodity_id', $commodityFilter);
+        if ($commodityId) {
+            $query->where('commodity_id', $commodityId);
         }
-        // if (!empty($productionOriginFilter)) {
-        //     $query->where(function($q) use ($productionOriginFilter) {
-        //         foreach ($productionOriginFilter as $filter) {
-        //             $q->orWhere('origin', 'like', "%$filter%");
-        //         }
-        //     });
-        // }
-        
-        
-        if (!empty($facilitatorFilter)) {
-            $query->where('facilitator_id', $facilitatorFilter);
+        if ($municipality) {
+            $query->where('municipality', $municipality);
         }
-        
         // Fetch the paginated results
         $trading_inflows_table = $query->paginate(5);
         
@@ -97,6 +92,9 @@ class TradingInflowController extends Controller
     
     // Fetch all facilitator members
     $facilitators = Facilitator::all();
+    
+  // Fetch distinct municipalities for the dropdown
+  $municipalities = Transaction::distinct()->pluck('municipality');
 
     // Fetch distinct production origins
     $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
@@ -183,7 +181,21 @@ class TradingInflowController extends Controller
    
     
     
-    return view('admin-pages.trading-inflow-report', compact('today_volume','today_vehicle','trading_inflows','trading_inflows_table','request','facilitators', 'chartData', 'dates', 'startDate', 'endDate', 'commodities', 'totalVolumeData', 'staffs', 'productionOrigins'));
+    return view('admin-pages.trading-inflow-report', compact('today_volume',
+                                                                        'today_vehicle',
+                                                                                    'trading_inflows',
+                                                                                    'trading_inflows_table',
+                                                                                    'request',
+                                                                                    'facilitators', 
+                                                                                    'chartData', 
+                                                                                    'dates', 
+                                                                                    'startDate', 
+                                                                                    'endDate', 
+                                                                                    'commodities',
+                                                                                    'totalVolumeData',
+                                                                                    'staffs', 
+                                                                                    'productionOrigins',
+                                                                                    'municipalities'));
 }
 
     

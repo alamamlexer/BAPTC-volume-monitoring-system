@@ -2,49 +2,56 @@
 @section('page_title','Home')
 @section('content')
 
-<div class="row table-responsive">
+<div class="row">
     <div class="col-md-6">
-    <div class="table">
         <h1>Trading Inflows</h1>
         <table>
             <thead>
                 <tr>
-                    <th>Address</th>
+                    <th>Municipality</th>
                     <th>Number of Cars</th>
                 </tr>
             </thead>
             <tbody>
+                @if ($grouped_inflows->isEmpty())
+                    <tr>
+                        <td colspan="2" class="text-center">No trading inflows found.</td>
+                    </tr>
+                @else
                 @foreach ($grouped_inflows as $inflow)
                     <tr>
-                        <td>{{ $inflow['address'] }}</td>
+                        <td>{{ $inflow['municipality'] }}</td>
                         <td>{{ $inflow['vehicle_count'] }}</td>
                     </tr>
                 @endforeach
+                @endif
             </tbody>
         </table>
     </div>
-</div>
-<div class="col-md-6">
-    <div class="table">
+    <div class="col-md-6">
         <h1>Trading Outflows</h1>
         <table>
             <thead>
                 <tr>
-                    <th>Address</th>
+                    <th>Municipality</th>
                     <th>Number of Cars</th>
                 </tr>
             </thead>
             <tbody>
+                 @if ($grouped_outflows->isEmpty())
+                    <tr>
+                        <td colspan="2" class="text-center">No trading outflows found.</td>
+                    </tr>
+                @else
                 @foreach ($grouped_outflows as $outflow)
                     <tr>
-                        <td>{{ $outflow['address'] }}</td>
+                        <td>{{ $outflow['municipality'] }}</td>
                         <td>{{ $outflow['vehicle_count'] }}</td>
                     </tr>
                 @endforeach
+                @endif
             </tbody>
         </table>
     </div>
-    </div>  
-    </div>
-        
+</div>
 @endsection

@@ -18,7 +18,7 @@
   <div class="row ">
     <!-- Number of Vehicles -->
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
-        <div class="card info-card customers-card">
+        <div class="card info-card sales-card">
             <div class="card-body">
                 <h5 class="card-title">Date and Time</h5>
                 <div class="d-flex align-items-center">
@@ -34,7 +34,7 @@
     </div>
 
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
-        <div class="card info-card revenue-card">
+        <div class="card info-card sales-card">
             <div class="card-body">
                 <h5 class="card-title">Vehicles </h5>
                 <div class="d-flex align-items-center">
@@ -113,13 +113,12 @@
                                     <th scope="col">Date</th>
                                     
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
-                                            <select id="amPmFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">AM/PM</option>
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="timeFilter" style="margin-right: 10px;">Time</label>
+                                            <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByTime()">
+                                                <option value="">All Times</option>
+                                                <option value="AM" {{ request('time_filter') == 'AM' ? 'selected' : '' }}>AM</option>
+                                                <option value="PM" {{ request('time_filter') == 'PM' ? 'selected' : '' }}>PM</option>
                                             </select>
                                         </div>
                                     </th>
@@ -130,13 +129,14 @@
                                     <th scope="col">Name</th>
                                     
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="commodityFilter" class="form-label" style="margin-right: 5px;">Commodity:</label>
-                                            <select id="commodityFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="commodityFilter" style="margin-right: 10px;">Commodity</label>
+                                            <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByCommodity()">
+                                                <option value="">All Commodities</option>
                                                 @foreach ($commodities as $commodity)
-                                                    <option value="{{ $commodity->commodity_id }}">{{ $commodity->commodity_name }}</option>
+                                                <option value="{{ $commodity->commodity_id }}" {{ request('commodity_filter') == $commodity->commodity_id ? 'selected' : '' }}>
+                                                    {{ $commodity->commodity_name }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -146,14 +146,15 @@
                                     
                                     
                                     
-                                    <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
-                                            <select id="productionOriginFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($productionOrigins as $origin)
-                                                    <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
+                                     <th scope="col">
+                                        <div class="d-flex align-items-center">
+                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
+                                            <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
+                                                <option value="">Origin:</option>
+                                                @foreach ($municipalities as $municipality)
+                                                <option value="{{ $municipality }}" {{ request('municipality_filter') == $municipality ? 'selected' : '' }}>
+                                                    {{ $municipality }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -173,13 +174,14 @@
                                     </th>
                                     
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="attendantFilter" class="form-label" style="margin-right: 5px;">TOI/TOA:</label>
-                                            <select id="attendantFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="staffFilter" style="margin-right: 10px;">TOA/TOI</label>
+                                            <select name="staff_filter" id="staffFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByStaff()">
+                                                <option value="">All Staff</option>
                                                 @foreach ($staffs as $staff)
-                                                    <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
+                                                <option value="{{ $staff->staff_id }}" {{ request('staff_id') == $staff->staff_id ? 'selected' : '' }}>
+                                                    {{ $staff->staff_name }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -220,20 +222,18 @@
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
                             <li class="page-item {{ $trading_inflows_table->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() - 1 }}">Previous</a>
+                                <a class="page-link" href="{{ $trading_inflows_table->previousPageUrl() . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Previous</a>
                             </li>
-                    
                             @for ($i = 1; $i <= $trading_inflows_table->lastPage(); $i++)
                                 <li class="page-item {{ $i == $trading_inflows_table->currentPage() ? 'active' : '' }}">
-                                    <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                                    <a class="page-link" href="{{ $trading_inflows_table->url($i) . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">{{ $i }}</a>
                                 </li>
-                            @endfor
-                    
-                            <li class="page-item {{ $trading_inflows_table->hasMorePages() ? '' : 'disabled' }}">
-                                <a class="page-link" href="#" data-page="{{ $trading_inflows_table->currentPage() + 1 }}">Next</a>
-                            </li>
+                                @endfor
+                                <li class="page-item {{ $trading_inflows_table->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $trading_inflows_table->nextPageUrl() . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Next</a>
+                                </li>
                         </ul>
-                    </nav>                    
+                    </nav>               
                     
                 </div>
             </div>
@@ -269,57 +269,6 @@
     </div>
   @endif
 </section>
-
-<script>
-    function loadPage(page) {
-        const url = `{{ route('trading-inflow.index') }}?page=${page}`; 
-
-        fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(data, 'text/html');
-                const newTableBody = doc.querySelector('#TableBody');
-                const newPagination = doc.querySelector('.pagination');
-
-                // Update the table body and pagination
-                document.querySelector('#TableBody').innerHTML = newTableBody.innerHTML;
-                document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
-
-                // Prevent the page from jumping to the top
-                scrollToTable();
-            })
-            .catch(error => console.error('Error loading page:', error));
-    }
-
-    // Function to smoothly scroll to the table position
-    function scrollToTable() {
-        const table = document.querySelector('.table-responsive');
-        if (table) {
-            table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-
-    // Event delegation for pagination links
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.page-link')) {
-            e.preventDefault(); // Prevent default anchor click behavior
-            const page = e.target.getAttribute('data-page');
-            if (page) {
-                loadPage(page);
-            }
-        }
-    });
-</script>
-
-
-
-
-
-
-
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
         const amPmFilter = document.getElementById('amPmFilter');
@@ -499,5 +448,53 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initial call to set the date and time right away
   updateDateTime();
+</script>
+
+<script>
+    function filterByStaff() {
+        const staffId = document.getElementById('staffFilter').value;
+        const url = new URL(window.location.href);
+        if (staffId) {
+            url.searchParams.set('staff_id', staffId);
+        } else {
+            url.searchParams.delete('staff_id');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByTime() {
+        const timeFilter = document.getElementById('timeFilter').value;
+        const url = new URL(window.location.href);
+        if (timeFilter) {
+            url.searchParams.set('time_filter', timeFilter);
+        } else {
+            url.searchParams.delete('time_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByCommodity() {
+        const commodityFilter = document.getElementById('commodityFilter').value;
+        const url = new URL(window.location.href);
+        if (commodityFilter) {
+            url.searchParams.set('commodity_filter', commodityFilter);
+        } else {
+            url.searchParams.delete('commodity_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByMunicipality() {
+        const municipalityFilter = document.getElementById('municipalityFilter').value;
+        const url = new URL(window.location.href);
+        if (municipalityFilter) {
+            url.searchParams.set('municipality_filter', municipalityFilter);
+        } else {
+            url.searchParams.delete('municipality_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    
 </script>
 @endsection

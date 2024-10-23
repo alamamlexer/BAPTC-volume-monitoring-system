@@ -318,11 +318,20 @@
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
+        <a class="nav-link collapsed" href="{{route('report.index')}}">
+          <i class="bi bi-person"></i>
+          <span>Reports</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('user-management.index')}}">
           <i class="bi bi-person"></i>
           <span>User Management</span>
         </a>
-      </li><!-- End Profile Page Nav -->
+      </li>
+      
+      <!-- End Profile Page Nav -->
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="pages-login.html">

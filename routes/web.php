@@ -8,6 +8,7 @@ use App\Http\Controllers\TradingInflowController;
 use App\Http\Controllers\TradingOutflowController;
 use App\Http\Controllers\ShortTripInflowAndOutflowController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HomeController;
 
 
@@ -27,6 +28,8 @@ Route::controller(AuthenticationController::class)->group(function(){
 Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('admin',AdminDashboardController::class);
+    
+    Route::resource('report',ReportController::class);
 
     Route::resource('trading-inflow', TradingInflowController::class);
     Route::post('/trading-inflow/submit', [TradingInflowController::class, 'submit'])->name('trading-inflow.submit');
