@@ -144,7 +144,7 @@
                                                     data-municipality="{{ $location_vehicle->location->municipality }}"
                                                     data-province="{{ $location_vehicle->location->province }}"
                                                     data-region="{{ $location_vehicle->location->region }}">
-                                                    {{ $location_vehicle->vehicle->plate_number }} ({{ $location_vehicle->vehicle->vehicle_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
+                                                    {{ $location_vehicle->vehicle->plate_number }} {{ $location_vehicle->vehicle->vehicle_name }} ({{ $location_vehicle->facilitator->facilitator_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
                                             @endif
                                         @endforeach
                                     @endif
@@ -692,12 +692,13 @@
     }
 
     // Autofill Facilitator details
+    const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
     if (facilitatorSelect) {
         facilitatorSelect.value = item.getAttribute('data-facilitator-name') || ''; // Set facilitator name
     }
 
     // Autofill Facilitator ID
-    const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
+    
     if (facilitatorIdInput) {
         facilitatorIdInput.value = item.getAttribute('data-facilitator-id') || ''; // Set facilitator ID
     }

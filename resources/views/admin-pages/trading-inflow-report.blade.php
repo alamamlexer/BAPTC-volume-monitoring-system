@@ -18,7 +18,7 @@
   <div class="row ">
     <!-- Number of Vehicles -->
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
-        <div class="card info-card sales-card">
+        <div class="card info-card customers-card">
             <div class="card-body">
                 <h5 class="card-title">Date and Time</h5>
                 <div class="d-flex align-items-center">
@@ -34,7 +34,7 @@
     </div>
 
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
-        <div class="card info-card sales-card">
+        <div class="card info-card revenue-card">
             <div class="card-body">
                 <h5 class="card-title">Vehicles </h5>
                 <div class="d-flex align-items-center">

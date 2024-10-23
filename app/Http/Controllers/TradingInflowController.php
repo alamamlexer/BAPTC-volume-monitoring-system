@@ -38,6 +38,7 @@ class TradingInflowController extends Controller
         $facilitatorFilter = $request->input('facilitatorFilter');
             
         $trading_inflows = Transaction::where('transaction_type', 'trading inflow')
+            ->where('transaction_status', 'regular')
             ->whereBetween('date', [$startDate, $endDate])
             ->with(['staff', 'commodity', 'vehicle_type','facilitator'])
             ->get();
@@ -48,6 +49,7 @@ class TradingInflowController extends Controller
     
      // For the table
          $query = Transaction::where('transaction_type', 'trading inflow')
+             ->where('transaction_status', 'regular')
             ->whereBetween('date', [$startDate, $endDate])
             ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
     
@@ -251,6 +253,8 @@ class TradingInflowController extends Controller
             'province' => 'required',
             'region' => 'required',
         ]);
+        
+        dd( $validatedData);
         
         //Storing new location 
         $location = Location::where('barangay', $validatedData['barangay'])
