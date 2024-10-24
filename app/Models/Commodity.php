@@ -10,9 +10,9 @@ class Commodity extends Model
 {
     use HasFactory;
     
-    public function comments(): HasMany
+    public function transactions(): HasMany
     {
-        return $this->hasMany(Transaction::class)->chaperone();
+        return $this->hasMany(Transaction::class, 'commodity_id', 'commodity_id');
     }
     protected $fillable = [
         'commodity_name',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Commodity;
 use Carbon\Carbon; // Import Carbon for date handling
 use Illuminate\Support\Facades\DB;
 
@@ -11,7 +12,7 @@ class ReportController extends Controller
 {
     public function index()
     {
-        // Existing transaction calculations...
+        //table 1
         $table_one_data = [
             'AM_TRADING' => [
                 'inflow' => number_format(
@@ -177,8 +178,40 @@ class ReportController extends Controller
         'farmer_count' => $dailyAvgCountShIn,   
         'short_trip_in_count' => $dailyAvgCountShIn, 
         'short_trip_out_count' => $dailyAvgCountShOu, 
-        
         ];
+        
+        //table 6
+        
+        $commodities = Commodity::with('transactions')->get();
+
+        // Group transactions by municipality for each commodity and calculate volumes
+        $table_six_commodities = $commodities->map(function ($commodity) {
+            // Group transactions by municipality and sum the volumes
+            $transactionsGrouped = $commodity->transactions->groupBy('municipality')->map(function ($transactions) {
+                return [
+                    'municipality' => $transactions->first()->municipality, // Get the municipality name
+                    'total_volume' => $transactions->sum('volume'), // Sum of volumes for the municipality
+                ];
+            });
+    
+            // Calculate the total volume for the commodity
+            $totalCommodityVolume = $transactionsGrouped->sum('total_volume');
+    
+            return [
+                'commodity_name' => $commodity->commodity_name,
+                'transactions'   => $transactionsGrouped,
+                'total_volume'   => $totalCommodityVolume, // Total volume for this commodity
+               
+            ];
+        })->filter(function ($commodity) {
+            // Filter out commodities with no transactions
+            return $commodity['transactions']->isNotEmpty();
+        });
+        
+        
+        $table_six_commodities = $table_six_commodities->sortByDesc('total_volume');
+        
+        $table_six_grand_total_volume = $table_six_commodities->sum('total_volume');
 
         // Passing data to the view
         return view('admin-pages.report', compact('table_one_data', 
@@ -187,6 +220,8 @@ class ReportController extends Controller
                                                                         'R2_peakDay', 
                                                                         'R2_leanDayDate', 
                                                                         'R2_leanDay',
+                                                                        'table_six_commodities',
+                                                                        'table_six_grand_total_volume',
                                                                         
         ));
         

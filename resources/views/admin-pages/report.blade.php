@@ -291,20 +291,60 @@
     <div class="card-body">
         <h5 class="card-title"><b>VI. MONITORED COMMODITY VOLUME PER RANK WITH ESTIMATED MONETARY VALUE</b></h5>
       <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">NO</th>
+                    <th class="text-center">COMMODITY</th>
+                    <th class="text-center">PRODUCTION SOURCE</th>
+                    <th class="text-center">VOLUME (KG)</th>
+                    <th class="text-center">BAPTC AVERAGE PRICE (PHP)</th>
+                    <th class="text-center">MONETARY VALUE (PHP)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($table_six_commodities as $index => $commodity)
+                    <tr>
+                        <td class="text-center" rowspan="{{ $commodity['transactions']->count() + 1 }}">
+                            {{ $loop->iteration }}
+                        </td>
+                        <td class="text-center" rowspan="{{ $commodity['transactions']->count() + 1 }}">
+                            {{ $commodity['commodity_name'] }}
+                        </td>
+                    </tr>
+        
+                    @foreach ($commodity['transactions'] as $transaction)
+                        <tr>
+                            <td class="text-center">{{ $transaction['municipality'] }}</td>
+                            <td class="text-center">{{ $transaction['total_volume'] }}</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                    @endforeach
+        
+                    <tr>
+                        <td class="text-center"></td>
+                        <td class="text-end" colspan="2">Sub-total</td>
+                        <td class="text-center">{{ $commodity['total_volume'] }}</td>
+                    </tr>
+                @endforeach
+                
+                <tr>
+                    <td class="text-center fw-bold" colspan="3">GRAND TOTAL</td>
+                    <td class="text-center fw-bold">{{ $table_six_grand_total_volume }}</td>
+                    <td class="text-center fw-bold"></td>
+                    <td class="text-center fw-bold"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
       </div>
     </div>
     </div>
     </div>
     </div>
     
-
-
 <!-- TABLE 7 -->
 <div class="row">
     <div class="col-lg-12">
@@ -312,12 +352,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>VII. MONITORED PRODUCTION SOURCE OF TRADED COMMODITES PER RANK</b></h5>
       <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
+     
       </div>
     </div>
     </div>
@@ -330,46 +365,14 @@
     <div class="col-lg-12">
     <div class="card">
     <div class="card-body">
-        <h5 class="card-title"><b>VIII. STATUS OF VEGETABLE TRADING STALLS</b></h5>
+        <h5 class="card-title"><b>VIII. MONITORED MARKET DESTINATION OF BROUGHT COMMODITIES</b></h5>
       <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="col-md-4 text-center">PARTICULAR</th>
-                    <th class="col-md-4 text-center">NUMBER OF STAKEHOLDERS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">FARMER GROUP</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">FARMER (Individual)</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">BUYER (Individual)</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">MARKET FACILITATOR</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">PACKER/PORTER/ASHER</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">PACKER,PORTER & WASHER'S GROUP</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-end">TOTAL</td>
-                    <td class="text-center"></td>
-                </tr>
-            </tbody>
-        </table>
+         {{-- <table class="table">Place the table here and add a class="table"
+      <thead>
+      </thead>
+      <tbody>
+      </tbody>
+      </table>  --}}
       </div>
     </div>
     </div>
