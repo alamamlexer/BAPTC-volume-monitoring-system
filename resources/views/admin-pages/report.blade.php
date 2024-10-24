@@ -23,52 +23,74 @@
  <h5 class="card-title"><b>I. SUMMARIZED MONITORED VEGETABLE TRADING TRANSACTIONS</b></h5>
  
  <div class="table-responsive">
- <table class="table">
+ <table class="table table-bordered">
         <thead>
             <tr>
-                <th rowspan="2">PARTICULAR</th>
-                <th colspan="2">TOTAL VOLUME (KG)</th>
+                <th rowspan="2" class="text-center align-middle ">PARTICULAR</th>
+                <th colspan="2" class="text-center">TOTAL VOLUME (KG)</th>
+
             </tr>
             <tr>
-                <th>INFLOW (KG)</th>
-                <th>OUTFLOW (KG)</th>
+                <th class="text-center">INFLOW (KG)</th>
+                <th class="text-center">OUTFLOW (KG)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>AM TRADING (Farmer)</td>
-                <td>{{ $transactions['AM_TRADING']['inflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['AM_TRADING']['inflow'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td>PM TRADING (Farmer)</td>
-                <td>{{ $transactions['PM_TRADING']['inflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['PM_TRADING']['inflow'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td>SHORT TRIP IN</td>
-                <td>{{ $transactions['SHORT_TRIP_IN']['inflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['SHORT_TRIP_IN']['inflow'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
+                <td class="text-end">-Dry Storage (includes the cold storage converted intro dry storage)</td>
+                <td class="text-end">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="text-end">-Cold Storage no.8 (Only functional cold storage)</td>
+                <td class="text-end">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="text-end">Carrot Washing Facility</td>
+                <td class="text-end">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="text-end">Inter Trading</td>
+                <td class="text-end">0</td>
+                <td></td>
+            </tr>
+
+            <tr>
                 <td>SHORT TRIP OUT</td>
                 <td></td>
-                <td>{{ $transactions['SHORT_TRIP_OUT']['outflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['SHORT_TRIP_OUT']['outflow'] ?? 0 }}</td>
             </tr>
             <tr>
                 <td>AM TRUCKINGS (Trader)</td>
                 <td></td>
-                <td>{{ $transactions['AM_TRUCKINGS']['outflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['AM_TRUCKINGS']['outflow'] ?? 0 }}</td>
             </tr>
             <tr>
                 <td>PM TRUCKINGS (Trader)</td>
                 <td></td>
-                <td>{{ $transactions['PM_TRUCKINGS']['outflow'] ?? 0 }}</td>
+                <td class="text-center">{{ $table_one_data['PM_TRUCKINGS']['outflow'] ?? 0 }}</td>
             </tr>
             <tr>
-                <td>GRAND TOTAL:</td>
-                <td>{{ array_sum(array_column($transactions, 'inflow')) }}</td>
-                <td>{{ array_sum(array_column($transactions, 'outflow')) }}</td>
+                <td class="text-center fw-bold">GRAND TOTAL:</td>
+                <td class="text-center fw-bold">{{ $table_one_data['GRAND_TOTAL_INFLOW']['all']?? 0 }}</td>
+                <td class="text-center fw-bold">{{ $table_one_data['GRAND_TOTAL_OUTFLOW']['all']?? 0 }}</td>
             </tr>
         </tbody>
     </table>
@@ -90,7 +112,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>II. PEAK AND LEAN OF VEGETABLE TRADING TRANSACTIONS</b></h5>
       <div class="table-responsive">
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th class="col-md-8 text-center">PARTICULAR</th>
@@ -132,7 +154,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>III. DAILY AVERAGE WEIGHT (KG) and LOADING/DELIVERY FREQUENCY</b></h5>
       <div class="table-responsive">
-        <table class="table">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th class="col-md-4 text-center">PARTICULAR</th>
@@ -143,26 +165,28 @@
             <tbody>
                 <tr>
                     <td class="text-center">TRADER</td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
+                    <td class="text-center">{{$table_three_data['trader']??0}}</td>
+                    <td class="text-center">{{$table_three_data['trader_count']??0}}</td>
                 </tr>
                 <tr>
                     <td class="text-center">FARMER</td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
+                    <td class="text-center">{{$table_three_data['farmer']??0}}</td>
+                    <td class="text-center">{{$table_three_data['farmer_count']??0}}</td>
                 </tr>
                 <tr>
-                    <td class="text-center" colspan="3"><strong>Short Trip</strong></td>
+                    <td class="text-center border-end-0" >SHORT TRIP</td>
+                    <td class="text-start border-0 "></td>
+                    <td class="text-start border-start-0"></td>
                 </tr>
                 <tr>
                     <td class="text-end">IN</td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
+                    <td class="text-center">{{$table_three_data['short_trip_in']??0}}</td>
+                    <td class="text-center">{{$table_three_data['short_trip_in_count']??0}}</td>
                 </tr>
                 <tr>
                     <td class="text-end">OUT</td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
+                    <td class="text-center">{{$table_three_data['short_trip_out']??0}}</td>
+                    <td class="text-center">{{$table_three_data['short_trip_out_count']??0}}</td>
                 </tr>
             </tbody>
         </table>
@@ -205,10 +229,6 @@
     </div>
     </div>
     
-<div class="col-md-12 mt-4">
-
-
-</div>
 
 <!-- TABLE 5 -->
 <div class="row">

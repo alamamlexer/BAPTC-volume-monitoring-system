@@ -72,6 +72,7 @@ class TradingInflowController extends Controller
             $query->where('municipality', $municipality);
         }
         // Fetch the paginated results
+        $trading_inflows_graph = $query->get();
         $trading_inflows_table = $query->paginate(5);
         
         if ($request->ajax()) {
@@ -80,7 +81,7 @@ class TradingInflowController extends Controller
                 'current_page' => $trading_inflows_table->currentPage(),
                 'last_page' => $trading_inflows_table->lastPage(),
                 'total' => $trading_inflows_table->total(),
-                
+
             ]);
         }
      
@@ -114,7 +115,7 @@ class TradingInflowController extends Controller
     $totalVolumes = [];
     $dates = [];
 
-    foreach ($trading_inflows as $inflow) {
+    foreach ($trading_inflows_graph as $inflow) {
         $date = Carbon::parse($inflow->date)->toDateString();
         $commodity = $inflow->commodity->commodity_name;
 
@@ -183,7 +184,7 @@ class TradingInflowController extends Controller
     
     return view('admin-pages.trading-inflow-report', compact('today_volume',
                                                                         'today_vehicle',
-                                                                                    'trading_inflows',
+                                                                                    'trading_inflows_graph',
                                                                                     'trading_inflows_table',
                                                                                     'request',
                                                                                     'facilitators', 
@@ -265,8 +266,7 @@ class TradingInflowController extends Controller
             'province' => 'required',
             'region' => 'required',
         ]);
-        
-        dd( $validatedData);
+  
         
         //Storing new location 
         $location = Location::where('barangay', $validatedData['barangay'])
