@@ -163,13 +163,6 @@
                                     <th scope="col">
                                         <div style="display: flex; align-items: center;">
                                             <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator:</label>
-                                            <select id="facilitatorFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($facilitators as $facilitator)
-                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
-                                                @endforeach
-                                            </select>
                                         </div>
                                     </th>
                                     
@@ -192,7 +185,7 @@
                             </thead>
                             <tbody id="TableBody">
                                 @foreach ($trading_inflows_table as $trading_inflow)
-                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}"> >
+                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
                                     <td>{{ $trading_inflow->time }}</td>
@@ -204,9 +197,13 @@
                                     <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
                                     <td>{{ $trading_inflow->staff->staff_name }}</td>
                                     <td>
-                                        <a href="{{ route('trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
+                                        @if ($userId == $trading_inflow->staff_id)
+                                        <a href="{{ route('staff-trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
                                             <i class="bx bxs-edit"></i> Edit
                                         </a>
+                                        @else
+                                        <span class="text-muted">Unauthorized Access</span>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -215,7 +212,7 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-10">
-                            <a href="{{ route('trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
+                            <a href="{{ route('staff-trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
                         </div>
                     </div>
                     
@@ -269,71 +266,6 @@
     </div>
   @endif
 </section>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-        const amPmFilter = document.getElementById('amPmFilter');
-        const attendantFilter = document.getElementById('attendantFilter');
-        const commodityFilter = document.getElementById('commodityFilter');
-        const productionOriginFilter = document.getElementById('productionOriginFilter');
-        const facilitatorFilter = document.getElementById('facilitatorFilter'); // Add this line
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#TableBody tr');
-
-        function filterTable() {
-            const selectedAmPm = amPmFilter.value;
-            const selectedAttendant = attendantFilter.value;
-            const selectedCommodity = commodityFilter.value;
-            const selectedProductionOrigin = productionOriginFilter.value;
-            const selectedFacilitator = facilitatorFilter.value; // This is now initialized
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-        
-            tableRows.forEach(row => {
-                const rowDate = new Date(row.dataset.date);
-                const rowAmPm = row.dataset.amPm;
-                const rowAttendant = row.dataset.attendant;
-                const rowCommodity = row.dataset.commodity;
-                const rowProductionOrigin = row.dataset.productionOrigin;
-                const rowFacilitator = row.dataset.facilitator; // This is now initialized
-        
-                const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
-                const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
-                const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
-                const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
-                const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
-                const isFacilitatorMatch = !selectedFacilitator || (rowFacilitator === selectedFacilitator); // This is now initialized
-        
-                if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isFacilitatorMatch) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Add event listeners for all filters
-        amPmFilter.addEventListener('change', filterTable);
-        attendantFilter.addEventListener('change', filterTable);
-        commodityFilter.addEventListener('change', filterTable);
-        productionOriginFilter.addEventListener('change', filterTable);
-        facilitatorFilter.addEventListener('change', filterTable); // Add this line for facilitator filter
-        startDateInput.addEventListener('change', filterTable);
-        endDateInput.addEventListener('change', filterTable);
-
-        // Reset filters button
-        document.getElementById('resetFilters').addEventListener('click', () => {
-            amPmFilter.value = '';
-            attendantFilter.value = '';
-            commodityFilter.value = '';
-            productionOriginFilter.value = '';
-            facilitatorFilter.value = ''; // Add this line to reset facilitator filter
-            startDateInput.value = '';
-            endDateInput.value = '';
-            filterTable(); // Apply reset
-        });
-    });
-</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -495,6 +427,5 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = url.toString();
     }
 
-    
 </script>
 @endsection

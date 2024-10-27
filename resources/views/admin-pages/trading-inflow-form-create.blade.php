@@ -289,15 +289,6 @@
                                 <button type="reset" class="btn btn-secondary">Reset</button>
                                 <a href="{{ route('trading-inflow.index') }}" class="btn btn-danger">Back</a>
                             </div>
-                          
-                            
-
-                            
-                            
-                            
-                            
-                            
-
                         </form>
                     </div>
                 </div>

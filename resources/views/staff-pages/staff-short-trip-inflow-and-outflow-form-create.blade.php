@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 @section('page_title','Short Trip Inflow and Outflow Form')
 @section('content')
 
@@ -23,7 +23,7 @@
             <div class="card-body">
               <h5 class="card-title">Short Trip Inflow and Outflow Form</h5>
               <!-- Floating Labels Form -->
-              <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
+              <form class="row g-3 " action="{{ route('staff-short-trip-inflow-and-outflow.store') }}" method="POST">
                 @csrf
 
                             {{--  input for transaction_status = "trading"  --}}
@@ -314,7 +314,7 @@
                             <div class="text-center">
                                 <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
                                 <button type="reset" class="btn btn-secondary">Reset</button>
-                                <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
+                                <a href="{{ route('staff-short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                             </div>
                           
                             
@@ -339,7 +339,7 @@
     
                         <div class="row mb-3">
                             <div class="col-auto">
-                                <form action="{{ route('short-trip-inflow-and-outflow.submit') }}" method="POST">
+                                <form action="{{ route('staff-short-trip-inflow-and-outflow.submit') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
                                     <button type="submit" class="btn btn-success">
@@ -460,10 +460,10 @@
                                             <td>{{ $temporary_transaction->facilitator->facilitator_name?? 'N/A'}}</td>
                                             <td>{{ $temporary_transaction->barangay }}, {{ $temporary_transaction->municipality }}, {{ $temporary_transaction->province }}, {{ $temporary_transaction->region }}</td>
                                             <td>
-                                                <a href="{{ route('short-trip-inflow-and-outflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
+                                                <a href="{{ route('staff-short-trip-inflow-and-outflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
                                                     <i class="bx bxs-edit"></i> Edit
                                                 </a>
-                                                <form action="{{ route('short-trip-inflow-and-outflow.destroy', $temporary_transaction->id) }}" method="POST" style="display:inline;">
+                                                <form action="{{ route('staff-short-trip-inflow-and-outflow.destroy', $temporary_transaction->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this reservation?')">

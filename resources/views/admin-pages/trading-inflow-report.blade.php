@@ -163,13 +163,6 @@
                                     <th scope="col">
                                         <div style="display: flex; align-items: center;">
                                             <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator:</label>
-                                            <select id="facilitatorFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($facilitators as $facilitator)
-                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
-                                                @endforeach
-                                            </select>
                                         </div>
                                     </th>
                                     
@@ -192,7 +185,7 @@
                             </thead>
                             <tbody id="TableBody">
                                 @foreach ($trading_inflows_table as $trading_inflow)
-                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}"> >
+                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
                                     <td>{{ $trading_inflow->time }}</td>

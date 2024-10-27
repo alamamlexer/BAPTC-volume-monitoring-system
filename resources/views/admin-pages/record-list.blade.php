@@ -48,7 +48,17 @@
         </div>
         </div>
         </div>
-        
+
+
+
+
+
+
+
+
+
+
+        <!-- Market Facilitator -->
         <div class="col-md-12">
             <div class="card">
             <div class="card-body">
@@ -83,7 +93,9 @@
             </div>
             </div>
             
-            <div class="col-md-1">
+
+            <!-- Commodity -->
+            <div class="col-md-12">
                 <div class="card">
                 <div class="card-body">
                    <h5 class="card-title">Commodity</h5> 
@@ -124,7 +136,7 @@
     datatables.forEach(function (tableClass) {
         if (!$.fn.DataTable.isDataTable(tableClass)) {
             $(tableClass).DataTable({
-                paging: true,          // Enable pagination
+                paging: false,          // Enable pagination
                 searching: true,       // Enable search
                 ordering: true,        // Enable column ordering
                 info: true,            // Show table info

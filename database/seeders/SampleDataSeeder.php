@@ -26,22 +26,29 @@ class SampleDataSeeder extends Seeder
         //Staff
         Staff::create([
             'staff_id' => '1',
+            'staff_name' => 'admin',
+            'email' => 'admin@gmail.com',
+            'contact_number' => '0999999994',
+        ]); 
+        Staff::create([
+            'staff_id' => '2',
             'staff_name' => 'Lexer',
             'email' => 'lexer@gmail.com',
             'contact_number' => '0999999998',
         ]);
         Staff::create([
-            'staff_id' => '2',
+            'staff_id' => '3',
             'staff_name' => 'Kimjo',
             'email' => 'kimjo@gmail.com',
             'contact_number' => '0999999992',
         ]);
         Staff::create([
-            'staff_id' => '3',
+            'staff_id' => '4',
             'staff_name' => 'trixan',
             'email' => 'trixan@gmail.com',
             'contact_number' => '0999999991',
         ]); 
+        
             
         //Vehicle Type
         VehicleType::create([
@@ -291,166 +298,166 @@ class SampleDataSeeder extends Seeder
             'facilitator_name' => 'Frozen Feast',
         ]);
         
-        // //Location
-        // Location::create([
-        //     'location_id' => '1',
-        //     'barangay' => 'Ampusongan',
-        //     'municipality' => 'Bakun',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        //Location
+        Location::create([
+            'location_id' => '1',
+            'barangay' => 'Ampusongan',
+            'municipality' => 'Bakun',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '2',
-        //     'barangay' => 'Gambang',
-        //     'municipality' => 'Bakun',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '2',
+            'barangay' => 'Gambang',
+            'municipality' => 'Bakun',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '3',
-        //     'barangay' => 'Dalipey',
-        //     'municipality' => 'Bakun',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '3',
+            'barangay' => 'Dalipey',
+            'municipality' => 'Bakun',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '4',
-        //     'barangay' => 'Poblacion',
-        //     'municipality' => 'Bakun',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '4',
+            'barangay' => 'Poblacion',
+            'municipality' => 'Bakun',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '5',
-        //     'barangay' => 'Poblacion',
-        //     'municipality' => 'Itogon',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '5',
+            'barangay' => 'Poblacion',
+            'municipality' => 'Itogon',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '6',
-        //     'barangay' => 'Loacan',
-        //     'municipality' => 'Itogon',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '6',
+            'barangay' => 'Loacan',
+            'municipality' => 'Itogon',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '7',
-        //     'barangay' => 'Tuding',
-        //     'municipality' => 'Itogon',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '7',
+            'barangay' => 'Tuding',
+            'municipality' => 'Itogon',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '8',
-        //     'barangay' => 'Ansagan',
-        //     'municipality' => 'Tuba',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '8',
+            'barangay' => 'Ansagan',
+            'municipality' => 'Tuba',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '9',
-        //     'barangay' => 'Camp 4',
-        //     'municipality' => 'Tuba',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '9',
+            'barangay' => 'Camp 4',
+            'municipality' => 'Tuba',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '10',
-        //     'barangay' => 'Padcal',
-        //     'municipality' => 'Tuba',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '10',
+            'barangay' => 'Padcal',
+            'municipality' => 'Tuba',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '11',
-        //     'barangay' => 'Longlong',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '11',
+            'barangay' => 'Longlong',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '12',
-        //     'barangay' => 'Pico',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '12',
+            'barangay' => 'Pico',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '13',
-        //     'barangay' => 'Betag',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '13',
+            'barangay' => 'Betag',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '14',
-        //     'barangay' => 'Lubas',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '14',
+            'barangay' => 'Lubas',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '15',
-        //     'barangay' => 'Ambiong',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '15',
+            'barangay' => 'Ambiong',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '16',
-        //     'barangay' => 'Santo Tomas Proper',
-        //     'municipality' => 'Baguio City',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '16',
+            'barangay' => 'Santo Tomas Proper',
+            'municipality' => 'Baguio City',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '17',
-        //     'barangay' => 'Irisan',
-        //     'municipality' => 'Baguio City',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '17',
+            'barangay' => 'Irisan',
+            'municipality' => 'Baguio City',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '18',
-        //     'barangay' => 'Guisad Surong',
-        //     'municipality' => 'Baguio City',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '18',
+            'barangay' => 'Guisad Surong',
+            'municipality' => 'Baguio City',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '19',
-        //     'barangay' => 'Asin',
-        //     'municipality' => 'Tuba',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '19',
+            'barangay' => 'Asin',
+            'municipality' => 'Tuba',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
-        // Location::create([
-        //     'location_id' => '20',
-        //     'barangay' => 'Puguis',
-        //     'municipality' => 'La Trinidad',
-        //     'province' => 'Benguet',
-        //     'region' => 'CAR',
-        // ]);
+        Location::create([
+            'location_id' => '20',
+            'barangay' => 'Puguis',
+            'municipality' => 'La Trinidad',
+            'province' => 'Benguet',
+            'region' => 'CAR',
+        ]);
         
         //Facilitator Location Vehicle
         FacilitatorLocationVehicle::create([
@@ -622,28 +629,29 @@ class SampleDataSeeder extends Seeder
         
         //User
         User::create([
-            'id' => '4',
-            'username' => 'Admin',
+            'id' => '1',
+            'staff_id' => '1',
+            'username' => 'admin',
             'password' => Hash::make('123'),
             'type' => 0,
         ]);
         User::create([
-            'id' => '1',
-            'staff_id' => '1',
-            'username' => 'Lexer',
-            'password' => Hash::make('123'),
-            'type' => 1,
-        ]);
-        User::create([
             'id' => '2',
             'staff_id' => '2',
-            'username' => 'Kimjo',
+            'username' => 'Lexer',
             'password' => Hash::make('123'),
             'type' => 1,
         ]);
         User::create([
             'id' => '3',
             'staff_id' => '3',
+            'username' => 'Kimjo',
+            'password' => Hash::make('123'),
+            'type' => 1,
+        ]);
+        User::create([
+            'id' => '4',
+            'staff_id' => '4',
             'username' => 'Trixan',
             'password' => Hash::make('123'),
             'type' => 1,

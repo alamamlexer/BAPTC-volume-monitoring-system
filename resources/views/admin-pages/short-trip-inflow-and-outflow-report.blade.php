@@ -12,28 +12,77 @@
     </nav>
 </div>
 
-<section class="section">
-    <div class="row mb-4">
-        <div class="col-lg-12">
-            <div class="card">
+<section class="section dashboard">
+
+    <div class="row ">
+        <!-- Number of Vehicles -->
+        <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+            <div class="card info-card sales-card">
+                <div class="card-body">
+                    <h5 class="card-title">Date and Time</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-time-fill"></i>
+                        </div>
+                        <div>
+                            <h6 id="current-date-time" class="ps-3 fs-3 fw-bold"></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+            <div class="card info-card sales-card">
+                <div class="card-body">
+                    <h5 class="card-title">Vehicles </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-car-fill"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>{{$today_vehicle}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Sales Card -->
+
+        <!-- Revenue Card -->
+        <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="card-title">Volume (kg)</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="ri-scales-2-fill"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>{{$today_volume}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Revenue Card -->
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4"> <!-- Added margin bottom for spacing -->
                 <div class="card-body">
                     <h5 class="card-title">Short Trip Chart</h5>
                     <!-- Filter Form -->
-                    <form method="GET" action="{{ route('short-trip-inflow-and-outflow.index') }}" class="mb-3">
-                        <div class="input-group">
-                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
-                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
-                            <button class="btn btn-primary" type="submit">Filter</button>
-                            <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-secondary ms-2">Reset</a>
-                        </div>
-                    </form>
-
                     <!-- Chart Container -->
                     <div id="areaChart" style="height: 350px;"></div>
                 </div>
             </div>
         </div>
     </div>
+
+
+
+
+
 
     <div class="row">
         <div class="col-lg-12">
@@ -42,155 +91,132 @@
                     <h5 class="card-title">Short Trip Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
-                        <!-- Filter Fields -->
-                        <div class="col-md-2">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" id="startDate" class="form-control" />
-                        </div>
-                        <div class="col-md-2">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" id="endDate" class="form-control" />
-                        </div>
-                    </div>
-
-
-                        <div class="row mb-3">
-                            <div class="col-sm-10">
-                                <button id="resetFilters" class="btn btn-secondary">Display all</button>
+                        <form method="GET" action="{{ route('short-trip-inflow-and-outflow.index') }}" class="mb-3">
+                            <div class="input-group">
+                                <div class="col-md-2">
+                                    <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
+                                </div>
+                                <button class="btn btn-primary" type="submit">Filter</button>
+                                <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-secondary ">Reset</a>
                             </div>
-                        </div>
-
+                        </form>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table" id="">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
-                                    
+
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
-                                            <select id="amPmFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">Am/Pm</option>
-                                                <option value="AM">Am</option>
-                                                <option value="PM">Pm</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="timeFilter" style="margin-right: 10px;">Time</label>
+                                            <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByTime()">
+                                                <option value="">All Times</option>
+                                                <option value="AM" {{ request('time_filter') == 'AM' ? 'selected' : '' }}>AM</option>
+                                                <option value="PM" {{ request('time_filter') == 'PM' ? 'selected' : '' }}>PM</option>
                                             </select>
                                         </div>
                                     </th>
-                                    
+
                                     <th scope="col">
-                                      <div style="display: flex; align-items: center;">
-                                          <label for="transactionTypeFilter" class="form-label" style="margin-right: 5px;">In/Out:</label>
-                                          <select id="transactionTypeFilter" class="form-select" 
-                                                  style="border: none; font-weight: bold;">
-                                              <option value="">All</option>
-                                              <option value="short trip inflow">Inflow</option>
-                                              <option value="short trip outflow">Outflow</option>
-                                          </select>
-                                      </div>
-                                  </th>
-                                    
-                                    <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
-                                            <select id="attendantFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($staffs as $staff)
-                                                    <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
-                                                @endforeach
+                                        <div class="d-flex align-items-center">
+                                            <label for="typeFilter" style="margin-right: 10px;">Type</label>
+                                            <select name="type_filter" id="typeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByType()">
+                                                <option value="">In/Out</option>
+                                                <option value="short trip inflow" {{ request('type_filter') == 'short trip inflow' ? 'selected' : '' }}>In</option>
+                                                <option value="short trip outflow" {{ request('type_filter') == 'short trip outflow' ? 'selected' : '' }}>Out</option>
                                             </select>
                                         </div>
                                     </th>
-                                    
+
                                     <th scope="col">Plate Number</th>
                                     <th scope="col">Name</th>
-                                    
+
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="commodityFilter" class="form-label" style="margin-right: 5px;">Commodity:</label>
-                                            <select id="commodityFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="commodityFilter" style="margin-right: 10px;">Commodity</label>
+                                            <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByCommodity()">
+                                                <option value="">All Commodities</option>
                                                 @foreach ($commodities as $commodity)
-                                                    <option value="{{ $commodity->commodity_id }}">{{ $commodity->commodity_name }}</option>
+                                                <option value="{{ $commodity->commodity_id }}" {{ request('commodity_filter') == $commodity->commodity_id ? 'selected' : '' }}>
+                                                    {{ $commodity->commodity_name }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </th>
-                                    
+
                                     <th scope="col">Volume</th>
-                                    
+                                    <th scope="col">Market Facilitator</th>
+
                                     <th scope="col">
-                                        <div style="display: flex; align-items: center;">
-                                            <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
-                                            <select id="productionOriginFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($productionOrigins as $origin)
-                                                    <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
+                                        <div class="d-flex align-items-center">
+                                            <label for="staffFilter" style="margin-right: 10px;">TOA/TOI</label>
+                                            <select name="staff_filter" id="staffFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByStaff()">
+                                                <option value="">All Staff</option>
+                                                @foreach ($staffs as $staff)
+                                                <option value="{{ $staff->staff_id }}" {{ request('staff_id') == $staff->staff_id ? 'selected' : '' }}>
+                                                    {{ $staff->staff_name }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </th>
-                                    
+
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="shortTripTableBody">
-                              @foreach ($short_trips_table as $short_trip)
-                              <tr data-date="{{ $short_trip->date }}" 
-                                  data-am-pm="{{ $short_trip->time }}" 
-                                  data-attendant="{{ $short_trip->staff->staff_id }}" 
-                                  data-commodity="{{ $short_trip->commodity->commodity_id }}" 
-                                  data-production-origin="{{ $short_trip->barangay }}" 
-                                  data-transaction-type="{{ $short_trip->transaction_type }}">
-                                  <td>{{ $short_trip->id }}</td>
-                                  <td>{{ $short_trip->date }}</td>
-                                  <td>{{ $short_trip->time }}</td>
-                                  <td>{{ $short_trip->transaction_type }}</td> <!-- Show the transaction type -->
-                                  <td>{{ $short_trip->staff->staff_name }}</td>
-                                  <td>{{ $short_trip->plate_number }}</td>
-                                  <td>{{ $short_trip->name }}</td>
-                                  <td>{{ $short_trip->commodity->commodity_name }}</td>
-                                  <td>{{ $short_trip->volume }}</td>
-                                  <td>{{ $short_trip->barangay }}, {{ $short_trip->municipality }}, {{ $short_trip->province }}, {{ $short_trip->region }}</td>
-                                  <td>
-                                      <a href="{{ route('short-trip-inflow-and-outflow.edit', $short_trip->id) }}" class="btn btn-outline-primary m-1">
-                                          <i class="bx bxs-edit"></i> Edit
-                                      </a>
-                                  </td>
-                              </tr>
-                              @endforeach                              
+                            <tbody id="TableBody">
+                                @foreach ($trading_inflows_table as $trading_inflow)
+                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}">
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $trading_inflow->date }}</td>
+                                    <td>{{ $trading_inflow->time }}</td>
+                                    <td>{{ $trading_inflow->transaction_type === 'short trip inflow' ? 'In' : 'Out' }}</td>
+                                    <td>{{ $trading_inflow->plate_number }}</td>
+                                    <td>{{ $trading_inflow->name }}</td>
+                                    <td>{{ $trading_inflow->commodity->commodity_name }}</td>
+                                    <td>{{ $trading_inflow->volume }}</td>
+                                    <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
+                                    <td>{{ $trading_inflow->staff->staff_name }}</td>
+                                    <td>
+                                        <a href="{{ route('short-trip-inflow-and-outflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
+                                            <i class="bx bxs-edit"></i> Edit
+                                        </a>
+                                    </td>
+
+
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-
                     <div class="row mb-3">
                         <div class="col-sm-10">
                             <a href="{{ route('short-trip-inflow-and-outflow.create') }}" class="btn btn-primary">Add New Short Trip</a>
                         </div>
                     </div>
-                    
+
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
-                            <li class="page-item {{ $short_trips_table->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="#" data-page="{{ $short_trips_table->currentPage() - 1 }}">Previous</a>
+                            <li class="page-item {{ $trading_inflows_table->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" href="{{ $trading_inflows_table->previousPageUrl() . (request()->input('type_filter') ? '&type_filter=' . request('type_filter') : '') .(request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Previous</a>
                             </li>
-                            
-                            @for ($i = 1; $i <= $short_trips_table->lastPage(); $i++)
-                                <li class="page-item {{ $i == $short_trips_table->currentPage() ? 'active' : '' }}">
-                                    <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                            @for ($i = 1; $i <= $trading_inflows_table->lastPage(); $i++)
+                                <li class="page-item {{ $i == $trading_inflows_table->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $trading_inflows_table->url($i) . (request()->input('type_filter') ? '&type_filter=' . request('type_filter') : '') .(request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">{{ $i }}</a>
                                 </li>
-                            @endfor
-                            
-                            <li class="page-item {{ $short_trips_table->hasMorePages() ? '' : 'disabled' }}">
-                                <a class="page-link" href="#" data-page="{{ $short_trips_table->currentPage() + 1 }}">Next</a>
-                            </li>
+                                @endfor
+                                <li class="page-item {{ $trading_inflows_table->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $trading_inflows_table->nextPageUrl() . (request()->input('type_filter') ? '&type_filter=' . request('type_filter') : '') .(request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Next</a>
+                                </li>
                         </ul>
                     </nav>
-                    
+
                 </div>
             </div>
         </div>
@@ -198,204 +224,268 @@
 
     <!-- Success Modal -->
     @if(session('success'))
-    {{--  Success Modal --}}
+    {{-- Success Modal --}}
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body text-center">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-            <p class="mt-3">{{ session('success') }}</p>
-          </div>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    <p class="mt-3">{{ session('success') }}</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  @endif
-  
-  @if(session('error'))
-    {{--   Error Modal  --}}
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body text-center">
-            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
-            <p class="mt-3">{{ session('error') }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  @endif
-</section>
+    @endif
 
+    @if(session('error'))
+    {{-- Error Modal  --}}
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                    <p class="mt-3">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+</section>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Load Page function
-        function loadPage(page) {
-            const url = `{{ route('short-trip-inflow-and-outflow.index') }}?page=${page}`; 
+        const amPmFilter = document.getElementById('amPmFilter');
 
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data, 'text/html');
-                    const newTableBody = doc.querySelector('#shortTripTableBody');
-                    const newPagination = doc.querySelector('.pagination');
+        const attendantFilter = document.getElementById('attendantFilter');
+        const commodityFilter = document.getElementById('commodityFilter');
+        const productionOriginFilter = document.getElementById('productionOriginFilter');
+        const facilitatorFilter = document.getElementById('facilitatorFilter'); // Add this line
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const tableRows = document.querySelectorAll('#TableBody tr');
 
-                    // Update the table body and pagination
-                    document.querySelector('#shortTripTableBody').innerHTML = newTableBody.innerHTML;
-                    document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+        function filterTable() {
+            const selectedAmPm = amPmFilter.value;
+            const selectedAttendant = attendantFilter.value;
+            const selectedCommodity = commodityFilter.value;
+            const selectedProductionOrigin = productionOriginFilter.value;
+            const selectedFacilitator = facilitatorFilter.value; // This is now initialized
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
 
-                    // Prevent the page from jumping to the top
-                    scrollToTable();
-                })
-                .catch(error => console.error('Error loading page:', error));
-        }
+            tableRows.forEach(row => {
+                const rowDate = new Date(row.dataset.date);
+                const rowAmPm = row.dataset.amPm;
+                const rowAttendant = row.dataset.attendant;
+                const rowCommodity = row.dataset.commodity;
+                const rowProductionOrigin = row.dataset.productionOrigin;
+                const rowFacilitator = row.dataset.facilitator; // This is now initialized
 
-        // Function to smoothly scroll to the table position
-        function scrollToTable() {
-            const table = document.querySelector('.table-responsive');
-            if (table) {
-                table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
+                const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
+                const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
+                const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
+                const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
+                const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
+                const isFacilitatorMatch = !selectedFacilitator || (rowFacilitator === selectedFacilitator); // This is now initialized
 
-        // Event delegation for pagination links
-        document.addEventListener('click', function (e) {
-            if (e.target.closest('.page-link')) {
-                e.preventDefault(); // Prevent default anchor click behavior
-                const page = e.target.getAttribute('data-page');
-                if (page) {
-                    loadPage(page);
+                if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isFacilitatorMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
-            }
-        });
-
-        // Filters setup
-const amPmFilter = document.getElementById('amPmFilter');
-const attendantFilter = document.getElementById('attendantFilter');
-const commodityFilter = document.getElementById('commodityFilter');
-const productionOriginFilter = document.getElementById('productionOriginFilter');
-const transactionTypeFilter = document.getElementById('transactionTypeFilter'); // New filter
-const startDateInput = document.getElementById('startDate');
-const endDateInput = document.getElementById('endDate');
-const tableRows = document.querySelectorAll('#shortTripTableBody tr');
-
-function filterTable() {
-    const selectedAmPm = amPmFilter.value;
-    const selectedAttendant = attendantFilter.value;
-    const selectedCommodity = commodityFilter.value;
-    const selectedProductionOrigin = productionOriginFilter.value;
-    const selectedTransactionType = transactionTypeFilter.value; // Get the selected transaction type
-    const startDate = new Date(startDateInput.value);
-    const endDate = new Date(endDateInput.value);
-
-    tableRows.forEach(row => {
-        const rowDate = new Date(row.dataset.date);
-        const rowAmPm = row.dataset.amPm;
-        const rowAttendant = row.dataset.attendant;
-        const rowCommodity = row.dataset.commodity;
-        const rowProductionOrigin = row.dataset.productionOrigin;
-        const rowTransactionType = row.dataset.transactionType; // Get the transaction type from data attribute
-
-        const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
-        const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
-        const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
-        const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
-        const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
-        const isTransactionTypeMatch = !selectedTransactionType || (rowTransactionType === selectedTransactionType); // Check transaction type
-
-        if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isTransactionTypeMatch) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+            });
         }
+
+        // Add event listeners for all filters
+        amPmFilter.addEventListener('change', filterTable);
+        attendantFilter.addEventListener('change', filterTable);
+        commodityFilter.addEventListener('change', filterTable);
+        productionOriginFilter.addEventListener('change', filterTable);
+        facilitatorFilter.addEventListener('change', filterTable); // Add this line for facilitator filter
+        startDateInput.addEventListener('change', filterTable);
+        endDateInput.addEventListener('change', filterTable);
+
+        // Reset filters button
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            amPmFilter.value = '';
+            attendantFilter.value = '';
+            commodityFilter.value = '';
+            productionOriginFilter.value = '';
+            facilitatorFilter.value = ''; // Add this line to reset facilitator filter
+            startDateInput.value = '';
+            endDateInput.value = '';
+            filterTable(); // Apply reset
+        });
     });
-}
+</script>
 
-// Event listeners for all filters
-amPmFilter.addEventListener('change', filterTable);
-attendantFilter.addEventListener('change', filterTable);
-commodityFilter.addEventListener('change', filterTable);
-productionOriginFilter.addEventListener('change', filterTable);
-transactionTypeFilter.addEventListener('change', filterTable); // Add event listener for transaction type
-startDateInput.addEventListener('change', filterTable);
-endDateInput.addEventListener('change', filterTable);
-
-// Reset filters button
-document.getElementById('resetFilters').addEventListener('click', () => {
-    amPmFilter.value = '';
-    attendantFilter.value = '';
-    commodityFilter.value = '';
-    productionOriginFilter.value = '';
-    transactionTypeFilter.value = ''; // Reset transaction type filter
-    startDateInput.value = '';
-    endDateInput.value = '';
-    filterTable(); // Apply reset
-});
-
-
-        // Initialize Trading Inflow Chart
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
 
-        // Add Total Volume as the first series
+        // Assuming dates is in the format of "YYYY-MM-DD"
+        const dates = @json($dates).map(date => Date.parse(date)); // Convert to timestamps
+
+        // Prepare the combined series
         const combinedSeries = [{
             name: 'Total Volume',
             data: totalVolumeData
         }, ...series];
 
-        const dates = @json($dates);
-
-        const inflowChart = new ApexCharts(document.querySelector("#areaChart"), {
-            series: combinedSeries,
+        // Initialize Trading Inflow Chart
+        Highcharts.chart('areaChart', {
             chart: {
                 type: 'line',
                 height: 350,
-                zoom: {
-                    enabled: false
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutBounce'
                 }
             },
-            dataLabels: {
-                enabled: false
+            title: {
+                text: 'Volume of Trading Inflows by Commodity'
             },
-            stroke: {
-                curve: 'straight'
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %e, %Y' // Format as "Oct 1, 2024"
+                },
+                tickInterval: 24 * 3600 * 1000 // One day
             },
-            subtitle: {
-                text: 'Volume of ShortTrip by Commodity',
-                align: 'left'
-            },
-            labels: dates,
-            xaxis: {
-                type: 'datetime'
-            },
-            yaxis: {
+            yAxis: {
+                title: {
+                    text: 'Volume'
+                },
                 opposite: true
             },
+            series: combinedSeries.map((serie, index) => ({
+                ...serie,
+                data: serie.data.map((value, i) => [dates[i], value]) // Pair each data point with its corresponding date
+            })),
             legend: {
                 horizontalAlign: 'left'
+            },
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    marker: {
+                        enabled: false
+                    }
+                }
             }
         });
-
-        inflowChart.render();
-
-        // Check for success message in session
-        @if(session('success'))
-            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-            successModal.show();
-            setTimeout(function() {
-                successModal.hide();
-            }, 1000); // 1 second timeout
-        @endif
-  
-        // Check for error message in session
-        @if(session('error'))
-            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-            errorModal.show();
-            setTimeout(function() {
-                errorModal.hide();
-            }, 1000); // 1 second timeout
-        @endif
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there's a success message in the session
+        @if(session('success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+        setTimeout(function() {
+            successModal.hide();
+        }, 1000); // 1 second timeout
+        @endif
+
+        // Check if there's an error message in the session
+        @if(session('error'))
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+        setTimeout(function() {
+            errorModal.hide();
+        }, 1000); // 1 second timeout
+        @endif
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#reportTable').DataTable();
+    });
+</script>
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true // Change this to true for 12-hour format
+        };
+
+        // Format the date and time
+        const formattedDateTime = now.toLocaleString('en-US', options);
+
+        // Update the content of the div
+        document.getElementById('current-date-time').textContent = formattedDateTime;
+    }
+
+    // Call updateDateTime every second
+    setInterval(updateDateTime, 1000);
+
+    // Initial call to set the date and time right away
+    updateDateTime();
+</script>
+
+<script>
+    function filterByStaff() {
+        const staffId = document.getElementById('staffFilter').value;
+        const url = new URL(window.location.href);
+        if (staffId) {
+            url.searchParams.set('staff_id', staffId);
+        } else {
+            url.searchParams.delete('staff_id');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByTime() {
+        const timeFilter = document.getElementById('timeFilter').value;
+        const url = new URL(window.location.href);
+        if (timeFilter) {
+            url.searchParams.set('time_filter', timeFilter);
+        } else {
+            url.searchParams.delete('time_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByType() {
+        const typeFilter = document.getElementById('typeFilter').value;
+        const url = new URL(window.location.href);
+        if (typeFilter) {
+            url.searchParams.set('type_filter', typeFilter);
+        } else {
+            url.searchParams.delete('type_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByCommodity() {
+        const commodityFilter = document.getElementById('commodityFilter').value;
+        const url = new URL(window.location.href);
+        if (commodityFilter) {
+            url.searchParams.set('commodity_filter', commodityFilter);
+        } else {
+            url.searchParams.delete('commodity_filter');
+        }
+        window.location.href = url.toString();
+    }
+
+    function filterByMunicipality() {
+        const municipalityFilter = document.getElementById('municipalityFilter').value;
+        const url = new URL(window.location.href);
+        if (municipalityFilter) {
+            url.searchParams.set('municipality_filter', municipalityFilter);
+        } else {
+            url.searchParams.delete('municipality_filter');
+        }
+        window.location.href = url.toString();
+    }
+</script>
 @endsection

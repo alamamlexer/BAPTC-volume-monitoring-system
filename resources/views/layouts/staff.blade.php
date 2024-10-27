@@ -296,14 +296,14 @@
       </li>
       
       <li class="nav-item">
-        <a class="nav-link collapsed" href="">
+        <a class="nav-link collapsed" href="{{route('staff-trading-outflow.index')}}">
           <i class="bi bi-journal-text"></i>
           <span>Trading Outflow</span>
         </a>
       </li>
       
       <li class="nav-item">
-        <a class="nav-link collapsed" href="">
+        <a class="nav-link collapsed" href="{{route('staff-short-trip-inflow-and-outflow.index')}}">
           <i class="bi bi-journal-text"></i>
           <span>Short Trip Inflow and Outflow</span>
         </a>

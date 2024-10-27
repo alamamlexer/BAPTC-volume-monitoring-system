@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 @section('page_title','Short Trip Inflow and Outflow Form')
 @section('content')
 
@@ -21,7 +21,7 @@
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Trading Inflow Form</h5>
+          <h5 class="card-title">Short Trip Edit Form</h5>
           <!-- Floating Labels Form -->
           <form class="row g-3" action="{{ route('short-trip-inflow-and-outflow.update', $short_trip_inflow_and_outflow->id) }}" method="POST">
           
@@ -31,7 +31,7 @@
             <div class="col-md-5" hidden>
                 <div class="form-floating">
                     <input type="text" class="form-control" id="transaction_status"
-                        name="transaction_status" value="regular">
+                        name="transaction_status" value="{{$short_trip_inflow_and_outflow->transaction_status}}">
                     <label for="transaction_status"></label>
                 </div>
             </div>
@@ -92,27 +92,6 @@
                 </div>
             </div>
 
-            <div class="col-md-5">
-                <div class="form-floating">
-                    <select class="form-select" id="staff_id" name="staff_id" required>
-                        @foreach ($staffs as $staff)
-                            @if ($staff->staff_id == $logged_in_staff)
-                                <option value="{{ $staff->staff_id }}" selected>
-                                    {{ $staff->staff_name }}
-                                </option>
-                            @else
-                                <option value="{{ $staff->staff_id }}">
-                                    {{ $staff->staff_name }}
-                                </option>
-                            @endif
-                        @endforeach
-                    </select>
-                    <label for="staff_id">Attendant</label>
-                    @if ($errors->has('staff_id'))
-                    <span class="text-danger">{{ $errors->first('staff_id') }}</span>
-                @endif
-                </div>
-            </div>
 
             <div class="col-md-6 position-relative" data-col="6">
                 <div class="form-floating">
