@@ -179,24 +179,44 @@ class TradingInflowController extends Controller
     $today_volume = number_format($volume, 2);
     
  
-   
+    $user = Auth::user();
     
+    if($user->type==0){
+        return view('admin-pages.trading-inflow-report', compact('today_volume',
+        'today_vehicle',
+                    'trading_inflows_graph',
+                    'trading_inflows_table',
+                    'request',
+                    'facilitators', 
+                    'chartData', 
+                    'dates', 
+                    'startDate', 
+                    'endDate', 
+                    'commodities',
+                    'totalVolumeData',
+                    'staffs', 
+                    'productionOrigins',
+                    'municipalities'));      
+                    }
+                    
+       elseif($user->type==1){
+        return view('staff-pages.staff-trading-inflow-report', compact('today_volume',
+        'today_vehicle',
+                    'trading_inflows_graph',
+                    'trading_inflows_table',
+                    'request',
+                    'facilitators', 
+                    'chartData', 
+                    'dates', 
+                    'startDate', 
+                    'endDate', 
+                    'commodities',
+                    'totalVolumeData',
+                    'staffs', 
+                    'productionOrigins',
+                    'municipalities'));   
+                    }
     
-    return view('admin-pages.trading-inflow-report', compact('today_volume',
-                                                                        'today_vehicle',
-                                                                                    'trading_inflows_graph',
-                                                                                    'trading_inflows_table',
-                                                                                    'request',
-                                                                                    'facilitators', 
-                                                                                    'chartData', 
-                                                                                    'dates', 
-                                                                                    'startDate', 
-                                                                                    'endDate', 
-                                                                                    'commodities',
-                                                                                    'totalVolumeData',
-                                                                                    'staffs', 
-                                                                                    'productionOrigins',
-                                                                                    'municipalities'));
 }
 
     

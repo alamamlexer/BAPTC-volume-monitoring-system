@@ -1,30 +1,30 @@
 @extends('layouts.admin')
-@section('page_title', 'Trading Inflow Form')
+@section('page_title','Short Trip Inflow and Outflow Form')
 @section('content')
 
     <!-- Page Title -->
     <div class="pagetitle">
-        <h1>Form Layouts</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Trading Inflow</a></li>
-                <li class="breadcrumb-item active"><a href="/">Add a new trading inflow</a></li>
-            </ol>
-        </nav>
+      <h1>Form Layouts</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Short Trip Inflow and Outflow</a></li>
+          <li class="breadcrumb-item active"><a href="/">Add a new short trip inflow/outflow</a></li>
+        </ol>
+      </nav>
     </div>
     <!-- End Page Title -->
-
+    
     <section class="section">
-
-        {{-- Form --}}
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Trading Inflow Form</h5>
-                        <!-- Floating Labels Form -->
-                        <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
-                            @csrf
+    
+    {{-- Form --}}
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Short Trip Inflow and Outflow Form</h5>
+              <!-- Floating Labels Form -->
+              <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
+                @csrf
 
                             {{--  input for transaction_status = "trading"  --}}
                             <div class="col-md-5" hidden>
@@ -35,43 +35,70 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-5" hidden>
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="transaction_type" name="transaction_type"
-                                        value="trading inflow">
-                                    <label for="transaction_type"></label>
-                                </div>
-                            </div>
+                            
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="date" class="form-control" id="date" name="date"
-                                        placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
+                                        placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required>
                                     <label for="date">Date</label>
                                     @if ($errors->has('date'))
                                         <span class="text-danger">{{ $errors->first('date') }}</span>
                                     @endif
                                 </div>
                             </div>
+                            
 
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select class="form-select" id="time" name="time" required>
-                                        <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
-                                        <option value="PM" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>PM</option>
-                                    </select>
-                                    <label for="time">Time</label>
+                            <div class="col-md-2">
+                                <div class="form-control" required>
+                                    <fieldset>
+                                        <legend class="col-form-label col-sm-5 pt-0">Time</legend>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio1" value="AM"
+                                                {{ old('time') == 'AM' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="inlineRadio1">AM</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="time" id="inlineRadio2" value="PM"
+                                                {{ old('time') == 'PM' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="inlineRadio2">PM</label>
+                                        </div>
+                                    </fieldset>
                                     @if ($errors->has('time'))
-                                        <span class="text-danger">{{ $errors->first('time') }}</span>
-                                    @endif
+                                    <span class="text-danger">{{ $errors->first('time') }}</span>
+                                @endif
                                 </div>
                             </div>
+                            
+                            <div class="col-md-2">
+                                <fieldset >
+                                <div class="row">
+                                <div class="col-md3">
+                                  <div class="form-control" placeholder="In/Out">
+                                      <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
+                                      <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_inflow" value="short trip inflow" {{ old('transaction_type') == 'short trip inflow' ? 'checked' : '' }}  required>
+                                        <label class="form-check-label" for="short_trip_inflow">In</label>
+                                      </div>
+                                      <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_outflow" value="short trip outflow" {{ old('transaction_type') == 'short trip outflow' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="short_trip_outflow">Out</label>
+                                      </div>
+                                  </div> 
+                                 </div>
+                                </div>  
+                                </fieldset>
+                                @if ($errors->has('transaction_type'))
+                                     <span class="text-danger">{{ $errors->first('transaction_type') }}</span>
+                                @endif
+                            </div>
+                            
                             
                             <div class="col-md-4 position-relative" data-col="6">
                                 <div class="form-floating">
                                     <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{ old('facilitator_id') }}">
                                     <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name" 
-                                        placeholder="Select or type facilitator..."  aria-label="Facilitator"
+                                        placeholder="Select or type facilitator..." required aria-label="Facilitator"
                                         autocomplete="off" data-dropdown="facilitatorDropdown" value="{{ old('facilitator_name') }}">
                                     <label for="facilitator_name">Facilitator</label>
                                     @if ($errors->has('facilitator_name'))
@@ -144,7 +171,7 @@
                                                     data-municipality="{{ $location_vehicle->location->municipality }}"
                                                     data-province="{{ $location_vehicle->location->province }}"
                                                     data-region="{{ $location_vehicle->location->region }}">
-                                                    {{ $location_vehicle->vehicle->plate_number }} {{ $location_vehicle->vehicle->vehicle_name }} ({{ $location_vehicle->facilitator->facilitator_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
+                                                    {{ $location_vehicle->vehicle->plate_number }} ({{ $location_vehicle->vehicle->vehicle_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
                                             @endif
                                         @endforeach
                                     @endif
@@ -287,7 +314,7 @@
                             <div class="text-center">
                                 <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
                                 <button type="reset" class="btn btn-secondary">Reset</button>
-                                <a href="{{ route('trading-inflow.index') }}" class="btn btn-danger">Back</a>
+                                <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                             </div>
                           
                             
@@ -308,11 +335,11 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Inflow Table</h5>                       
+                        <h5 class="card-title">Short Trip Inflow and Outflow Table</h5>                       
     
                         <div class="row mb-3">
                             <div class="col-auto">
-                                <form action="{{ route('trading-inflow.submit') }}" method="POST">
+                                <form action="{{ route('short-trip-inflow-and-outflow.submit') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
                                     <button type="submit" class="btn btn-success">
@@ -331,12 +358,24 @@
                                         
                                         <th scope="col">
                                             <div style="display: flex; align-items: center;">
-                                                <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
+                                                <label for="amPmFilter" class="form-label" style="margin-right: 5px;"hidden>Time:</label>
                                                 <select id="amPmFilter" class="form-select" 
                                                         style="border: none; font-weight: bold;">
                                                     <option value="">AM/PM</option>
                                                     <option value="AM">AM</option>
                                                     <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </th>
+                                        
+                                        <th scope="col">
+                                            <div style="display: flex; align-items: center;">
+                                                <label for="amPmFilter" class="form-label" style="margin-right: 5px;"hidden>In/Out:</label>
+                                                <select id="amPmFilter" class="form-select" 
+                                                        style="border: none; font-weight: bold;">
+                                                    <option value="">In/Out</option>
+                                                    <option value="AM">In</option>
+                                                    <option value="PM">Out</option>
                                                 </select>
                                             </div>
                                         </th>
@@ -412,6 +451,7 @@
                                             <td>{{ $temporary_transaction->id }}</td>
                                             <td>{{ $temporary_transaction->date }}</td>
                                             <td>{{ $temporary_transaction->time }}</td>
+                                            <td>{{ $temporary_transaction->transaction_type }}</td>
                                             <td>{{ $temporary_transaction->staff->staff_name }}</td>
                                             <td>{{ $temporary_transaction->plate_number }}</td>
                                             <td>{{ $temporary_transaction->name }}</td>
@@ -420,10 +460,10 @@
                                             <td>{{ $temporary_transaction->facilitator->facilitator_name?? 'N/A'}}</td>
                                             <td>{{ $temporary_transaction->barangay }}, {{ $temporary_transaction->municipality }}, {{ $temporary_transaction->province }}, {{ $temporary_transaction->region }}</td>
                                             <td>
-                                                <a href="{{ route('trading-inflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
+                                                <a href="{{ route('short-trip-inflow-and-outflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
                                                     <i class="bx bxs-edit"></i> Edit
                                                 </a>
-                                                <form action="{{ route('trading-inflow.destroy', $temporary_transaction->id) }}" method="POST" style="display:inline;">
+                                                <form action="{{ route('short-trip-inflow-and-outflow.destroy', $temporary_transaction->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this reservation?')">
@@ -561,7 +601,7 @@
     // Reset filters button
     document.getElementById('resetFilters').addEventListener('click', () => {
         amPmFilter.value = '';
-        attendantFilter.value = ''; 
+        attendantFilter.value = '';
         commodityFilter.value = '';
         productionOriginFilter.value = '';
         facilitatorFilter.value = ''; // Reset Facilitator Filter
@@ -589,23 +629,9 @@
                 setTimeout(() => errorModal.hide(), 1000);
                 @endif
             
-                
-                // Store the selected time in local storage
-                document.querySelector('form').addEventListener('reset', function() {
-                    // Get the selected radio button value
-                    const selectedTime = document.querySelector('input[name="time"]:checked');
-                    if (selectedTime) {
-                        localStorage.setItem('selectedTime', selectedTime.value);
-                    }
-                });
-            
-                // Restore the selected time when the page loads
-                window.addEventListener('load', function() {
-                    const savedTime = localStorage.getItem('selectedTime');
-                    if (savedTime) {
-                        document.querySelector(`input[name="time"][value="${savedTime}"]`).checked = true;
-                    }
-                });
+                // Auto select AM or PM radio button
+                const currentHour = new Date().getHours();
+                document.getElementById(currentHour < 12 ? 'inlineRadio1' : 'inlineRadio2').checked = true;
             
                 // Filterable Dropdown Setup
                 function setupFilterableDropdown(inputSelector, dropdownSelector, autofillFields = {}, autofillCallback = null) {
@@ -692,13 +718,12 @@
     }
 
     // Autofill Facilitator details
-    const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
     if (facilitatorSelect) {
         facilitatorSelect.value = item.getAttribute('data-facilitator-name') || ''; // Set facilitator name
     }
 
     // Autofill Facilitator ID
-    
+    const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
     if (facilitatorIdInput) {
         facilitatorIdInput.value = item.getAttribute('data-facilitator-id') || ''; // Set facilitator ID
     }
@@ -752,51 +777,14 @@
             });
 
         </script>
-            <script>
-                // Store the selected time in local storage
-                document.querySelector('form').addEventListener('reset', function() {
-                    // Get the selected radio button value
-                    const selectedTime = document.querySelector('input[name="time"]:checked');
-                    if (selectedTime) {
-                        localStorage.setItem('selectedTime', selectedTime.value);
-                    }
-                });
             
-                // Restore the selected time when the page loads
-                window.addEventListener('load', function() {
-                    const savedTime = localStorage.getItem('selectedTime');
-                    if (savedTime) {
-                        document.querySelector(`input[name="time"][value="${savedTime}"]`).checked = true;
-                    }
-                });
-            </script>
-            <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const barangay = document.getElementById('barangay');
-                const municipality = document.getElementById('municipality');
-                const province = document.getElementById('province');
-                const region = document.getElementById('region');
-                const origin = document.getElementById('origin');
-            
-                const checkAddressFields = () => {
-                    const allFilled = [barangay, municipality, province, region].every(input => input.value.trim() !== '');
-                    if (allFilled) {
-                        origin.removeAttribute('required');
-                    } else {
-                        origin.setAttribute('required', 'required');
-                    }
-                };
-            
-                // Add event listeners to address fields
-                [barangay, municipality, province, region].forEach(input => {
-                    input.addEventListener('input', checkAddressFields);
-                });
-            
-                // Run the check on page load in case fields are pre-filled
-                checkAddressFields();
-            });
-            </script>
-            
-    </section>
 
+
+
+
+
+            
+ 
+    </section>
+ 
 @endsection

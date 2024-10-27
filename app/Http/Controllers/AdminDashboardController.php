@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Auth;
 use Ramsey\Collection\AbstractArray;
 
 class AdminDashboardController extends Controller
 {
+
+
     /**
      * Display a listing of the resource.
      */
@@ -120,11 +122,16 @@ class AdminDashboardController extends Controller
         ];
     }
     
-    
-    
+    $user = Auth::user();
+
+   if($user->type==0){
+    return view('admin-pages.admin-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_inflow_vehicle','today_inflow_volume','today_outflow_vehicle','today_outflow_volume',));
+   }
+   elseif($user->type==1){
+    return view('staff-pages.staff-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_inflow_vehicle','today_inflow_volume','today_outflow_vehicle','today_outflow_volume',));
+   }
     
 
-        return view('admin-pages.admin-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_inflow_vehicle','today_inflow_volume','today_outflow_vehicle','today_outflow_volume',));
     }
 
     /**

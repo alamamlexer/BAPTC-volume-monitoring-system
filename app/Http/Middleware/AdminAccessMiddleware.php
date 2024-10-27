@@ -16,11 +16,11 @@ class AdminAccessMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         
-        if (!empty(Auth::user()) && Auth::user()->type==1){
+        if (!empty(Auth::user()) && Auth::user()->type==0){
             return $next($request);
             }
-        elseif(!empty(Auth::user()) && Auth::user()->type==0){
-            return redirect('user-dashboard');
+        elseif(!empty(Auth::user()) && Auth::user()->type==1){
+            return redirect()->route('staff-dashboard');
         }
         else{
             return redirect('/');

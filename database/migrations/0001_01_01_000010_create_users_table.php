@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->boolean('type')->default(false); //false=user,true=admin
-            
-            $table->foreign('farmer_id')->references('farmer_id')->on('farmers')->onDelete('cascade');
             $table->foreign('staff_id')->references('staff_id')->on('staff')->onDelete('cascade');
             
             $table->rememberToken();

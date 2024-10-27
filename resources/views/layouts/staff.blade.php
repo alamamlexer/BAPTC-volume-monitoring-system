@@ -26,6 +26,10 @@
   <link href="{{asset('assets/vendor/remixicon/remixicon.css')}}" rel="stylesheet">
   <link href="{{asset('assets/vendor/simple-datatables/style.css')}}" rel="stylesheet">
 
+  <link href="{{asset('/custom-scripts/datatables.min.css')}}" rel="stylesheet">
+  <link href="{{asset('/custom-scripts/datatables.css')}}" rel="stylesheet">
+ 
+  <script src="{{asset('/custom-scripts/jquery-3.6.0.min.js')}}"></script>
   <!-- Template Main CSS File -->
   <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
 
@@ -278,19 +282,33 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/user-dashboard">
+        <a class="nav-link collapsed" href="{{route('staff-dashboard')}}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
-      </li><!-- End Dashboard Nav -->
-
+      </li>
+      
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/reservation">
-          <i class="bi bi-journal-text"></i>
-          <span>Reservations</span>
+        <a class="nav-link collapsed" href="{{route('staff-trading-inflow.index')}}">
+          <i class="bi bi-grid"></i>
+          <span>Trading Inflow</span>
         </a>
       </li>
-       
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="">
+          <i class="bi bi-journal-text"></i>
+          <span>Trading Outflow</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="">
+          <i class="bi bi-journal-text"></i>
+          <span>Short Trip Inflow and Outflow</span>
+        </a>
+      </li>
+
 
 
       <li class="nav-heading">Pages</li>
@@ -333,6 +351,9 @@
   <script src="{{asset('assets/vendor/simple-datatables/simple-datatables.js')}}"></script>
   <script src="{{asset('assets/vendor/tinymce/tinymce.min.js')}}"></script>
   <script src="{{asset('assets/vendor/php-email-form/validate.js')}}"></script>
+  <script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
+  <script src="{{asset('/custom-scripts/datatables.js')}}"></script>
+  <script src="{{asset('/custom-scripts/datatables.min.js')}}"></script>
 
   <!-- Template Main JS File -->
   <script src="{{asset('assets/js/main.js')}}"></script>

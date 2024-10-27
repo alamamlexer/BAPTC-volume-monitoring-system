@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\RecordController;
 use App\Http\Controllers\TradingInflowController;
 use App\Http\Controllers\TradingOutflowController;
 use App\Http\Controllers\ShortTripInflowAndOutflowController;
@@ -27,7 +28,9 @@ Route::controller(AuthenticationController::class)->group(function(){
 
 Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
-    Route::resource('admin',AdminDashboardController::class);
+    Route::resource('admin',AdminDashboardController::class); 
+    
+    Route::resource('record',RecordController::class); 
     
     Route::resource('report',ReportController::class);
 
@@ -44,7 +47,11 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
 Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
 
-    Route::get('/user-dashboard',[UserDashboardController::class,'user_dashboard'])->name('user-dashboard');
+    Route::get('/staff-dashboard',[AdminDashboardController::class,'index'])->name('staff-dashboard');
+    
+    Route::get('/staff-trading-inflow',[TradingInflowController::class,'index'])->name('staff-trading-inflow.index');
+    
+  
     
 });
 
