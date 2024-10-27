@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         //table 1
         $table_one_data = [
@@ -213,16 +213,68 @@ class ReportController extends Controller
         
         $table_six_grand_total_volume = $table_six_commodities->sum('total_volume');
 
+        $municipality = $request->input('municipality', null);
+
+        // Fetch all transactions for the specified municipality (or all if null)
+        $allTransactions = Transaction::with('commodity')
+            ->when($municipality, function ($query) use ($municipality) {
+                return $query->where('municipality', $municipality);
+            })
+            ->get();
+
+        // Group by municipality and then by commodity
+        $transactionsByMunicipality = $allTransactions
+            ->groupBy('municipality')
+            ->map(function ($municipalityGroup) {
+                $totalMunicipalityVolume = $municipalityGroup->sum('volume');
+
+                return $municipalityGroup->groupBy('commodity_id')->map(function ($group) use ($totalMunicipalityVolume) {
+                    $commodity = $group->first()->commodity;
+                    $totalVolume = $group->sum('volume');
+                    $deliveryFrequency = $group->count();
+
+                    return [
+                        'commodity' => $commodity,
+                        'total_volume' => $totalVolume,
+                        'delivery_frequency' => $deliveryFrequency,
+                        'percentage_share' => $totalMunicipalityVolume > 0
+                            ? ($totalVolume / $totalMunicipalityVolume) * 100
+                            : 0,
+                    ];
+                });
+            });
+
+        // Prepare totals and subtotals for the view
+        $subtotals = $transactionsByMunicipality->map(function ($commodities) {
+            return [
+                'subtotal_volume' => $commodities->sum('total_volume'),
+                'subtotal_frequency' => $commodities->sum('delivery_frequency'),
+            ];
+        });
+
+        // Calculate the grand totals for all municipalities
+        $grandTotalVolume = $transactionsByMunicipality->flatten(1)->sum('total_volume');
+        $grandTotalFrequency = $transactionsByMunicipality->flatten(1)->sum('delivery_frequency');
+
+        // Prepare the grand total percentage
+        $overallVolume = $allTransactions->sum('volume');
+        $totalGrandPercentage = $overallVolume > 0 ? ($grandTotalVolume / $overallVolume) * 100 : 0;
+
         // Passing data to the view
-        return view('admin-pages.report', compact('table_one_data', 
-                                                            'table_three_data', 
-                                                                        'R2_peakDayDate', 
-                                                                        'R2_peakDay', 
-                                                                        'R2_leanDayDate', 
-                                                                        'R2_leanDay',
-                                                                        'table_six_commodities',
-                                                                        'table_six_grand_total_volume',
-                                                                        
+        return view('admin-pages.report', compact(
+            'table_one_data',
+            'table_three_data',
+            'R2_peakDayDate',
+            'R2_peakDay',
+            'R2_leanDayDate',
+            'R2_leanDay',
+            'table_six_commodities',
+            'table_six_grand_total_volume',
+            'transactionsByMunicipality',
+            'subtotals',
+            'grandTotalVolume',
+            'grandTotalFrequency',
+            'totalGrandPercentage'
         ));
         
         }

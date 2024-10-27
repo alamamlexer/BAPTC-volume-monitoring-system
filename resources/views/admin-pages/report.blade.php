@@ -345,19 +345,77 @@
     </div>
     </div>
     
-<!-- TABLE 7 -->
-<div class="row">
-    <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>VII. MONITORED PRODUCTION SOURCE OF TRADED COMMODITES PER RANK</b></h5>
-      <div class="table-responsive">
-     
-      </div>
+<!-- Table 7-->
+    <!-- TABLE 7 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><b>VII. DELIVERY VOLUME AND FREQUENCY PER MUNICIPALITY</b></h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">NO</th>
+                                    <th class="text-center">MUNICIPALITY</th>
+                                    <th class="text-center">COMMODITY</th>
+                                    <th class="text-center">DELIVERY VOLUME (KG)</th>
+                                    <th class="text-center">DELIVERY FREQUENCY</th>
+                                    <th class="text-center">PERCENTAGE SHARE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $counter = 1; @endphp
+                                @foreach($transactionsByMunicipality as $municipality => $commodities)
+                                @foreach($commodities as $data)
+                                @if ($loop->first)
+                                <tr>
+                                    <td class="text-center">{{ $counter }}</td>
+                                    <td class="text-center" rowspan="{{ count($commodities) }}">{{ $municipality }}</td>
+                                    <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
+                                    <td class="text-center">{{ $data['total_volume'] }}</td>
+                                    <td class="text-center">{{ $data['delivery_frequency'] }}</td>
+                                </tr>
+                                @else
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
+                                    <td class="text-center">{{ $data['total_volume'] }}</td>
+                                    <td class="text-center">{{ $data['delivery_frequency'] }}</td>
+                                </tr>
+                                @endif
+                                @endforeach
+
+                                <!-- Subtotal Row -->
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-end" colspan="2"><strong>Subtotal</strong></td>
+                                    <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_volume'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_frequency'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ number_format(($subtotals[$municipality]['subtotal_volume'] / $grandTotalVolume) * 100, 2) }}%</strong></td>
+                                </tr>
+
+                                @php $counter++; @endphp
+                                @endforeach
+
+                                <!-- Grand Total Row -->
+                                <tr>
+                                    <td class="text-center fw-bold" colspan="3">GRAND TOTAL</td>
+                                    <td class="text-center fw-bold">{{ $grandTotalVolume }}</td>
+                                    <td class="text-center fw-bold">{{ $grandTotalFrequency }}</td>
+                                    <td class="text-center fw-bold">
+                                        <strong>{{ number_format($totalGrandPercentage, 2) }}%</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
+
+
     
 
 <!-- TABLE 8 -->
