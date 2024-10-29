@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('facilitator_location_vehicles', function (Blueprint $table) {
             $table->id(); 
             $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id')->onDelete('cascade');
-            $table->foreignId('location_id')->constrained('locations', 'location_id')->onDelete('cascade');
-            $table->foreignId('facilitator_id')->constrained('facilitators', 'facilitator_id')->onDelete('cascade');
+            $table->foreignId('location_id')->nullable()->constrained('locations', 'location_id')->onDelete('cascade');
+            $table->foreignId('facilitator_id')->nullable()->constrained('facilitators', 'facilitator_id')->onDelete('cascade');
             $table->timestamps(); 
         });
     }

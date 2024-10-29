@@ -7,8 +7,8 @@
         <h1>Form Layouts</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Trading Inflow</a></li>
-                <li class="breadcrumb-item active"><a href="/">Add a new trading inflow</a></li>
+                <li class="breadcrumb-item"><a href="/">Special Records</a></li>
+                <li class="breadcrumb-item active"><a href="/">Add a new special records</a></li>
             </ol>
         </nav>
     </div>
@@ -21,7 +21,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Trading Inflow Form</h5>
+                        <h5 class="card-title">Special Records Form</h5>
                         <!-- Floating Labels Form -->
                         <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
                             @csrf
@@ -35,15 +35,8 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-5" hidden>
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="transaction_type" name="transaction_type"
-                                        value="trading inflow">
-                                    <label for="transaction_type"></label>
-                                </div>
-                            </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-floating">
                                     <input type="date" class="form-control" id="date" name="date"
                                         placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
@@ -54,9 +47,9 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-floating">
-                                    <select class="form-select" id="time" name="time" required >
+                                    <select class="form-select" id="time" name="time" required>
                                         <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
                                         <option value="PM" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>PM</option>
                                     </select>
@@ -66,11 +59,26 @@
                                     @endif
                                 </div>
                             </div>
-                            
-                            
-                            <div class="col-md-4 position-relative" data-col="6">
+
+                            <div class="col-md-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control filter-input"  name="facilitator_name" 
+                                    <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                        <option value="dry" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Dry</option>
+                                        <option value="cold" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>Cold</option>
+                                        <option value="washing" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Washing</option>
+                                        <option value="intertrading" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Intertrading</option>
+                                    </select>
+                                    <label for="time">Time</label>
+                                    @if ($errors->has('time'))
+                                        <span class="text-danger">{{ $errors->first('time') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 position-relative" data-col="6">
+                                <div class="form-floating">
+                                    <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{ old('facilitator_id') }}">
+                                    <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name" 
                                         placeholder="Select or type facilitator..."  aria-label="Facilitator"
                                         autocomplete="off" data-dropdown="facilitatorDropdown" value="{{ old('facilitator_name') }}">
                                     <label for="facilitator_name">Facilitator</label>
@@ -83,14 +91,17 @@
                                     data-dropdown="facilitatorDropdown">
                                     <li class="no-records list-group-item" style="display: none; cursor: default;">Facilitator does not exist in the records</li>
                                     @foreach ($facilitators as $facilitator)
-                                    <li class="list-group-item list-group-item-action input-item" 
-                                        data-facilitator-id="{{ $facilitator->facilitator_id }}" 
-                                        data-facilitator-name="{{ $facilitator->facilitator_name }}">{{ $facilitator->facilitator_name }}</li>
+                                        <li class="list-group-item list-group-item-action input-item" 
+                                            data-facilitator-id="{{ $facilitator->id }}" 
+                                            data-facilitator-name="{{ $facilitator->facilitator_name }}">
+                                            {{ $facilitator->facilitator_name }}
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
+                            
 
-
+                    
                             <div class="col-md-5" hidden>
                                 <div class="form-floating">
                                     <select class="form-select" id="staff_id" name="staff_id" required>
@@ -113,7 +124,7 @@
                                 </div>
                             </div>
                             
-                            <div class="col-md-4 position-relative" data-col="5">
+                            {{--  <div class="col-md-4 position-relative" data-col="5">
                                 <div class="form-floating">
                                     <input type="text" class="form-control filter-input" name="plate_number"
                                         placeholder="Select or type plate number..."  aria-label="Plate Number"
@@ -147,7 +158,7 @@
                                     @endif
                                     <li class="no-records list-group-item" style="display: none; cursor: default;">No existing record/s for this plate number, fill the following to create a new record</li>
                                 </ul>
-                            </div>
+                            </div>  --}}
                             
                             <div class="col-md-4 position-relative" data-col="5">
                                 <div class="form-floating">
@@ -191,9 +202,6 @@
                                 </ul>
                             </div>
 
-
-                            
-                            
                             <div class="col-md-2">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="volume" name="volume"
@@ -207,39 +215,6 @@
                             
                             <p class="form-label">If there is no existing record, please fill the following:</p>
                             
-                           
-
-
-
-                            <div class="col-md-2">
-                                <div class="form-floating">
-                                    <select class="form-select" id="vehicle_type_id" name="vehicle_type_id">
-                                        <option value="" disabled selected>Select a vehicle type</option>
-                                        @foreach ($vehicle_types as $vehicle_type)
-                                            <option value="{{ $vehicle_type->vehicle_type_id }}" 
-                                                {{ old('vehicle_type_id') == $vehicle_type->vehicle_type_id ? 'selected' : '' }}>
-                                                {{ $vehicle_type->vehicle_type_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <label for="vehicle_type_id">Vehicle Type</label>
-                                    @if ($errors->has('vehicle_type_id'))
-                                        <span class="text-danger">{{ $errors->first('vehicle_type_id') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        
-                            <div class="col-md-2">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" name="name"
-                                        placeholder="Name (optional)" value="{{ old('name') }}">
-                                    <label for="name">Vehicle's Name</label>
-                                    @if ($errors->has('name'))
-                                        <span class="text-danger">{{ $errors->first('name') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-
                             <div class="col-md-2" >
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="barangay" name="barangay"
@@ -299,7 +274,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Inflow Table</h5>                       
+                        <h5 class="card-title">Table</h5>                       
     
                         <div class="row mb-3">
                             <div class="col-auto">
@@ -314,7 +289,7 @@
                         </div>
     
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -332,21 +307,8 @@
                                             </div>
                                         </th>
                                         
-                                        <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
-                                                <select id="attendantFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
-                                                    <option value="">All</option>
-                                                    @foreach ($staffs as $staff)
-                                                        <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </th>
-                                        
-                                        <th scope="col">Plate Number</th>
-                                        <th scope="col">Name</th>
+
+                                        <th scope="col">Transaction Type</th>
                                         
                                         <th scope="col">
                                             <div style="display: flex; align-items: center;">
@@ -370,24 +332,13 @@
                                                         style="border: none; font-weight: bold;">
                                                     <option value="">All</option>
                                                     @foreach ($facilitators as $facilitators)
-                                                        <option value="{{$facilitators['facilitator_id'] }}">{{$facilitators['facilitator_name']}}</option>
+                                                        <option value="{{ $facilitators['facilitator_id'] }}">{{ $facilitators['facilitator_name'] }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </th>
                                         
-                                        <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
-                                                <select id="productionOriginFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
-                                                    <option value="">All</option>
-                                                    @foreach ($productionOrigins as $origin)
-                                                        <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </th>
+
                                         
                                         <th scope="col">Action</th>
                                     </tr>
@@ -403,13 +354,10 @@
                                             <td>{{ $temporary_transaction->id }}</td>
                                             <td>{{ $temporary_transaction->date }}</td>
                                             <td>{{ $temporary_transaction->time }}</td>
-                                            <td>{{ $temporary_transaction->staff->staff_name }}</td>
-                                            <td>{{ $temporary_transaction->plate_number ?? 'N/A'}}</td>
-                                            <td>{{ $temporary_transaction->name ?? 'N/A'}}</td>
+                                            <td>{{ $temporary_transaction->transaction_type }}</td>
                                             <td>{{ $temporary_transaction->commodity->commodity_name }}</td>
                                             <td>{{ $temporary_transaction->volume }}</td>
                                             <td>{{ $temporary_transaction->facilitator->facilitator_name?? 'N/A'}}</td>
-                                            <td>{{ $temporary_transaction->barangay }}, {{ $temporary_transaction->municipality }}, {{ $temporary_transaction->province }}, {{ $temporary_transaction->region }}</td>
                                             <td>
                                                 <a href="{{ route('trading-inflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
                                                     <i class="bx bxs-edit"></i> Edit
@@ -429,9 +377,23 @@
                             </table>
                         </div>
                         
-                        <div id="paginationLinks">
-                            @include('admin-pages.pagination', ['temporary_transactions' => $temporary_transactions])
-                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item {{ $temporary_transactions->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="#" data-page="{{ $temporary_transactions->currentPage() - 1 }}">Previous</a>
+                                </li>
+                                
+                                @for ($i = 1; $i <= $temporary_transactions->lastPage(); $i++)
+                                    <li class="page-item {{ $i == $temporary_transactions->currentPage() ? 'active' : '' }}">
+                                        <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
+                                    </li>
+                                @endfor
+                                
+                                <li class="page-item {{ $temporary_transactions->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="#" data-page="{{ $temporary_transactions->currentPage() + 1 }}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                         
                     </div>
                 </div>
@@ -472,39 +434,6 @@
                                     </div>
                                 </div>
                             @endif
-                            
-                            <script>
-                            
-                            document.addEventListener('DOMContentLoaded', function () {
-            const transactionsContainer = document.getElementById('transactions');
-            const paginationLinks = document.getElementById('paginationLinks');
-
-            paginationLinks.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                if (event.target.tagName === 'A') {
-                    const page = event.target.getAttribute('data-page');
-
-                    // Prevent clicking on disabled links
-                    if (event.target.parentElement.classList.contains('disabled')) {
-                        return;
-                    }
-
-                    // Make the AJAX request
-                    fetch(`/path/to/your/route?page=${page}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            // Update the transactions section with new data
-                            transactionsContainer.innerHTML = data.html;
-
-                            // Update pagination links
-                            paginationLinks.innerHTML = data.links;
-                        })
-                        .catch(error => console.error('Error fetching transactions:', error));
-                }
-            });
-        });
-        </script>
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -701,16 +630,18 @@
         vehicleNameInput.value = vehicleName; // Set vehicle name
     }
 
-    // Autofill Facilitator ID
+    // Autofill Facilitator details
     const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
     if (facilitatorSelect) {
         facilitatorSelect.value = item.getAttribute('data-facilitator-name') || ''; // Set facilitator name
     }
-    
+
     // Autofill Facilitator ID
+    
     if (facilitatorIdInput) {
         facilitatorIdInput.value = item.getAttribute('data-facilitator-id') || ''; // Set facilitator ID
     }
+
     // Populate hidden individual fields
     document.getElementById('barangay').value = barangay;
     document.getElementById('municipality').value = municipality;

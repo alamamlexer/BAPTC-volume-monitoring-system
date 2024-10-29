@@ -11,6 +11,7 @@ use App\Http\Controllers\ShortTripInflowAndOutflowController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SpecialRecordsController;
 
 
 Route::controller(AuthenticationController::class)->group(function(){
@@ -29,6 +30,8 @@ Route::controller(AuthenticationController::class)->group(function(){
 Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('admin',AdminDashboardController::class); 
+
+    Route::resource('special-records',SpecialRecordsController::class); 
     
     Route::resource('record',RecordController::class); 
     

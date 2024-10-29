@@ -230,56 +230,7 @@
     </div>
     
 
-<!-- TABLE 5 -->
-<div class="row">
-    <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>V. NUMBERS OF ACCREDITTED/PROFILED STAKEHOLDERS FOR THE MONTH OF _____ 2024</b></h5>
-      <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="col-md-4 text-center">PARTICULAR</th>
-                    <th class="col-md-4 text-center">NUMBER OF STAKEHOLDERS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">FARMER GROUP</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">FARMER (Individual)</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">BUYER (Individual)</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">MARKET FACILITATOR</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">PACKER/PORTER/ASHER</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">PACKER,PORTER & WASHER'S GROUP</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-end">TOTAL</td>
-                    <td class="text-center"></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-    </div>
-    </div>
-    </div>
-    </div>
+
     
 
 
@@ -421,21 +372,44 @@
 <!-- TABLE 8 -->
 <div class="row">
     <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>VIII. MONITORED MARKET DESTINATION OF BROUGHT COMMODITIES</b></h5>
-      <div class="table-responsive">
-         {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
-      </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><b>VIII. MONITORED MARKET DESTINATION OF BROUGHT COMMODITIES</b></h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">NO</th>
+                                <th class="text-center">PROVINCE</th>
+                                <th class="text-center">VOLUME IN KG</th>
+                                <th class="text-center">LOADING FREQUENCY</th>
+                                <th class="text-center">PERCENTAGE SHARE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $index = 1; @endphp
+                            @foreach ($table_eight_data as $data)
+                                <tr>
+                                    <td class="text-center">{{ $index++ }}</td>
+                                    <td class="text-center">{{ $data['destination'] }}</td>
+                                    <td class="text-center">{{ $data['volume'] }}</td>
+                                    <td class="text-center">{{ $data['frequency'] }}</td>
+                                    <td class="text-center">{{ $data['percentage_share'] }}</td>
+                                </tr>
+                            @endforeach
+                            <tr>
+                                <td class="text-center" colspan="2"><strong>GRAND TOTAL</strong></td>
+                                <td class="text-center"><strong>{{ $formattedGrandTotalVolume }}</strong></td>
+                                <td class="text-center"><strong>{{ $formattedGrandTotalFrequency }}</strong></td>
+                                <td class="text-center"><strong>100.00%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
+</div>
     
 
 
@@ -636,67 +610,6 @@
     
 
 
-<!-- TABLE 13 -->
-<div class="row">
-    <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>XIII. STATUS OF VEGETABLE TRADING STALLS</b></h5>
-        <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
-      </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    
-
-<!-- TABLE 14 -->
-<div class="row">
-    <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>XIV. MARKET LINKAGES</b></h5>
-        <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
-      </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    
-
-
-<!-- TABLE 15 -->
-<div class="row">
-    <div class="col-lg-12">
-    <div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>XV. PRICE MONITORING</b></h5>
-
-      <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
-      <thead>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>  --}}
-      </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    
 
 
 </section>

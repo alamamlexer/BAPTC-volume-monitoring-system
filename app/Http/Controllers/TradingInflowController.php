@@ -229,7 +229,7 @@ class TradingInflowController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         date_default_timezone_set('Asia/Manila');
 
@@ -263,11 +263,26 @@ class TradingInflowController extends Controller
         $staffs = Staff::all();
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
 
 
         $user = Auth::user();
+        
+        if ($request->ajax()) {
+            $temporary_transactions = Transaction::where('transaction_status', 'temporary')
+                ->where('transaction_type', 'trading inflow')
+                ->where('date', $currentDate)
+                ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
+                ->paginate(5);
+    
+            $html = view('admin-pages.trading-inflow-form-create', compact('temporary_transactions'))->render();
+    
+            return response()->json([
+                'html' => $html,
+                'links' => view('admin-pages.pagination', compact('temporary_transactions'))->render(),
+            ]);
+        }
+        
         if ($user->type == 0) {
             return view('admin-pages.trading-inflow-form-create', compact(
                 'defaultTime',
@@ -279,7 +294,7 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
-                'location_vehicles'
+             
             ));
         } elseif ($user->type == 1) {
             return view('staff-pages.staff-trading-inflow-form-create', compact(
@@ -292,7 +307,7 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
-                'location_vehicles'
+               
             ));
         }
     }
@@ -312,14 +327,13 @@ class TradingInflowController extends Controller
             'volume' => 'required|numeric',
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
-            'facilitator_id' => 'nullable|exists:facilitators,facilitator_id',
             'name' => 'nullable|string',
             'barangay' => 'required',
             'municipality' => 'required',
+            'facilitator_name' => 'nullable',
             'province' => 'required',
             'region' => 'required',
         ]);
-
 
         //Storing new location 
         $location = Location::where('barangay', $validatedData['barangay'])
@@ -342,6 +356,7 @@ class TradingInflowController extends Controller
                 ->where('region', $validatedData['region'])
                 ->first();
         }
+        
         $location = Location::where('barangay', $validatedData['barangay'])
             ->where('municipality', $validatedData['municipality'])
             ->where('province', $validatedData['province'])
@@ -353,42 +368,58 @@ class TradingInflowController extends Controller
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
 
         if (!$vehicle) {
-            session()->flash('success', 'Trading inflow added successfully!');
-            Vehicle::create([
-                'plate_number' => $validatedData['plate_number'],
-                'vehicle_name' => $validatedData['name'],
-                'vehicle_type_id' => $validatedData['vehicle_type_id'],
+            
+            $vehicle= Vehicle::create([
+                'plate_number' => $validatedData['plate_number']?? null,
+                'vehicle_name' => $validatedData['name']?? null,
+                'vehicle_type_id' => $validatedData['vehicle_type_id']?? null,
             ]);
+       
         } else {
             Vehicle::where('plate_number', $validatedData['plate_number'])->first();
         }
+        
+        
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
 
-        $facilitator = Facilitator::where('facilitator_id', $validatedData['facilitator_id'])->first();
+        $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
+        
         //Storing a link in the address and location if there is no existing record
-        $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
-            ->where('location_id', $location->location_id)
-            ->where('facilitator_id', $facilitator->facilitator_id)
+        
+        
+        
+        
+       if(!$vehicle){
+       $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+            ->where('location_id', $location->location_id?? null)
+            ->where('facilitator_id', $facilitator->facilitator_id?? null)
             ->first();
-        if (!$facilitator_location_vehicles) {
+            
+         if (!$facilitator_location_vehicles) {
             $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
                 'vehicle_id' => $vehicle->vehicle_id,
                 'location_id' => $location->location_id,
-                'facilitator_id' => $facilitator->facilitator_id,
+                'facilitator_id' => $facilitator->facilitator_id?? null,
             ]);
+            
         } else {
             $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
                 ->where('location_id', $location->location_id)
                 ->where('facilitator_id', $facilitator->facilitator_id)
                 ->first();
+               
         }
+       }
+            
+        
+       
 
 
         //Get the commodity_id that corresponds to the commodity selected in the view
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
 
         //Store the transaction
-        Transaction::create([
+        $test=Transaction::create([
             'date' => $validatedData['date'],
             'time' => $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
@@ -399,13 +430,12 @@ class TradingInflowController extends Controller
             'plate_number' => $validatedData['plate_number'] ?? null,
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'name' => $validatedData['name'] ?? null,
-            'facilitator_id' => $validatedData['facilitator_id'] ?? null,
+            'facilitator_id' => $facilitator->facilitator_id?? null,
             'barangay' => $location->barangay,
             'municipality' => $location->municipality,
             'province' => $location->province,
             'region' => $location->region,
         ]);
-
         session()->flash('success', 'Trading inflow added successfully!');
 
     $user = Auth::user();
@@ -429,6 +459,7 @@ class TradingInflowController extends Controller
      */
     public function edit(Transaction $trading_inflow)
     {
+        
         $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
             ->distinct()
             ->get()
@@ -445,7 +476,6 @@ class TradingInflowController extends Controller
         $staffs = Staff::all(); // Fetch all staff
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $logged_in_staff = Auth::id();
         $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
         $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
@@ -462,7 +492,6 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'commodities',
                 'vehicle_types',
-                'location_vehicles'
             ));
         } elseif ($user->type == 1) {
             return view('staff-pages.staff-trading-inflow-form-edit', compact(
@@ -475,7 +504,6 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'commodities',
                 'vehicle_types',
-                'location_vehicles'
             ));
         }
     }
@@ -495,14 +523,16 @@ class TradingInflowController extends Controller
             'volume' => 'required|numeric',
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
-            'facilitator_id' => 'nullable|exists:facilitators,facilitator_id',
+            'facilitator_name' => 'nullable|exists:facilitators,facilitator_name',
             'name' => 'nullable|string',
             'barangay' => 'required',
             'municipality' => 'required',
             'province' => 'required',
             'region' => 'required',
         ]);
-
+        
+        
+        
         // Find or create location
         $location = Location::firstOrCreate(
             [
@@ -514,6 +544,8 @@ class TradingInflowController extends Controller
         );
 
         // Find or create vehicle
+        
+        if(!empty($validatedData['plate_number'])){
         $vehicle = Vehicle::firstOrCreate(
             [
                 'plate_number' => $validatedData['plate_number'],
@@ -523,15 +555,21 @@ class TradingInflowController extends Controller
                 'vehicle_type_id' => $validatedData['vehicle_type_id'],
             ]
         );
-
+        }
+        
+        $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
         // Find or create location_vehicle relationship
+        
+        if(!empty($validatedData['plate_number'])){
         $facilitator_location_vehicle = FacilitatorLocationVehicle::firstOrCreate(
             [
                 'vehicle_id' => $vehicle->vehicle_id,
                 'location_id' => $location->location_id,
-                'facilitator_id' => $location->location_id,
+                'facilitator_id' => $facilitator->facilitator_id,
             ]
         );
+        }
+        
 
         // Find the corresponding commodity
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
@@ -547,7 +585,7 @@ class TradingInflowController extends Controller
             'volume' => $validatedData['volume'],
             'plate_number' => $validatedData['plate_number'] ?? null,
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
-            'facilitator_id' => $validatedData['facilitator_id'] ?? null,
+            'facilitator_id' => $facilitator->facilitator_id ?? null,
             'name' => $validatedData['name'] ?? null,
             'barangay' => $location->barangay,
             'municipality' => $location->municipality,

@@ -260,6 +260,52 @@ class ReportController extends Controller
         $overallVolume = $allTransactions->sum('volume');
         $totalGrandPercentage = $overallVolume > 0 ? ($grandTotalVolume / $overallVolume) * 100 : 0;
 
+
+        //table 8
+        
+        // Fetch and aggregate data for Table 8 by province
+        $outflows = Transaction::where('transaction_type', 'trading outflow')
+        ->where('transaction_status', 'regular')
+        ->get()
+        ->groupBy('province');
+    
+    $table_eight_data = [];
+    $grandTotalVolume = 0;
+    $grandTotalFrequency = 0;
+    
+    foreach ($outflows as $province => $transactions) {
+        $totalVolume = $transactions->sum('volume');
+        $frequency = $transactions->count();
+        
+        $grandTotalVolume += $totalVolume;
+        $grandTotalFrequency += $frequency;
+        
+        $table_eight_data[] = [
+            'destination' => $province,
+            'volume' => $totalVolume,
+            'frequency' => $frequency,
+            'percentage_share' => $frequency, // Raw frequency for later calculation
+        ];
+    }
+    
+    // Calculate percentage share for each province
+    foreach ($table_eight_data as &$data) {
+        $data['percentage_share'] = $grandTotalFrequency > 0
+            ? number_format(($data['frequency'] / $grandTotalFrequency) * 100, 2) . '%'
+            : '0.00%';
+    }
+    
+    // Sort by percentage share in descending order
+    usort($table_eight_data, function ($a, $b) {
+        $percentA = (float) rtrim($a['percentage_share'], '%');
+        $percentB = (float) rtrim($b['percentage_share'], '%');
+        return $percentB <=> $percentA; // Sort by percentage in descending order
+    });
+    
+    // Format grand totals
+    $formattedGrandTotalVolume = number_format($grandTotalVolume, 0, '.', ',');
+    $formattedGrandTotalFrequency = $grandTotalFrequency;
+
         // Passing data to the view
         return view('admin-pages.report', compact(
             'table_one_data',
@@ -274,7 +320,11 @@ class ReportController extends Controller
             'subtotals',
             'grandTotalVolume',
             'grandTotalFrequency',
-            'totalGrandPercentage'
+            'totalGrandPercentage',
+            'table_eight_data',
+            'formattedGrandTotalVolume',
+            'formattedGrandTotalFrequency',
+            
         ));
         
         }
