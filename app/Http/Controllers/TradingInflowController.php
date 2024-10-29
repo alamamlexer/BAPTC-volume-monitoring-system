@@ -237,14 +237,52 @@ class TradingInflowController extends Controller
         $defaultTime = ($currentHour < 12) ? 'AM' : 'PM';
 
         $currentDate = Carbon::today()->toDateString();
-
-        $temporary_transactions = Transaction::where('transaction_status', 'temporary')
+        
+        $amPmFilter = $request->input('amPmFilter');
+        $attendantFilter = $request->input('attendantFilter');
+        $commodityFilter = $request->input('commodityFilter');
+        $productionOriginFilter = $request->input('productionOriginFilter');
+        $facilitatorFilter = $request->input('facilitatorFilter');
+        
+        $temporary_transaction = Transaction::where('transaction_status', 'temporary')
             ->where('transaction_type', 'trading inflow')
             ->where('date', $currentDate)
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
-            ->paginate(5);
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+    
         // Fetch all commodities
 
+        $staffId = $request->input('staff_id');
+        $timeFilter = $request->input('time_filter');
+        $commodityId = $request->input('commodity_filter');
+        $municipality = $request->input('municipality_filter');
+    
+        // Apply filters if provided
+        if ($staffId) {
+            $temporary_transaction->where('staff_id', $staffId);
+        }
+        if ($timeFilter) {
+            $temporary_transaction->where('time', $timeFilter);
+        }
+        if ($commodityId) {
+            $temporary_transaction->where('commodity_id', $commodityId);
+        }
+        if ($municipality) {
+            $temporary_transaction->where('municipality', $municipality);
+        }
+        
+        $temporary_transactions = $temporary_transaction->paginate(5);
+      
+        if ($request->ajax()) {
+            return response()->json([
+                'data' => $temporary_transactions->items(),
+                'current_page' => $temporary_transactions->currentPage(),
+                'last_page' => $temporary_transactions->lastPage(),
+                'total' => $temporary_transactions->total(),
+
+            ]);
+        }
+
+        
         // Fetch distinct production origins
         $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
             ->distinct()
@@ -258,6 +296,7 @@ class TradingInflowController extends Controller
                     'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
                 ];
             });
+        $municipalities = Transaction::distinct()->pluck('municipality');
         $facilitators = Facilitator::all();
         $logged_in_staff = Auth::id();
         $staffs = Staff::all();
@@ -268,20 +307,6 @@ class TradingInflowController extends Controller
 
         $user = Auth::user();
         
-        if ($request->ajax()) {
-            $temporary_transactions = Transaction::where('transaction_status', 'temporary')
-                ->where('transaction_type', 'trading inflow')
-                ->where('date', $currentDate)
-                ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
-                ->paginate(5);
-    
-            $html = view('admin-pages.trading-inflow-form-create', compact('temporary_transactions'))->render();
-    
-            return response()->json([
-                'html' => $html,
-                'links' => view('admin-pages.pagination', compact('temporary_transactions'))->render(),
-            ]);
-        }
         
         if ($user->type == 0) {
             return view('admin-pages.trading-inflow-form-create', compact(
@@ -294,6 +319,7 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
+                'municipalities'
              
             ));
         } elseif ($user->type == 1) {
@@ -307,6 +333,7 @@ class TradingInflowController extends Controller
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
+                'municipalities'
                
             ));
         }
@@ -396,26 +423,11 @@ class TradingInflowController extends Controller
                 'location_id' => $location->location_id,
                 'facilitator_id' => $facilitator->facilitator_id?? null,
         ]);
-            
+            $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+                ->where('location_id', $location->location_id)
+                ->where('facilitator_id', $facilitator->facilitator_id)
+                ->first();
         }
-         
-        
-            
-        //  if (!$facilitator_location_vehicles) {
-           
-            
-        // } else {
-        //     $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
-        //         ->where('location_id', $location->location_id)
-        //         ->where('facilitator_id', $facilitator->facilitator_id)
-        //         ->first();
-               
-        // }
-       
-            
-        
-       
-
 
         //Get the commodity_id that corresponds to the commodity selected in the view
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
@@ -641,12 +653,23 @@ class TradingInflowController extends Controller
             // Handle any other exceptions
             session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-
+        
         // Redirect to the appropriate index page based on user type
         if ($user->type == 0) {
+            if($trading_inflow->transation_status="temporary"){
+            return redirect()->route('trading-inflow.create'); // Admin index
+            }
+            elseif($trading_inflow->transation_status="regular"){
             return redirect()->route('trading-inflow.index'); // Admin index
+            }
+            
         } elseif ($user->type == 1) {
-            return redirect()->route('staff-trading-inflow.index'); // Staff index
+            if($trading_inflow->transation_status="temporary"){
+                return redirect()->route('staff-trading-inflow.create'); // Admin index
+                }
+                elseif($trading_inflow->transation_status="regular"){
+                return redirect()->route('staff-trading-inflow.index'); // Admin index
+                }
         }
     }
     public function submit()

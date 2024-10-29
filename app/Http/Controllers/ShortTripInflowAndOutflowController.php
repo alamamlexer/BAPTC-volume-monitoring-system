@@ -251,7 +251,16 @@ class ShortTripInflowAndOutflowController extends Controller
             ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
             ->paginate(5);
         // Fetch all commodities
+        $commodities = Commodity::all();
 
+        // Fetch all staff members
+        $staffs = Staff::all();
+
+        // Fetch all facilitator members
+        $facilitators = Facilitator::all();
+
+        // Fetch distinct municipalities for the dropdown
+        $municipalities = Transaction::distinct()->pluck('municipality');
         // Fetch distinct production origins
         $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
             ->distinct()
