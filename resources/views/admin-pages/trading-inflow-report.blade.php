@@ -185,16 +185,16 @@
                             </thead>
                             <tbody id="TableBody">
                                 @foreach ($trading_inflows_table as $trading_inflow)
-                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id }}">
+                                <tr data-date="{{ $trading_inflow->date }}" data-am-pm="{{ $trading_inflow->time }}" data-attendant="{{ $trading_inflow->staff->staff_id }}" data-commodity="{{ $trading_inflow->commodity->commodity_id }}" data-production-origin="{{ $trading_inflow->barangay }}" data-facilitator="{{ $trading_inflow->facilitator->facilitator_id ?? 'N/A'}}">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $trading_inflow->date }}</td>
                                     <td>{{ $trading_inflow->time }}</td>
-                                    <td>{{ $trading_inflow->plate_number }}</td>
-                                    <td>{{ $trading_inflow->name }}</td>
+                                    <td>{{ $trading_inflow->plate_number ?? 'N/A' }}</td>
+                                    <td>{{ $trading_inflow->name ?? 'N/A'}}</td>
                                     <td>{{ $trading_inflow->commodity->commodity_name }}</td>
                                     <td>{{ $trading_inflow->volume }}</td>
                                     <td>{{ $trading_inflow->barangay }}, {{ $trading_inflow->municipality }}, {{ $trading_inflow->province }}, {{ $trading_inflow->region }}</td>
-                                    <td>{{ $trading_inflow->facilitator->facilitator_name }}</td>
+                                    <td>{{ $trading_inflow->facilitator->facilitator_name ?? 'N/A'}}</td>
                                     <td>{{ $trading_inflow->staff->staff_name }}</td>
                                     <td>
                                         <a href="{{ route('trading-inflow.edit', $trading_inflow->id) }}" class="btn btn-outline-primary m-1">
