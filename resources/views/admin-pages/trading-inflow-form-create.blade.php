@@ -135,13 +135,13 @@
                                                     data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
                                                     data-vehicle-name="{{ $location_vehicle->vehicle->vehicle_name }}"
                                                     data-vehicle-type-id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
-                                                    data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id }}"
-                                                    data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name }}"
-                                                    data-barangay="{{ $location_vehicle->location->barangay }}"
-                                                    data-municipality="{{ $location_vehicle->location->municipality }}"
-                                                    data-province="{{ $location_vehicle->location->province }}"
-                                                    data-region="{{ $location_vehicle->location->region }}">
-                                                    {{ $location_vehicle->vehicle->plate_number }} {{ $location_vehicle->vehicle->vehicle_name }} ({{ $location_vehicle->facilitator->facilitator_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
+                                                    data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id ?? ''}}"
+                                                    data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name ?? ''}}"
+                                                    data-barangay="{{ $location_vehicle->location->barangay ?? ''}}"
+                                                    data-municipality="{{ $location_vehicle->location->municipality ?? ''}}"
+                                                    data-province="{{ $location_vehicle->location->province ?? ''}}"
+                                                    data-region="{{ $location_vehicle->location->region?? '' }}">
+                                                    {{ $location_vehicle->vehicle->plate_number }} {{ $location_vehicle->vehicle->vehicle_name }} ({{ $location_vehicle->facilitator->facilitator_name ?? ''}}) - {{ $location_vehicle->location->barangay?? '' }}, {{ $location_vehicle->location->municipality ?? ''}}</li>
                                             @endif
                                         @endforeach
                                     @endif

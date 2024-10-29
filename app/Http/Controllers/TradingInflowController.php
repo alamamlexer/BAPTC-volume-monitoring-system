@@ -385,31 +385,33 @@ class TradingInflowController extends Controller
         $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
         
         //Storing a link in the address and location if there is no existing record
-        
-        
-        
-        
-       if(!$vehicle){
-       $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+        $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
             ->where('location_id', $location->location_id?? null)
             ->where('facilitator_id', $facilitator->facilitator_id?? null)
             ->first();
             
-         if (!$facilitator_location_vehicles) {
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
+        if (!$facilitator_location_vehicles) {
+        $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
                 'vehicle_id' => $vehicle->vehicle_id,
                 'location_id' => $location->location_id,
                 'facilitator_id' => $facilitator->facilitator_id?? null,
-            ]);
+        ]);
             
-        } else {
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
-                ->where('location_id', $location->location_id)
-                ->where('facilitator_id', $facilitator->facilitator_id)
-                ->first();
-               
         }
-       }
+         
+        
+            
+        //  if (!$facilitator_location_vehicles) {
+           
+            
+        // } else {
+        //     $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+        //         ->where('location_id', $location->location_id)
+        //         ->where('facilitator_id', $facilitator->facilitator_id)
+        //         ->first();
+               
+        // }
+       
             
         
        
