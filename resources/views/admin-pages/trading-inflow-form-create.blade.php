@@ -723,7 +723,7 @@
             tableBody.innerHTML = '';
 
             if (data.data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records available</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
             } else {
                 data.data.forEach(transaction => {
                     tableBody.innerHTML += `
@@ -739,10 +739,10 @@
                             <td>${transaction.facilitator.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
                             <td>
-                                <a href="{{ url('trading-inflow/edit') }}/${transaction.id}" class="btn btn-outline-primary m-1">
+                                <a href="/trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
                                     <i class="bx bxs-edit"></i> Edit
                                 </a>
-                                <form action="{{ url('trading-inflow') }}/${transaction.id}" method="POST" style="display:inline;">
+                                <form action="/trading-inflow/${transaction.id}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this reservation?')">

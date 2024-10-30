@@ -656,18 +656,18 @@ class TradingInflowController extends Controller
         
         // Redirect to the appropriate index page based on user type
         if ($user->type == 0) {
-            if($trading_inflow->transation_status="temporary"){
+            if($trading_inflow->transaction_status=='temporary'){
             return redirect()->route('trading-inflow.create'); // Admin index
             }
-            elseif($trading_inflow->transation_status="regular"){
+            elseif($trading_inflow->transaction_status=='regular'){
             return redirect()->route('trading-inflow.index'); // Admin index
             }
             
         } elseif ($user->type == 1) {
-            if($trading_inflow->transation_status="temporary"){
+            if($trading_inflow->transaction_status=='temporary'){
                 return redirect()->route('staff-trading-inflow.create'); // Admin index
                 }
-                elseif($trading_inflow->transation_status="regular"){
+                elseif($trading_inflow->transaction_status=='regular'){
                 return redirect()->route('staff-trading-inflow.index'); // Admin index
                 }
         }
