@@ -354,7 +354,7 @@
   <script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
   <script src="{{asset('/custom-scripts/datatables.js')}}"></script>
   <script src="{{asset('/custom-scripts/datatables.min.js')}}"></script>
-
+  <script src="{{asset('/custom-scripts/exporting.js')}}"></script>
   <!-- Template Main JS File -->
   <script src="{{asset('assets/js/main.js')}}"></script>
 

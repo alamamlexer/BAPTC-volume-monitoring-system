@@ -156,12 +156,12 @@
                                     <label for="origin">Origin</label>
                                     <ul class="dropdown-list list-group position-absolute w-100"
                                         style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
-                                        @foreach ($facilitator_location_vehicles as $location_vehicle)
+                                        @foreach ($locations as $location)
                                             <li class="list-group-item list-group-item-action input-item"
-                                                data-barangay="{{ $location_vehicle->location->barangay }}"
-                                                data-municipality="{{ $location_vehicle->location->municipality }}"
-                                                data-province="{{ $location_vehicle->location->province }}"
-                                                data-region="{{ $location_vehicle->location->region }}">{{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}, {{ $location_vehicle->location->province }}, {{ $location_vehicle->location->region }}</li>
+                                                data-barangay="{{ $location->barangay }}"
+                                                data-municipality="{{ $location->municipality }}"
+                                                data-province="{{ $location->province }}"
+                                                data-region="{{ $location->region }}">{{ $location->barangay }}, {{ $location->municipality }}, {{ $location->province }}, {{ $location->region }}</li>
                                         @endforeach
                                         <li class="no-records list-group-item" style="display: none;">No matching records found.</li>
                                     </ul>
@@ -403,7 +403,6 @@
                         
                         
                         <div id="paginationLinks">
-                            
                         </div>    
                         
                     </div>
@@ -725,18 +724,19 @@
             if (data.data.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
             } else {
-                data.data.forEach(transaction => {
+                data.data.forEach((transaction,index) => {
+                    console.log('Index:', index)
                     tableBody.innerHTML += `
                         <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
-                            <td>${transaction.id}</td>
+                            <td>${index + 1}</td>
                             <td>${transaction.date}</td>
                             <td>${transaction.time}</td>
-                            <td>${transaction.staff.staff_name}</td>
+                            <td>${transaction.staff_name}</td>
                             <td>${transaction.plate_number ?? 'N/A'}</td>
                             <td>${transaction.name ?? 'N/A'}</td>
-                            <td>${transaction.commodity.commodity_name}</td>
+                            <td>${transaction.commodity_name}</td>
                             <td>${transaction.volume}</td>
-                            <td>${transaction.facilitator.facilitator_name ?? 'N/A'}</td>
+                            <td>${transaction.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
                             <td>
                                 <a href="/trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">

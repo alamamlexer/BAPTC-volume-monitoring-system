@@ -30,6 +30,7 @@
   <link href="{{asset('/custom-scripts/datatables.css')}}" rel="stylesheet">
  
   <script src="{{asset('/custom-scripts/jquery-3.6.0.min.js')}}"></script>
+  <script src="{{asset('/custom-scripts/exporting.js')}}"></script>
 
   <!-- Template Main CSS File -->
   <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
