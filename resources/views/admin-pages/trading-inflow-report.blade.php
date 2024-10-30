@@ -232,125 +232,10 @@
       </div>
     </div>
   @endif
-</section>
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const totalVolumeData = @json($totalVolumeData);
-        const series = @json($chartData);
 
-        // Assuming dates is in the format of "YYYY-MM-DD"
-        const dates = @json($dates).map(date => Date.parse(date)); // Convert to timestamps
-
-        // Prepare the combined series
-        const combinedSeries = [{
-            name: 'Total Volume',
-            data: totalVolumeData
-        }, ...series];
-
-        // Initialize Trading Inflow Chart
-        Highcharts.chart('areaChart', {
-            chart: {
-                type: 'line',
-                height: 350,
-                animation: {
-                    duration: 2000,
-                    easing: 'easeOutBounce'
-                }
-            },
-            title: {
-                text: 'Volume of Trading Inflows by Commodity'
-            },
-            xAxis: {
-                type: 'datetime',
-                dateTimeLabelFormats: {
-                    day: '%b %e, %Y' // Format as "Oct 1, 2024"
-                },
-                tickInterval: 24 * 3600 * 1000 // One day
-            },
-            yAxis: {
-                title: {
-                    text: 'Volume'
-                },
-                opposite: true
-            },
-            series: combinedSeries.map((serie, index) => ({
-                ...serie,
-                data: serie.data.map((value, i) => [dates[i], value]) // Pair each data point with its corresponding date
-            })),
-            legend: {
-                horizontalAlign: 'left'
-            },
-            plotOptions: {
-                series: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    marker: {
-                        enabled: false
-                    }
-                }
-            }
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check if there's a success message in the session
-      @if(session('success'))
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-        setTimeout(function() {
-          successModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-  
-      // Check if there's an error message in the session
-      @if(session('error'))
-        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-        errorModal.show();
-        setTimeout(function() {
-          errorModal.hide();
-        }, 1000); // 1 second timeout
-      @endif
-    });
-  </script>
-<script>
-    $(document).ready( function () {
-    $('#reportTable').DataTable();
-} );
-
-</script>
-<script>
-  function updateDateTime() {
-      const now = new Date();
-      const options = { 
-          year: 'numeric', 
-          month: '2-digit', 
-          day: '2-digit', 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          second: '2-digit', 
-          hour12: true // Change this to true for 12-hour format
-      };
-      
-      // Format the date and time
-      const formattedDateTime = now.toLocaleString('en-US', options);
-      
-      // Update the content of the div
-      document.getElementById('current-date-time').textContent = formattedDateTime;
-  }
-
-  // Call updateDateTime every second
-  setInterval(updateDateTime, 1000);
-  
-  // Initial call to set the date and time right away
-  updateDateTime();
-</script>
-
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -379,7 +264,7 @@ const commodityFilter = document.getElementById('commodityFilter').value;
 const municipalityFilter = document.getElementById('municipalityFilter').value;
 
 // Construct the AJAX URL
-const url = "{{ route('trading-inflow.create') }}"; // Make sure to replace this with your route
+const url = "{{ route('trading-inflow.index') }}"; // Make sure to replace this with your route
 
 // Create query parameters
 const queryParams = new URLSearchParams({
@@ -505,4 +390,124 @@ fetchFilteredData();
 }
 
    </script>
+
+   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const totalVolumeData = @json($totalVolumeData);
+        const series = @json($chartData);
+
+        // Assuming dates is in the format of "YYYY-MM-DD"
+        const dates = @json($dates).map(date => Date.parse(date)); // Convert to timestamps
+
+        // Prepare the combined series
+        const combinedSeries = [{
+            name: 'Total Volume',
+            data: totalVolumeData
+        }, ...series];
+
+        // Initialize Trading Inflow Chart
+        Highcharts.chart('areaChart', {
+            chart: {
+                type: 'line',
+                height: 350,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutBounce'
+                }
+            },
+            title: {
+                text: 'Volume of Trading Inflows by Commodity'
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %e, %Y' // Format as "Oct 1, 2024"
+                },
+                tickInterval: 24 * 3600 * 1000 // One day
+            },
+            yAxis: {
+                title: {
+                    text: 'Volume'
+                },
+                opposite: true
+            },
+            series: combinedSeries.map((serie, index) => ({
+                ...serie,
+                data: serie.data.map((value, i) => [dates[i], value]) // Pair each data point with its corresponding date
+            })),
+            legend: {
+                horizontalAlign: 'left'
+            },
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    marker: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if there's a success message in the session
+      @if(session('success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+        setTimeout(function() {
+          successModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+  
+      // Check if there's an error message in the session
+      @if(session('error'))
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        errorModal.show();
+        setTimeout(function() {
+          errorModal.hide();
+        }, 1000); // 1 second timeout
+      @endif
+    });
+  </script>
+<script>
+    $(document).ready( function () {
+    $('#reportTable').DataTable();
+} );
+
+</script>
+<script>
+  function updateDateTime() {
+      const now = new Date();
+      const options = { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit', 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit', 
+          hour12: true // Change this to true for 12-hour format
+      };
+      
+      // Format the date and time
+      const formattedDateTime = now.toLocaleString('en-US', options);
+      
+      // Update the content of the div
+      document.getElementById('current-date-time').textContent = formattedDateTime;
+  }
+
+  // Call updateDateTime every second
+  setInterval(updateDateTime, 1000);
+  
+  // Initial call to set the date and time right away
+  updateDateTime();
+</script>
+</section>
+
+
+
+
 @endsection

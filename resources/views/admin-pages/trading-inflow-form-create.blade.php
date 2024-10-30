@@ -233,7 +233,7 @@
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="name" name="name"
                                         placeholder="Name (optional)" value="{{ old('name') }}">
-                                    <label for="name">Vehicle's Name</label>
+                                    <label for="name">Vehicles Name</label>
                                     @if ($errors->has('name'))
                                         <span class="text-danger">{{ $errors->first('name') }}</span>
                                     @endif

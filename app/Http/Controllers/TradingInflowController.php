@@ -271,7 +271,7 @@ class TradingInflowController extends Controller
         }
         
         $temporary_transactions = $temporary_transaction->paginate(5);
-      
+            
         if ($request->ajax()) {
             return response()->json([
                 'data' => $temporary_transactions->items(),
