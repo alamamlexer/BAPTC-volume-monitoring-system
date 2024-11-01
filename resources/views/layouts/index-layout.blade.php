@@ -76,7 +76,7 @@
 </header>
 
  
-<main id="">
+<main id="  ">
     @yield('content')
 </main>
   

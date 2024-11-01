@@ -39,6 +39,7 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('trading-inflow', TradingInflowController::class);
     Route::post('/trading-inflow/submit', [TradingInflowController::class, 'submit'])->name('trading-inflow.submit');
+    Route::post('/trading-inflow/import', [TradingInflowController::class, 'import'])->name('trading-inflow.import');
     
     Route::resource('trading-outflow', TradingOutflowController::class);
     Route::post('/trading-outflow/submit', [TradingOutflowController::class, 'submit'])->name('trading-outflow.submit');

@@ -12,7 +12,8 @@
         </ol>
     </nav>
 </div>
-
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
 <section class="section dashboard">
 
   <div class="row ">
@@ -304,10 +305,10 @@
                             <td>${transaction.time}</td>
                             <td>${transaction.plate_number ?? 'N/A'}</td>
                             <td>${transaction.name ?? 'N/A'}</td>
-                            <td>${transaction.commodity.commodity_name}</td>
+                            <td>${transaction.commodity?.commodity_name ?? 'N/A' }</td>
                             <td>${transaction.volume}</td>
                             <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
-                            <td>${transaction.facilitator.facilitator_name ?? 'N/A'}</td>
+                            <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff.staff_name}</td>
                             <td>
                                 <a href="/trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
@@ -355,15 +356,15 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
                 <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1})">Previous</a>
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1}); return false;">Previous</a>
                 </li>
                 ${Array.from({ length: endPage - startPage + 1 }, (_, i) => `
                     <li class="page-item ${startPage + i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="#" onclick="fetchFilteredData(${startPage + i})">${startPage + i}</a>
+                        <a class="page-link" href="#" onclick="fetchFilteredData(${startPage + i}); return false;">${startPage + i}</a>
                     </li>
                 `).join('')}
                 <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1})">Next</a>
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1}); return false;">Next</a>
                 </li>
             </ul>
         </nav>
@@ -389,7 +390,7 @@
     
    </script>
 
-   <script>
+<script>
     document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
         const series = @json($chartData);
@@ -446,16 +447,26 @@
                     }
                 }
             },
-            exporting: { // Enable exporting
+            exporting: {
+                enabled: true,
                 buttons: {
-                    contextButton: {
-                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'separator', 'printChart']
+                    customDownloadButton: {
+                        text: 'Download PNG',
+                        useHTML: true,
+                        onclick: function() {
+                            // Trigger local export
+                            this.exportChartLocal({
+                                type: 'image/png',
+                                filename: 'trading_inflow_chart'
+                            });
+                        }
                     }
                 }
             }
         });
     });
 </script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

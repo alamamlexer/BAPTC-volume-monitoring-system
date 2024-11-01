@@ -74,6 +74,28 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Vehicle Links to the Facilitator and/or Location -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Vehicle Links</h5> 
+                    <div class="table-responsive">
+                        <table class="table" id="datatable-links">
+                            <thead>
+                                <tr>
+                                    <th class="text-start">No.</th>
+                                    <th class="text-start">Vehicle Name</th>
+                                    <th class="text-start">Location</th>
+                                    <th class="text-start">Facilitator</th>
+                                    <th class="text-start">Action</th> <!-- Added Action column -->
+                                </tr>
+                            </thead>
+                        </table>  
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -136,6 +158,50 @@ $(document).ready(function () {
             search: "Search:",
         }
     });
+
+    // Initialize DataTable for Vehicle Links
+    $('#datatable-links').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('record.index') }}",
+            data: { type: 'link' } // Specify the type
+        },
+        columns: [
+            { data: 'id', name: 'id' ?? "N/A"},
+            { data: 'vehicle', name: 'vehicle' },
+            { data: 'location', name: 'location' },
+            { data: 'facilitator', name: 'facilitator' },
+            { data: 'action', name: 'action', orderable: false, searchable: false } // Added action column
+        ],
+        lengthMenu: [5, 10, 20],
+        language: {
+            search: "Search:",
+        }
+    });
+    
+    function deleteRecord(url) {
+        if (confirm('Are you sure you want to delete this reservation?')) {
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    alert(response.message);
+                    // Refresh DataTables after deletion
+                    $('#datatable-location').DataTable().ajax.reload();
+                    $('#datatable-facilitator').DataTable().ajax.reload();
+                    $('#datatable-commodity').DataTable().ajax.reload();
+                    $('#datatable-links').DataTable().ajax.reload();
+                },
+                error: function (xhr) {
+                    alert(xhr.responseJSON.message || 'An error occurred while deleting the record.');
+                }
+            });
+        }
+    }
 });
 </script>
 @endsection
