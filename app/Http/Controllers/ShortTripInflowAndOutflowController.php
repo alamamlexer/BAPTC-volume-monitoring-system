@@ -15,6 +15,8 @@ use App\Models\FacilitatorLocationVehicle;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ShortTripInflowAndOutflowController extends Controller
 {
@@ -607,5 +609,114 @@ class ShortTripInflowAndOutflowController extends Controller
         } elseif ($user->type == 1) {
             return redirect()->route('staff-short-trip-inflow-and-outflow.index');
         }
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('file');
+
+        // Load the Excel file
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        
+        // Initialize an array to store the rows
+        $rows = [];
+
+        foreach ($worksheet->getRowIterator(2) as $row) { // Start from row 2 to skip headers
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $data = [];
+            foreach ($cellIterator as $cell) {
+                $data[] = $cell->getValue(); // Collect each cell's value
+            }
+
+            $excel_date = $worksheet->getCell("A" . $row->getRowIndex())->getValue();
+            $time = $worksheet->getCell("B" . $row->getRowIndex())->getValue();
+            $transaction_type = $worksheet->getCell("C" . $row->getRowIndex())->getValue();
+            $staff_name = $worksheet->getCell("E" . $row->getRowIndex())->getValue();
+            $commodity_name = $worksheet->getCell("F" . $row->getRowIndex())->getValue();
+            $volume = $worksheet->getCell("G" . $row->getRowIndex())->getValue();
+            $plate_number = $worksheet->getCell("H" . $row->getRowIndex())->getValue();
+            $vehicle_type_name = $worksheet->getCell("I" . $row->getRowIndex())->getValue();
+            $name = $worksheet->getCell("J" . $row->getRowIndex())->getValue();
+            $facilitator_name = $worksheet->getCell("K" . $row->getRowIndex())->getValue();
+            $barangay = $worksheet->getCell("L" . $row->getRowIndex())->getValue();
+            $municipality = $worksheet->getCell("M" . $row->getRowIndex())->getValue();
+            $province = $worksheet->getCell("N" . $row->getRowIndex())->getValue();
+            $region = $worksheet->getCell("O" . $row->getRowIndex())->getValue();
+            
+            
+            if (is_numeric($excel_date)) {
+                $date = Date::excelToDateTimeObject($excel_date)->format('Y-m-d');
+            } else {
+                // Handle non-numeric date values as needed (e.g., log or throw an error)
+                $date = null; // or some default value
+            }
+            $staff = Staff::where('staff_name', $staff_name)->first();
+            if ($staff) {
+                $staff_id = $staff->staff_id; 
+            } else {
+                $staff_id = null; 
+            }
+            
+            $commodity = Commodity::where('commodity_name', $commodity_name)->first();
+            if ($commodity) {
+                $commodity_id = $commodity->commodity_id; 
+            } else {
+                $commodity_id = null; 
+            }
+          
+            if($plate_number){
+            $vehicle = Vehicle::where('plate_number', $plate_number)->first();
+            if ($vehicle) {
+                $vehicle_type_id = $vehicle->vehicle_type_id; 
+            } else {
+                $vehicle_type_id = null; 
+            }
+            }
+            else{
+            $vehicle_type_id = null; 
+            }
+            
+            
+            $facilitator = Facilitator::where('facilitator_name', $facilitator_name)->first();
+            if ($facilitator) {
+                $facilitator_id = $facilitator->facilitator_id; 
+            } else {
+                $facilitator_id = null; 
+            }
+          
+            // Map data to your model fields
+            $rows[] = [
+                'date' => $date,
+                'time' => $time,
+                'transaction_type' => $transaction_type,
+                'transaction_status' => "temporary",
+                'staff_id' => $staff_id,
+                'commodity_id' => $commodity_id,
+                'volume' => $volume,
+                'plate_number' => $plate_number,
+                'vehicle_type_id' => $vehicle_type_id,
+                'name' => $name,
+                'facilitator_id' => $facilitator_id,
+                'barangay' => $barangay,
+                'municipality' => $municipality,
+                'province' => $province,
+                'region' => $region,
+                'created_at' => now(), 
+                'updated_at' => now(),
+
+            ];
+            
+        }
+        
+        // Insert all rows at once for efficiency
+        Transaction::insert($rows);
+
+        return back()->with('success', 'Data imported successfully');
     }
 }

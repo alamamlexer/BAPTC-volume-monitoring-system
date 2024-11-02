@@ -12,8 +12,8 @@
         </ol>
     </nav>
 </div>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
 <section class="section dashboard">
 
   <div class="row ">
@@ -235,7 +235,9 @@
   @endif
 
 
-
+<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -449,19 +451,6 @@
             },
             exporting: {
                 enabled: true,
-                buttons: {
-                    customDownloadButton: {
-                        text: 'Download PNG',
-                        useHTML: true,
-                        onclick: function() {
-                            // Trigger local export
-                            this.exportChartLocal({
-                                type: 'image/png',
-                                filename: 'trading_inflow_chart'
-                            });
-                        }
-                    }
-                }
             }
         });
     });

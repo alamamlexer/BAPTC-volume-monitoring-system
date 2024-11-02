@@ -30,7 +30,10 @@
   <link href="{{asset('/custom-scripts/datatables.css')}}" rel="stylesheet">
  
   <script src="{{asset('/custom-scripts/jquery-3.6.0.min.js')}}"></script>
-  <script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+
+<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
 
   <!-- Template Main CSS File -->
   <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
@@ -380,7 +383,7 @@
   <script src="{{asset('assets/vendor/simple-datatables/simple-datatables.js')}}"></script>
   <script src="{{asset('assets/vendor/tinymce/tinymce.min.js')}}"></script>
   <script src="{{asset('assets/vendor/php-email-form/validate.js')}}"></script>
-  <script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
+
   <script src="{{asset('/custom-scripts/datatables.js')}}"></script>
   <script src="{{asset('/custom-scripts/datatables.min.js')}}"></script>
   <!-- Template Main JS File -->
