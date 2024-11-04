@@ -3,6 +3,7 @@
 
 @section('content')
 
+
 <div class="pagetitle">
     <h1>Trading Outflow</h1>
     <nav>
@@ -11,7 +12,8 @@
         </ol>
     </nav>
 </div>
-
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
 <section class="section dashboard">
 
   <div class="row ">
@@ -91,7 +93,7 @@
                     <h5 class="card-title">Outflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
-                      <form method="GET" action="{{ route('trading-inflow.index') }}" class="mb-3">
+                      <form method="GET" action="{{ route('trading-outflow.index') }}" class="mb-3">
                         <div class="input-group">
                         <div class="col-md-2">
                         <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
@@ -100,12 +102,12 @@
                         <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
                         </div>
                             <button class="btn btn-primary" type="submit">Filter</button>
-                            <a href="{{ route('trading-inflow.index') }}" class="btn btn-secondary ">Reset</a>
+                      
                         </div>
                     </form>
                     </div>
                     <div class="table-responsive">
-                        <table class="table" id="">
+                        <table class="table table-bordered" id="">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -115,12 +117,13 @@
                                         <div class="d-flex align-items-center">
                                             <label for="timeFilter" style="margin-right: 10px;">Time</label>
                                             <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByTime()">
-                                                <option value="">All Times</option>
+                                                <option value="">All</option>
                                                 <option value="AM" {{ request('time_filter') == 'AM' ? 'selected' : '' }}>AM</option>
                                                 <option value="PM" {{ request('time_filter') == 'PM' ? 'selected' : '' }}>PM</option>
                                             </select>
                                         </div>
                                     </th>
+
                                     
                                     
                                     
@@ -131,7 +134,7 @@
                                         <div class="d-flex align-items-center">
                                             <label for="commodityFilter" style="margin-right: 10px;">Commodity</label>
                                             <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByCommodity()">
-                                                <option value="">All Commodities</option>
+                                                <option value="">All</option>
                                                 @foreach ($commodities as $commodity)
                                                 <option value="{{ $commodity->commodity_id }}" {{ request('commodity_filter') == $commodity->commodity_id ? 'selected' : '' }}>
                                                     {{ $commodity->commodity_name }}
@@ -145,11 +148,11 @@
                                     
                                     
                                     
-                                     <th scope="col">
+                                    <th scope="col">
                                         <div class="d-flex align-items-center">
                                             <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
-                                                <option value="">Origin:</option>
+                                                <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)
                                                 <option value="{{ $municipality }}" {{ request('municipality_filter') == $municipality ? 'selected' : '' }}>
                                                     {{ $municipality }}
@@ -162,13 +165,6 @@
                                     <th scope="col">
                                         <div style="display: flex; align-items: center;">
                                             <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator:</label>
-                                            <select id="facilitatorFilter" class="form-select" 
-                                                    style="border: none; font-weight: bold;">
-                                                <option value="">All</option>
-                                                @foreach ($facilitators as $facilitator)
-                                                    <option value="{{ $facilitator->facilitator_id }}">{{ $facilitator->facilitator_name }}</option>
-                                                @endforeach
-                                            </select>
                                         </div>
                                     </th>
                                     
@@ -190,25 +186,7 @@
                                 </tr>
                             </thead>
                             <tbody id="TableBody">
-                                @foreach ($trading_outflows_table as $trading_outflow)
-                                <tr data-date="{{ $trading_outflow->date }}" data-am-pm="{{ $trading_outflow->time }}" data-attendant="{{ $trading_outflow->staff->staff_id }}" data-commodity="{{ $trading_outflow->commodity->commodity_id }}" data-production-origin="{{ $trading_outflow->barangay }}" data-facilitator="{{ $trading_outflow->facilitator->facilitator_id }}"> >
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $trading_outflow->date }}</td>
-                                    <td>{{ $trading_outflow->time }}</td>
-                                    <td>{{ $trading_outflow->plate_number }}</td>
-                                    <td>{{ $trading_outflow->name }}</td>
-                                    <td>{{ $trading_outflow->commodity->commodity_name }}</td>
-                                    <td>{{ $trading_outflow->volume }}</td>
-                                    <td>{{ $trading_outflow->barangay }}, {{ $trading_outflow->municipality }}, {{ $trading_outflow->province }}, {{ $trading_outflow->region }}</td>
-                                    <td>{{ $trading_outflow->facilitator->facilitator_name }}</td>
-                                    <td>{{ $trading_outflow->staff->staff_name }}</td>
-                                    <td>
-                                        <a href="{{ route('trading-outflow.edit', $trading_outflow->id) }}" class="btn btn-outline-primary m-1">
-                                            <i class="bx bxs-edit"></i> Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
+
                             </tbody>
                         </table>
                     </div>
@@ -218,21 +196,9 @@
                         </div>
                     </div>
                     
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item {{ $trading_outflows_table->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="{{ $trading_outflows_table->previousPageUrl() . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Previous</a>
-                            </li>
-                            @for ($i = 1; $i <= $trading_outflows_table->lastPage(); $i++)
-                                <li class="page-item {{ $i == $trading_outflows_table->currentPage() ? 'active' : '' }}">
-                                    <a class="page-link" href="{{ $trading_outflows_table->url($i) . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">{{ $i }}</a>
-                                </li>
-                                @endfor
-                                <li class="page-item {{ $trading_outflows_table->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $trading_outflows_table->nextPageUrl() . (request()->input('staff_id') ? '&staff_id=' . request('staff_id') : '') . (request()->input('time_filter') ? '&time_filter=' . request('time_filter') : '') . (request()->input('commodity_filter') ? '&commodity_filter=' . request('commodity_filter') : '') . (request()->input('municipality_filter') ? '&municipality_filter=' . request('municipality_filter') : '') }}">Next</a>
-                                </li>
-                        </ul>
-                    </nav>               
+                    <div id="paginationLinks">
+                            
+                    </div>           
                     
                 </div>
             </div>
@@ -267,72 +233,162 @@
       </div>
     </div>
   @endif
-</section>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-        const amPmFilter = document.getElementById('amPmFilter');
-        const attendantFilter = document.getElementById('attendantFilter');
-        const commodityFilter = document.getElementById('commodityFilter');
-        const productionOriginFilter = document.getElementById('productionOriginFilter');
-        const facilitatorFilter = document.getElementById('facilitatorFilter'); // Add this line
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#TableBody tr');
 
-        function filterTable() {
-            const selectedAmPm = amPmFilter.value;
-            const selectedAttendant = attendantFilter.value;
-            const selectedCommodity = commodityFilter.value;
-            const selectedProductionOrigin = productionOriginFilter.value;
-            const selectedFacilitator = facilitatorFilter.value; // This is now initialized
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
         
-            tableRows.forEach(row => {
-                const rowDate = new Date(row.dataset.date);
-                const rowAmPm = row.dataset.amPm;
-                const rowAttendant = row.dataset.attendant;
-                const rowCommodity = row.dataset.commodity;
-                const rowProductionOrigin = row.dataset.productionOrigin;
-                const rowFacilitator = row.dataset.facilitator; // This is now initialized
-        
-                const isDateInRange = (!startDateInput.value || rowDate >= startDate) && (!endDateInput.value || rowDate <= endDate);
-                const isAmPmMatch = !selectedAmPm || (rowAmPm.startsWith(selectedAmPm));
-                const isAttendantMatch = !selectedAttendant || (rowAttendant === selectedAttendant);
-                const isCommodityMatch = !selectedCommodity || (rowCommodity === selectedCommodity);
-                const isProductionOriginMatch = !selectedProductionOrigin || (rowProductionOrigin.includes(selectedProductionOrigin));
-                const isFacilitatorMatch = !selectedFacilitator || (rowFacilitator === selectedFacilitator); // This is now initialized
-        
-                if (isDateInRange && isAmPmMatch && isAttendantMatch && isCommodityMatch && isProductionOriginMatch && isFacilitatorMatch) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+        // Set initial filter values based on URL parameters
+        if (urlParams.has('time_filter')) {
+            document.getElementById('timeFilter').value = urlParams.get('time_filter');
+        }
+        if (urlParams.has('staff_id')) {
+            document.getElementById('staffFilter').value = urlParams.get('staff_id');
+        }
+        if (urlParams.has('commodity_filter')) {
+            document.getElementById('commodityFilter').value = urlParams.get('commodity_filter');
+        }
+        if (urlParams.has('municipality_filter')) {
+            document.getElementById('municipalityFilter').value = urlParams.get('municipality_filter');
         }
 
-        // Add event listeners for all filters
-        amPmFilter.addEventListener('change', filterTable);
-        attendantFilter.addEventListener('change', filterTable);
-        commodityFilter.addEventListener('change', filterTable);
-        productionOriginFilter.addEventListener('change', filterTable);
-        facilitatorFilter.addEventListener('change', filterTable); // Add this line for facilitator filter
-        startDateInput.addEventListener('change', filterTable);
-        endDateInput.addEventListener('change', filterTable);
-
-        // Reset filters button
-        document.getElementById('resetFilters').addEventListener('click', () => {
-            amPmFilter.value = '';
-            attendantFilter.value = '';
-            commodityFilter.value = '';
-            productionOriginFilter.value = '';
-            facilitatorFilter.value = ''; // Add this line to reset facilitator filter
-            startDateInput.value = '';
-            endDateInput.value = '';
-            filterTable(); // Apply reset
-        });
+        // Fetch filtered data based on current filter selections
+        fetchFilteredData();
     });
-</script>
+ function fetchFilteredData(page = 1) {
+        // Get selected filter values
+        const timeFilter = document.getElementById('timeFilter').value;
+        const staffFilter = document.getElementById('staffFilter').value;
+        const commodityFilter = document.getElementById('commodityFilter').value;
+        const municipalityFilter = document.getElementById('municipalityFilter').value;
+        const startDate = document.querySelector('input[name="start_date"]').value;
+        const endDate = document.querySelector('input[name="end_date"]').value;
+
+
+        // Construct the AJAX URL
+        const url = "{{ route('trading-outflow.index') }}"; // Make sure to replace this with your route
+
+        // Create query parameters
+        const queryParams = new URLSearchParams({
+            time_filter: timeFilter,
+            staff_id: staffFilter,
+            commodity_filter: commodityFilter,
+            municipality_filter: municipalityFilter,
+            start_date: startDate, 
+            end_date: endDate,
+            page:page
+        });
+
+        // Perform AJAX request
+        fetch(url + '?' + queryParams.toString(), {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update table body
+            const tableBody = document.getElementById('TableBody');
+            tableBody.innerHTML = '';
+
+            if (data.data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
+            } else {
+                data.data.forEach((transaction,index) => {
+                    tableBody.innerHTML += `
+                        <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
+                            <td>${index + 1}</td>
+                            <td>${transaction.date}</td>
+                            <td>${transaction.time}</td>
+                            <td>${transaction.plate_number ?? 'N/A'}</td>
+                            <td>${transaction.name ?? 'N/A'}</td>
+                            <td>${transaction.commodity?.commodity_name ?? 'N/A' }</td>
+                            <td>${transaction.volume}</td>
+                            <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
+                            <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
+                            <td>${transaction.staff.staff_name}</td>
+                            <td>
+                                <a href="/trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                    <i class="bx bxs-edit"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            // Update pagination
+        updatePagination(data.current_page, data.last_page);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    function updatePagination(currentPage, lastPage) {
+    const paginationLinks = document.getElementById('paginationLinks');
+    const maxPagesToShow = 5;
+    let startPage, endPage;
+
+    if (lastPage <= maxPagesToShow) {
+        // If the total number of pages is less than or equal to max, show all
+        startPage = 1;
+        endPage = lastPage;
+    } else {
+        // Determine the start and end pages to show
+        const halfMaxPages = Math.floor(maxPagesToShow / 2);
+        if (currentPage <= halfMaxPages) {
+            // If current page is near the beginning
+            startPage = 1;
+            endPage = maxPagesToShow;
+        } else if (currentPage + halfMaxPages >= lastPage) {
+            // If current page is near the end
+            startPage = lastPage - maxPagesToShow + 1;
+            endPage = lastPage;
+        } else {
+            // Current page is somewhere in the middle
+            startPage = currentPage - halfMaxPages;
+            endPage = currentPage + halfMaxPages;
+        }
+    }
+
+    const paginationHtml = `
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1}); return false;">Previous</a>
+                </li>
+                ${Array.from({ length: endPage - startPage + 1 }, (_, i) => `
+                    <li class="page-item ${startPage + i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="fetchFilteredData(${startPage + i}); return false;">${startPage + i}</a>
+                    </li>
+                `).join('')}
+                <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1}); return false;">Next</a>
+                </li>
+            </ul>
+        </nav>
+    `;
+    paginationLinks.innerHTML = paginationHtml;
+}
+
+    function filterByStaff() {
+        fetchFilteredData();
+    }
+
+    function filterByTime() {
+        fetchFilteredData();
+    }
+
+    function filterByCommodity() {
+        fetchFilteredData();
+    }
+
+    function filterByMunicipality() {
+        fetchFilteredData();
+    }
+    
+   </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -348,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data: totalVolumeData
         }, ...series];
 
-        // Initialize Trading Inflow Chart
+        // Initialize Trading Outflow Chart
         Highcharts.chart('areaChart', {
             chart: {
                 type: 'line',
@@ -390,10 +446,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         enabled: false
                     }
                 }
+            },
+            exporting: {
+                enabled: true,
+                buttons: {
+                    customDownloadButton: {
+                        text: 'Download PNG',
+                        useHTML: true,
+                        onclick: function() {
+                            // Trigger local export
+                            this.exportChartLocal({
+                                type: 'image/png',
+                                filename: 'trading_outflow_chart'
+                            });
+                        }
+                    }
+                }
             }
         });
     });
 </script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -448,53 +521,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initial call to set the date and time right away
   updateDateTime();
 </script>
+</section>
 
-<script>
-    function filterByStaff() {
-        const staffId = document.getElementById('staffFilter').value;
-        const url = new URL(window.location.href);
-        if (staffId) {
-            url.searchParams.set('staff_id', staffId);
-        } else {
-            url.searchParams.delete('staff_id');
-        }
-        window.location.href = url.toString();
-    }
 
-    function filterByTime() {
-        const timeFilter = document.getElementById('timeFilter').value;
-        const url = new URL(window.location.href);
-        if (timeFilter) {
-            url.searchParams.set('time_filter', timeFilter);
-        } else {
-            url.searchParams.delete('time_filter');
-        }
-        window.location.href = url.toString();
-    }
 
-    function filterByCommodity() {
-        const commodityFilter = document.getElementById('commodityFilter').value;
-        const url = new URL(window.location.href);
-        if (commodityFilter) {
-            url.searchParams.set('commodity_filter', commodityFilter);
-        } else {
-            url.searchParams.delete('commodity_filter');
-        }
-        window.location.href = url.toString();
-    }
-
-    function filterByMunicipality() {
-        const municipalityFilter = document.getElementById('municipalityFilter').value;
-        const url = new URL(window.location.href);
-        if (municipalityFilter) {
-            url.searchParams.set('municipality_filter', municipalityFilter);
-        } else {
-            url.searchParams.delete('municipality_filter');
-        }
-        window.location.href = url.toString();
-    }
-
-    
-</script>
 
 @endsection

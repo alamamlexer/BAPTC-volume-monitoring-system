@@ -82,10 +82,10 @@
         
         <div class="col-md-4 position-relative" data-col="6">
             <div class="form-floating">
-                <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{$trading_inflow->facilitator->facilitator_id}}">
+                <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{$trading_inflow->facilitator->facilitator_id?? ''}}">
                 <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name" 
-                    placeholder="Select or type facilitator..." required aria-label="Facilitator"
-                    autocomplete="off" data-dropdown="facilitatorDropdown" value="{{$trading_inflow->facilitator->facilitator_name}}">
+                    placeholder="Select or type facilitator..."  aria-label="Facilitator"
+                    autocomplete="off" data-dropdown="facilitatorDropdown" value="{{$trading_inflow->facilitator->facilitator_name?? ''}}">
                 <label for="facilitator_name">Facilitator</label>
                 @if ($errors->has('facilitator_name'))
                     <span class="text-danger">{{ $errors->first('facilitator_name') }}</span>
@@ -97,9 +97,9 @@
                 <li class="no-records list-group-item" style="display: none; cursor: default;">Facilitator does not exist in the records</li>
                 @foreach ($facilitators as $facilitator)
                     <li class="list-group-item list-group-item-action input-item" 
-                        data-facilitator-id="{{ $facilitator->id }}" 
-                        data-facilitator-name="{{ $facilitator->facilitator_name }}">
-                        {{ $facilitator->facilitator_name }}
+                        data-facilitator-id="{{ $facilitator->id ?? ''}}" 
+                        data-facilitator-name="{{ $facilitator->facilitator_name ?? ''}}">
+                        {{ $facilitator->facilitator_name ?? 'N/A' }}
                     </li>
                 @endforeach
             </ul>
@@ -133,7 +133,7 @@
             <div class="form-floating">
                 <input type="text" class="form-control filter-input" name="plate_number"
                     placeholder="Select or type plate number..."  aria-label="Plate Number"
-                    autocomplete="off" data-dropdown="plateDropdown" value="{{$trading_inflow->plate_number}}">
+                    autocomplete="off" data-dropdown="plateDropdown" value="{{$trading_inflow->plate_number ?? ''}}">
                 <label for="plate_number">Plate Number</label>
                 @if ($errors->has('plate_number'))
                     <span class="text-danger">{{ $errors->first('plate_number') }}</span>
@@ -151,13 +151,13 @@
                                 data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
                                 data-vehicle-name="{{ $location_vehicle->vehicle->vehicle_name }}"
                                 data-vehicle-type-id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
-                                data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id }}"
-                                data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name }}"
-                                data-barangay="{{ $location_vehicle->location->barangay }}"
-                                data-municipality="{{ $location_vehicle->location->municipality }}"
-                                data-province="{{ $location_vehicle->location->province }}"
-                                data-region="{{ $location_vehicle->location->region }}">
-                                {{ $location_vehicle->vehicle->plate_number }} ({{ $location_vehicle->vehicle->vehicle_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
+                                data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id ?? ''}}"
+                                data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name ?? ''}}"
+                                data-barangay="{{ $location_vehicle->location->barangay ?? ''}}"
+                                data-municipality="{{ $location_vehicle->location->municipality ?? ''}}"
+                                data-province="{{ $location_vehicle->location->province ?? ''}}"
+                                data-region="{{ $location_vehicle->location->region ?? ''}}">
+                                {{ $location_vehicle->vehicle->plate_number}} ({{ $location_vehicle->vehicle->vehicle_name?? '' }}) - {{ $location_vehicle->location->barangay?? '' }}, {{ $location_vehicle->location->municipality?? '' }}</li>
                         @endif
                     @endforeach
                 @endif
@@ -190,7 +190,7 @@
             <div class="form-floating">
                 <input type="text" class="form-control filter-input" name="commodity_name" 
                     placeholder="Select or type commodity..." required aria-label="Commodity"
-                    autocomplete="off" data-dropdown="commodityDropdown" value="{{$trading_inflow->commodity->commodity_name}}">
+                    autocomplete="off" data-dropdown="commodityDropdown" required value="{{$trading_inflow->commodity->commodity_name}}">
                 <label for="commodity_name">Commodity</label>
                 @if ($errors->has('commodity_name'))
                 <span class="text-danger">{{ $errors->first('commodity_name') }}</span>
@@ -297,11 +297,16 @@
             </div>
         </div>  
 
+
+
+
             <div class="text-center">
               <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
               <button type="reset" class="btn btn-secondary">Reset</button>
               <a href="{{ route('staff-trading-inflow.index') }}" class="btn btn-danger">Back</a>
             </div>
+
+
 
 
 

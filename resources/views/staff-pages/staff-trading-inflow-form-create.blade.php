@@ -56,7 +56,7 @@
 
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <select class="form-select" id="time" name="time" required>
+                                    <select class="form-select" id="time" name="time" required >
                                         <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
                                         <option value="PM" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>PM</option>
                                     </select>
@@ -67,10 +67,10 @@
                                 </div>
                             </div>
                             
+                            
                             <div class="col-md-4 position-relative" data-col="6">
                                 <div class="form-floating">
-                                    <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{ old('facilitator_id') }}">
-                                    <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name" 
+                                    <input type="text" class="form-control filter-input"  name="facilitator_name" 
                                         placeholder="Select or type facilitator..."  aria-label="Facilitator"
                                         autocomplete="off" data-dropdown="facilitatorDropdown" value="{{ old('facilitator_name') }}">
                                     <label for="facilitator_name">Facilitator</label>
@@ -83,17 +83,14 @@
                                     data-dropdown="facilitatorDropdown">
                                     <li class="no-records list-group-item" style="display: none; cursor: default;">Facilitator does not exist in the records</li>
                                     @foreach ($facilitators as $facilitator)
-                                        <li class="list-group-item list-group-item-action input-item" 
-                                            data-facilitator-id="{{ $facilitator->id }}" 
-                                            data-facilitator-name="{{ $facilitator->facilitator_name }}">
-                                            {{ $facilitator->facilitator_name }}
-                                        </li>
+                                    <li class="list-group-item list-group-item-action input-item" 
+                                        data-facilitator-id="{{ $facilitator->facilitator_id }}" 
+                                        data-facilitator-name="{{ $facilitator->facilitator_name }}">{{ $facilitator->facilitator_name }}</li>
                                     @endforeach
                                 </ul>
                             </div>
-                            
 
-                    
+
                             <div class="col-md-5" hidden>
                                 <div class="form-floating">
                                     <select class="form-select" id="staff_id" name="staff_id" required>
@@ -138,13 +135,13 @@
                                                     data-plate-number="{{ $location_vehicle->vehicle->plate_number }}"
                                                     data-vehicle-name="{{ $location_vehicle->vehicle->vehicle_name }}"
                                                     data-vehicle-type-id="{{ $location_vehicle->vehicle->vehicle_type_id }}"
-                                                    data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id }}"
-                                                    data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name }}"
-                                                    data-barangay="{{ $location_vehicle->location->barangay }}"
-                                                    data-municipality="{{ $location_vehicle->location->municipality }}"
-                                                    data-province="{{ $location_vehicle->location->province }}"
-                                                    data-region="{{ $location_vehicle->location->region }}">
-                                                    {{ $location_vehicle->vehicle->plate_number }} {{ $location_vehicle->vehicle->vehicle_name }} ({{ $location_vehicle->facilitator->facilitator_name }}) - {{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}</li>
+                                                    data-facilitator-id="{{ $location_vehicle->facilitator->facilitator_id ?? ''}}"
+                                                    data-facilitator-name="{{ $location_vehicle->facilitator->facilitator_name ?? ''}}"
+                                                    data-barangay="{{ $location_vehicle->location->barangay ?? ''}}"
+                                                    data-municipality="{{ $location_vehicle->location->municipality ?? ''}}"
+                                                    data-province="{{ $location_vehicle->location->province ?? ''}}"
+                                                    data-region="{{ $location_vehicle->location->region?? '' }}">
+                                                    {{ $location_vehicle->vehicle->plate_number }} - {{ $location_vehicle->vehicle->vehicle_name??'N/A'}} ({{ $location_vehicle->facilitator->facilitator_name ?? 'N/A'}}) - {{ $location_vehicle->location->barangay?? 'N/A' }}, {{ $location_vehicle->location->municipality ?? ''}}</li>
                                             @endif
                                         @endforeach
                                     @endif
@@ -155,16 +152,16 @@
                             <div class="col-md-4 position-relative" data-col="5">
                                 <div class="form-floating">
                                     <input type="text" class="form-control filter-input" name="origin" placeholder="Select or type origin..."
-                                        autocomplete="off" data-dropdown="originDropdown" required value="{{ old('origin') }}">
+                                        autocomplete="off" data-dropdown="originDropdown"  value="{{ old('origin') }}">
                                     <label for="origin">Origin</label>
                                     <ul class="dropdown-list list-group position-absolute w-100"
                                         style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
-                                        @foreach ($facilitator_location_vehicles as $location_vehicle)
+                                        @foreach ($locations as $location)
                                             <li class="list-group-item list-group-item-action input-item"
-                                                data-barangay="{{ $location_vehicle->location->barangay }}"
-                                                data-municipality="{{ $location_vehicle->location->municipality }}"
-                                                data-province="{{ $location_vehicle->location->province }}"
-                                                data-region="{{ $location_vehicle->location->region }}">{{ $location_vehicle->location->barangay }}, {{ $location_vehicle->location->municipality }}, {{ $location_vehicle->location->province }}, {{ $location_vehicle->location->region }}</li>
+                                                data-barangay="{{ $location->barangay }}"
+                                                data-municipality="{{ $location->municipality }}"
+                                                data-province="{{ $location->province }}"
+                                                data-region="{{ $location->region }}">{{ $location->barangay }}, {{ $location->municipality }}, {{ $location->province }}, {{ $location->region }}</li>
                                         @endforeach
                                         <li class="no-records list-group-item" style="display: none;">No matching records found.</li>
                                     </ul>
@@ -194,6 +191,9 @@
                                 </ul>
                             </div>
 
+
+                            
+                            
                             <div class="col-md-2">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="volume" name="volume"
@@ -205,12 +205,8 @@
                                 </div>
                             </div>
                             
-                            <p class="form-label">If there is no existing record, please fill the following:</p>
+                            <p class="form-label">New Record:</p>
                             
-                           
-
-
-
                             <div class="col-md-2">
                                 <div class="form-floating">
                                     <select class="form-select" id="vehicle_type_id" name="vehicle_type_id">
@@ -233,7 +229,7 @@
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="name" name="name"
                                         placeholder="Name (optional)" value="{{ old('name') }}">
-                                    <label for="name">Vehicle's Name</label>
+                                    <label for="name">Vehicles Name</label>
                                     @if ($errors->has('name'))
                                         <span class="text-danger">{{ $errors->first('name') }}</span>
                                     @endif
@@ -284,20 +280,18 @@
                                 </div>
                             </div>  
                             
+                          
+                            
+                                        
+
+
+                            </div>  
+                            
                             <div class="text-center">
                                 <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
                                 <button type="reset" class="btn btn-secondary">Reset</button>
                                 <a href="{{ route('staff-trading-inflow.index') }}" class="btn btn-danger">Back</a>
                             </div>
-                          
-                            
-
-                            
-                            
-                            
-                            
-                            
-
                         </form>
                     </div>
                 </div>
@@ -315,56 +309,63 @@
                                 <form action="{{ route('staff-trading-inflow.submit') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
+                                    {{-- <button type="submit" class="btn btn-success">
+                                        Submit 
+                                    </button> --}}
                                     <button type="submit" class="btn btn-success">
                                         Submit 
                                     </button>
                                 </form>
+
+                                    <div class="form-floating">
+                                        <form action="{{ route('staff-trading-inflow.import') }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="row">
+                                                <!-- Responsive column for file input and Import button -->
+                                                <div class="col-md-6 col-sm-12 d-flex align-items-center">
+                                                    <input type="file" name="file" id="file" class="form-control me-2" required>
+                                                </div>
+                                                <div class="col-md-3 col-sm-6 mt-2 mt-md-0">
+                                                    <button type="submit" class="btn btn-primary w-100">Import</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
                             </div>
                         </div>
     
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Date</th>
                                         
                                         <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="amPmFilter" class="form-label" style="margin-right: 5px;">Time:</label>
-                                                <select id="amPmFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
-                                                    <option value="">AM/PM</option>
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM">PM</option>
-                                                </select>
-                                            </div>
-                                        </th>
-                                        
-                                        <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="attendantFilter" class="form-label" style="margin-right: 5px;">Attendant:</label>
-                                                <select id="attendantFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
+                                            <div class="d-flex align-items-center">
+                                                <label for="timeFilter" style="margin-right: 10px;">Time:</label>
+                                                <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByTime()">
                                                     <option value="">All</option>
-                                                    @foreach ($staffs as $staff)
-                                                        <option value="{{ $staff->staff_id }}">{{ $staff->staff_name }}</option>
-                                                    @endforeach
+                                                    <option value="AM" {{ request('time_filter') == 'AM' ? 'selected' : '' }}>AM</option>
+                                                    <option value="PM" {{ request('time_filter') == 'PM' ? 'selected' : '' }}>PM</option>
                                                 </select>
                                             </div>
                                         </th>
+    
                                         
+                                       
                                         <th scope="col">Plate Number</th>
                                         <th scope="col">Name</th>
                                         
                                         <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="commodityFilter" class="form-label" style="margin-right: 5px;">Commodity:</label>
-                                                <select id="commodityFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
+                                            <div class="d-flex align-items-center">
+                                                <label for="commodityFilter" style="margin-right: 10px;">Commodity:</label>
+                                                <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByCommodity()">
                                                     <option value="">All</option>
                                                     @foreach ($commodities as $commodity)
-                                                        <option value="{{ $commodity->commodity_id }}">{{ $commodity->commodity_name }}</option>
+                                                    <option value="{{ $commodity->commodity_id }}" {{ request('commodity_filter') == $commodity->commodity_id ? 'selected' : '' }}>
+                                                        {{ $commodity->commodity_name }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -372,14 +373,17 @@
                                         
                                         <th scope="col">Volume</th>
                                         
+                                        
+                                        
                                         <th scope="col">
-                                            <div style="display: flex; align-items: center;">
-                                                <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Facilitator:</label>
-                                                <select id="productionOriginFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
+                                            <div class="d-flex align-items-center">
+                                                <label for="municipalityFilter" style="margin-right: 10px;">Origin:</label>
+                                                <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                     <option value="">All</option>
-                                                    @foreach ($facilitators as $facilitators)
-                                                        <option value="{{ $facilitators['facilitator_id'] }}">{{ $facilitators['facilitator_name'] }}</option>
+                                                    @foreach ($municipalities as $municipality)
+                                                    <option value="{{ $municipality }}" {{ request('municipality_filter') == $municipality ? 'selected' : '' }}>
+                                                        {{ $municipality }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -387,74 +391,44 @@
                                         
                                         <th scope="col">
                                             <div style="display: flex; align-items: center;">
-                                                <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;">Origin:</label>
+                                                <label for="productionOriginFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator</label>
                                                 <select id="productionOriginFilter" class="form-select" 
-                                                        style="border: none; font-weight: bold;">
+                                                        style="border: none; font-weight: bold;" hidden>
                                                     <option value="">All</option>
-                                                    @foreach ($productionOrigins as $origin)
-                                                        <option value="{{ $origin['barangay'] }}">{{ $origin['full_address'] }}</option>
+                                                    @foreach ($facilitators as $facilitators)
+                                                        <option value="{{$facilitators['facilitator_id'] }}">{{$facilitators['facilitator_name']}}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </th>
+                                        
+                                        <th scope="col">
+                                            <div class="d-flex align-items-center">
+                                                <label for="staffFilter" style="margin-right: 10px;">TOA/TOI:</label>
+                                                <select name="staff_filter" id="staffFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByStaff()">
+                                                    <option value="">All Staff</option>
+                                                    @foreach ($staffs as $staff)
+                                                    <option value="{{ $staff->staff_id }}" {{ request('staff_id') == $staff->staff_id ? 'selected' : '' }}>
+                                                        {{ $staff->staff_name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </th>
+                                        
                                         
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="inflowTableBody">
-                                    @if($temporary_transactions->isEmpty())
-                                        <tr>
-                                            <td colspan="10" class="text-center">No records available</td>
-                                        </tr>
-                                    @else
-                                        @foreach ($temporary_transactions as $temporary_transaction)
-                                        <tr data-date="{{ $temporary_transaction->date }}" data-am-pm="{{ $temporary_transaction->time }}" data-attendant="{{ $temporary_transaction->staff->staff_id }}" data-commodity="{{ $temporary_transaction->commodity->commodity_id }}" data-production-origin="{{ $temporary_transaction->barangay }}">
-                                            <td>{{ $temporary_transaction->id }}</td>
-                                            <td>{{ $temporary_transaction->date }}</td>
-                                            <td>{{ $temporary_transaction->time }}</td>
-                                            <td>{{ $temporary_transaction->staff->staff_name }}</td>
-                                            <td>{{ $temporary_transaction->plate_number }}</td>
-                                            <td>{{ $temporary_transaction->name }}</td>
-                                            <td>{{ $temporary_transaction->commodity->commodity_name }}</td>
-                                            <td>{{ $temporary_transaction->volume }}</td>
-                                            <td>{{ $temporary_transaction->facilitator->facilitator_name?? 'N/A'}}</td>
-                                            <td>{{ $temporary_transaction->barangay }}, {{ $temporary_transaction->municipality }}, {{ $temporary_transaction->province }}, {{ $temporary_transaction->region }}</td>
-                                            <td>
-                                                <a href="{{ route('staff-trading-inflow.edit', $temporary_transaction->id) }}" class="btn btn-outline-primary m-1">
-                                                    <i class="bx bxs-edit"></i> Edit
-                                                </a>
-                                                <form action="{{ route('staff-trading-inflow.destroy', $temporary_transaction->id) }}" method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this reservation?')">
-                                                        <i class="bx bxs-trash-alt"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    @endif
+                                <tbody id="TableBody">
+                                   
                                 </tbody>
                             </table>
                         </div>
                         
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item {{ $temporary_transactions->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="#" data-page="{{ $temporary_transactions->currentPage() - 1 }}">Previous</a>
-                                </li>
-                                
-                                @for ($i = 1; $i <= $temporary_transactions->lastPage(); $i++)
-                                    <li class="page-item {{ $i == $temporary_transactions->currentPage() ? 'active' : '' }}">
-                                        <a class="page-link" href="#" data-page="{{ $i }}">{{ $i }}</a>
-                                    </li>
-                                @endfor
-                                
-                                <li class="page-item {{ $temporary_transactions->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="#" data-page="{{ $temporary_transactions->currentPage() + 1 }}">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
+                        
+                        <div id="paginationLinks">
+                        </div>    
                         
                     </div>
                 </div>
@@ -496,82 +470,7 @@
                                 </div>
                             @endif
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-        const amPmFilter = document.getElementById('amPmFilter');
-        const attendantFilter = document.getElementById('attendantFilter');
-        const commodityFilter = document.getElementById('commodityFilter');
-        const productionOriginFilter = document.getElementById('productionOriginFilter');
-        const facilitatorFilter = document.getElementById('facilitatorFilter'); // Facilitator Filter
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const tableRows = document.querySelectorAll('#inflowTableBody tr');
-
-    function filterTable() {
-        const selectedAmPm = amPmFilter.value;
-        const selectedAttendant = attendantFilter.value;
-        const selectedCommodity = commodityFilter.value;
-        const selectedProductionOrigin = productionOriginFilter.value;
-        const selectedFacilitator = facilitatorFilter.value; // New Facilitator Filter
-        const startDate = new Date(startDateInput.value);
-        const endDate = new Date(endDateInput.value);
-
-        tableRows.forEach(row => {
-            const rowDate = new Date(row.dataset.date);
-            const rowAmPm = row.dataset.amPm;
-            const rowAttendant = row.dataset.attendant;
-            const rowCommodity = row.dataset.commodity;
-            const rowProductionOrigin = row.dataset.productionOrigin;
-            const rowFacilitator = row.dataset.facilitator; // New Facilitator Data
-
-            const isDateInRange =
-                (!startDateInput.value || rowDate >= startDate) &&
-                (!endDateInput.value || rowDate <= endDate);
-            const isAmPmMatch = !selectedAmPm || rowAmPm.startsWith(selectedAmPm);
-            const isAttendantMatch = !selectedAttendant || rowAttendant === selectedAttendant;
-            const isCommodityMatch = !selectedCommodity || rowCommodity === selectedCommodity;
-            const isProductionOriginMatch =
-                !selectedProductionOrigin || rowProductionOrigin.includes(selectedProductionOrigin);
-            const isFacilitatorMatch = !selectedFacilitator || rowFacilitator === selectedFacilitator;
-
-            if (
-                isDateInRange &&
-                isAmPmMatch &&
-                isAttendantMatch &&
-                isCommodityMatch &&
-                isProductionOriginMatch &&
-                isFacilitatorMatch
-            ) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    amPmFilter.addEventListener('change', filterTable);
-    attendantFilter.addEventListener('change', filterTable);
-    commodityFilter.addEventListener('change', filterTable);
-    productionOriginFilter.addEventListener('change', filterTable);
-    facilitatorFilter.addEventListener('change', filterTable); // Facilitator Filter Listener
-    startDateInput.addEventListener('change', filterTable);
-    endDateInput.addEventListener('change', filterTable);
-
-    // Reset filters button
-    document.getElementById('resetFilters').addEventListener('click', () => {
-        amPmFilter.value = '';
-        attendantFilter.value = ''; 
-        commodityFilter.value = '';
-        productionOriginFilter.value = '';
-        facilitatorFilter.value = ''; // Reset Facilitator Filter
-        startDateInput.value = '';
-        endDateInput.value = '';
-        filterTable(); // Apply reset
-
-                });
-            });
-        </script>
+       
 
 
         <script>
@@ -691,18 +590,16 @@
         vehicleNameInput.value = vehicleName; // Set vehicle name
     }
 
-    // Autofill Facilitator details
+    // Autofill Facilitator ID
     const facilitatorIdInput = document.getElementById('facilitator_id'); // Make sure this input exists
     if (facilitatorSelect) {
         facilitatorSelect.value = item.getAttribute('data-facilitator-name') || ''; // Set facilitator name
     }
-
-    // Autofill Facilitator ID
     
+    // Autofill Facilitator ID
     if (facilitatorIdInput) {
         facilitatorIdInput.value = item.getAttribute('data-facilitator-id') || ''; // Set facilitator ID
     }
-
     // Populate hidden individual fields
     document.getElementById('barangay').value = barangay;
     document.getElementById('municipality').value = municipality;
@@ -796,7 +693,162 @@
                 checkAddressFields();
             });
             </script>
-            
+            <script>
+             document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Set initial filter values based on URL parameters
+        if (urlParams.has('time_filter')) {
+            document.getElementById('timeFilter').value = urlParams.get('time_filter');
+        }
+        if (urlParams.has('staff_id')) {
+            document.getElementById('staffFilter').value = urlParams.get('staff_id');
+        }
+        if (urlParams.has('commodity_filter')) {
+            document.getElementById('commodityFilter').value = urlParams.get('commodity_filter');
+        }
+        if (urlParams.has('municipality_filter')) {
+            document.getElementById('municipalityFilter').value = urlParams.get('municipality_filter');
+        }
+
+        // Fetch filtered data based on current filter selections
+        fetchFilteredData();
+    });
+ function fetchFilteredData(page = 1) {
+        // Get selected filter values
+        const timeFilter = document.getElementById('timeFilter').value;
+        const staffFilter = document.getElementById('staffFilter').value;
+        const commodityFilter = document.getElementById('commodityFilter').value;
+        const municipalityFilter = document.getElementById('municipalityFilter').value;
+
+        // Construct the AJAX URL
+        const url = "{{ route('staff-trading-inflow.create') }}"; // Make sure to replace this with your route
+
+        // Create query parameters
+        const queryParams = new URLSearchParams({
+            time_filter: timeFilter,
+            staff_id: staffFilter,
+            commodity_filter: commodityFilter,
+            municipality_filter: municipalityFilter,
+            page:page
+        });
+
+        // Perform AJAX request
+        fetch(url + '?' + queryParams.toString(), {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update table body
+            const tableBody = document.getElementById('TableBody');
+            tableBody.innerHTML = '';
+
+            if (data.data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
+            } else {
+                data.data.forEach((transaction,index) => {
+                    console.log('Index:', index)
+                    tableBody.innerHTML += `
+                        <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
+                            <td>${index + 1}</td>
+                            <td>${transaction.date}</td>
+                            <td>${transaction.time}</td>
+                            <td>${transaction.plate_number ?? 'N/A'}</td>
+                            <td>${transaction.name ?? 'N/A'}</td>
+                            <td>${transaction.commodity.commodity_name}</td>
+                            <td>${transaction.volume}</td>
+                            <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
+                            <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
+                            <td>${transaction.staff.staff_name}</td>
+                            <td>
+                                <a href="/staff-trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                    <i class="bx bxs-edit"></i> Edit
+                                </a>
+                                <form action="/staff-trading-inflow/${transaction.id}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+                                        <i class="bx bxs-trash-alt"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            // Update pagination
+        updatePagination(data.current_page, data.last_page);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    function updatePagination(currentPage, lastPage) {
+    const paginationLinks = document.getElementById('paginationLinks');
+    const maxPagesToShow = 5;
+    let startPage, endPage;
+
+    if (lastPage <= maxPagesToShow) {
+        // If the total number of pages is less than or equal to max, show all
+        startPage = 1;
+        endPage = lastPage;
+    } else {
+        // Determine the start and end pages to show
+        const halfMaxPages = Math.floor(maxPagesToShow / 2);
+        if (currentPage <= halfMaxPages) {
+            // If current page is near the beginning
+            startPage = 1;
+            endPage = maxPagesToShow;
+        } else if (currentPage + halfMaxPages >= lastPage) {
+            // If current page is near the end
+            startPage = lastPage - maxPagesToShow + 1;
+            endPage = lastPage;
+        } else {
+            // Current page is somewhere in the middle
+            startPage = currentPage - halfMaxPages;
+            endPage = currentPage + halfMaxPages;
+        }
+    }
+
+    const paginationHtml = `
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1}); return false;">Previous</a>
+                </li>
+                ${Array.from({ length: endPage - startPage + 1 }, (_, i) => `
+                    <li class="page-item ${startPage + i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="fetchFilteredData(${startPage + i}); return false;">${startPage + i}</a>
+                    </li>
+                `).join('')}
+                <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1}); return false;">Next</a>
+                </li>
+            </ul>
+        </nav>
+    `;
+    paginationLinks.innerHTML = paginationHtml;
+}
+
+    function filterByStaff() {
+        fetchFilteredData();
+    }
+
+    function filterByTime() {
+        fetchFilteredData();
+    }
+
+    function filterByCommodity() {
+        fetchFilteredData();
+    }
+
+    function filterByMunicipality() {
+        fetchFilteredData();
+    }
+    
+            </script>
     </section>
 
 @endsection

@@ -18,31 +18,57 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         
-    //inflow total vehicle and volume this day
-    $inflow_vehicle = Transaction::wherein('transaction_type', ['trading inflow','short trip inflow'])
+    //trading inflow total vehicle and volume this day
+    $trading_inflow_vehicle = Transaction::where('transaction_type', 'trading inflow')
                     ->where('transaction_status', 'regular')
                     ->whereDate('date', Carbon::today())
                     ->count('id');
-    $today_inflow_vehicle = number_format($inflow_vehicle);      
+    $today_trading_inflow_vehicle = number_format($trading_inflow_vehicle);      
 
-    $inflow_volume = Transaction::wherein('transaction_type', ['trading inflow','short trip inflow'])
+    $trading_inflow_volume = Transaction::where('transaction_type', 'trading inflow')
                 ->where('transaction_status', 'regular')
                 ->whereDate('date', Carbon::today())
                 ->sum('volume');
-    $today_inflow_volume = number_format($inflow_volume, 2);
+    $today_trading_inflow_volume = number_format($trading_inflow_volume, 2);
     
-     //inflow total vehicle and volume this day
-     $outflow_vehicle = Transaction::wherein('transaction_type', ['trading outflow','short trip outflow'])
-     ->where('transaction_status', 'regular')
-     ->whereDate('date', Carbon::today())
-     ->count('plate_number');
-    $today_outflow_vehicle = number_format($outflow_vehicle);      
+    //short trip inflow total vehicle and volume this day
+    $short_trip_inflow_vehicle = Transaction::where('transaction_type', 'short trip inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereDate('date', Carbon::today())
+                    ->count('id');
+    $today_short_trip_inflow_vehicle = number_format($short_trip_inflow_vehicle);      
+
+    $short_trip_inflow_volume = Transaction::where('transaction_type', 'short trip inflow')
+                ->where('transaction_status', 'regular')
+                ->whereDate('date', Carbon::today())
+                ->sum('volume');
+    $today_short_trip_inflow_volume = number_format($short_trip_inflow_volume, 2);
     
-    $outflow_volume = Transaction::wherein('transaction_type', ['trading outflow','short trip outflow'])
-     ->where('transaction_status', 'regular')
-     ->whereDate('date', Carbon::today())
-     ->sum('volume');
-    $today_outflow_volume = number_format($outflow_volume, 2);
+     //trading outflow total vehicle and volume this day
+     $trading_outflow_vehicle = Transaction::where('transaction_type', 'trading outflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereDate('date', Carbon::today())
+                    ->count('id');
+    $today_trading_outflow_vehicle = number_format($trading_outflow_vehicle);      
+
+    $trading_outflow_volume = Transaction::where('transaction_type', 'trading outflow')
+                ->where('transaction_status', 'regular')
+                ->whereDate('date', Carbon::today())
+                ->sum('volume');
+    $today_trading_outflow_volume = number_format($trading_outflow_volume, 2);
+    
+    //short trip outflow total vehicle and volume this day
+    $short_trip_outflow_vehicle = Transaction::where('transaction_type', 'short trip outflow')
+    ->where('transaction_status', 'regular')
+    ->whereDate('date', Carbon::today())
+    ->count('id');
+    $today_short_trip_outflow_vehicle = number_format($short_trip_outflow_vehicle);      
+    
+    $short_trip_outflow_volume = Transaction::where('transaction_type', 'short trip outflow')
+    ->where('transaction_status', 'regular')
+    ->whereDate('date', Carbon::today())
+    ->sum('volume');
+    $today_short_trip_outflow_volume = number_format($short_trip_outflow_volume, 2);
 
     //Volume Tally Table
         
@@ -125,10 +151,10 @@ class AdminDashboardController extends Controller
     $user = Auth::user();
 
    if($user->type==0){
-    return view('admin-pages.admin-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_inflow_vehicle','today_inflow_volume','today_outflow_vehicle','today_outflow_volume',));
+    return view('admin-pages.admin-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_trading_inflow_vehicle','today_trading_inflow_volume','today_trading_outflow_vehicle','today_trading_outflow_volume','today_short_trip_inflow_vehicle','today_short_trip_inflow_volume','today_short_trip_outflow_vehicle','today_short_trip_outflow_volume',));
    }
    elseif($user->type==1){
-    return view('staff-pages.staff-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_inflow_vehicle','today_inflow_volume','today_outflow_vehicle','today_outflow_volume',));
+    return view('staff-pages.staff-dashboard',compact('years','month','year','volume_tally_data','farmers','date','volume_tally_variance','volume_tally_outflow','volume_tally_inflow','volume_tally_dates','today_trading_inflow_vehicle','today_trading_inflow_volume','today_trading_outflow_vehicle','today_trading_outflow_volume','today_short_trip_inflow_vehicle','today_short_trip_inflow_volume','today_short_trip_outflow_vehicle','today_short_trip_outflow_volume',));
    }
     
 

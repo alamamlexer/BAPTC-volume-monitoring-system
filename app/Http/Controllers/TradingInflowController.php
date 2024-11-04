@@ -164,7 +164,7 @@ class TradingInflowController extends Controller
         $vehicle = Transaction::where('transaction_type', 'trading inflow')
             ->where('transaction_status', 'regular')
             ->whereDate('date', Carbon::today())
-            ->count('plate_number');
+            ->count('id');
         $today_vehicle = number_format($vehicle);
 
         //total volume today

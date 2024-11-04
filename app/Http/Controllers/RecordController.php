@@ -8,6 +8,9 @@ use App\Models\FacilitatorLocationVehicle;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
+
 
 class RecordController extends Controller
 {
@@ -39,11 +42,9 @@ class RecordController extends Controller
             $data = [];
             foreach ($locations as $location) {
                 $data[] = [
-                    'id' => $location->id,
+                    'id' => $location->location_id,
                     'name' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}",
-                    'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $location->id . '?type=location\')">
-                                    <i class="bx bxs-trash-alt"></i> Delete
-                                 </button>',
+
                 ];
             }
     
@@ -58,6 +59,7 @@ class RecordController extends Controller
         // Facilitators Table
         if ($type === 'facilitator') {
             $query = Facilitator::query();
+            $query->orderBy('facilitator_name');
     
             if ($search = $request->get('search')['value']) {
                 $query->where('facilitator_code', 'like', "%{$search}%")
@@ -69,7 +71,7 @@ class RecordController extends Controller
             $data = [];
             foreach ($facilitators as $facilitator) {
                 $data[] = [
-                    'id' => $facilitator->id,
+                    'id' => $facilitator->facilitator_id,
                     'code' => $facilitator->facilitator_code,
                     'name' => $facilitator->facilitator_name,
                     'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $facilitator->id . '?type=facilitator\')">
@@ -89,7 +91,7 @@ class RecordController extends Controller
         // Commodities Table
         if ($type === 'commodity') {
             $query = Commodity::query();
-    
+            $query->orderBy('commodity_name');
             if ($search = $request->get('search')['value']) {
                 $query->where('commodity_name', 'like', "%{$search}%");
             }
@@ -99,7 +101,7 @@ class RecordController extends Controller
             $data = [];
             foreach ($commodities as $commodity) {
                 $data[] = [
-                    'id' => $commodity->id,
+                    'id' => $commodity->commodity_id,
                     'name' => $commodity->commodity_name,
                     'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $commodity->id . '?type=commodity\')">
                                     <i class="bx bxs-trash-alt"></i> Delete
@@ -157,9 +159,6 @@ class RecordController extends Controller
                     'vehicle' => "{$link->plate_number} ({$link->vehicle_name})", // Show N/A if vehicle_name is null
                     'location' => "{$link->barangay}, {$link->municipality}, {$link->province}, {$link->region}", // Show N/A if all location fields are null
                     'facilitator' => !empty($link->facilitator_name) ? "{$link->facilitator_name} ({$link->facilitator_code})" : 'N/A', // Show N/A if facilitator_name is empty
-                    'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $link->id . '?type=link\')">
-                                    <i class="bx bxs-trash-alt"></i> Delete
-                                 </button>',
                 ];
             }
         
@@ -188,7 +187,7 @@ class RecordController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -196,7 +195,39 @@ class RecordController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $record_type=$request->get('record_type');
+        
+        if($record_type=='facilitator'){
+        
+        $validatedData = $request->validate([
+            'facilitator_name' => 'required|unique:facilitators,facilitator_name',
+            'facilitator_code' => 'required|unique:facilitators,facilitator_code',
+        ],[
+            'facilitator_name.unique' => session()->flash('error', 'The facilitator name already exists!'),
+            'facilitator_code.unique' => session()->flash('error', 'The facilitator code already exists!'),
+        ]);
+        Facilitator::create([
+            'facilitator_name' => $validatedData['facilitator_name'],
+            'facilitator_code' => $validatedData['facilitator_code'],
+        ]);
+        session()->flash('success', 'Facilitator added successfully!');
+        }
+        elseif($record_type=='commodity'){
+            $validatedData = $request->validate([
+                'commodity_name' => 'required|unique:commodities,commodity_name',
+            ],[
+                'commodity_name.unique' => session()->flash('error', 'The commodity already exists!'),
+            ]);
+            Commodity::create([
+                'commodity_name' => $validatedData['commodity_name'],
+            ]);
+            session()->flash('success', 'Commodity added successfully!');
+        }
+        else{
+            session()->flash('error', 'Record type not found!');
+        }
+        
+         return redirect()->route('record.index');
     }
 
     /**
@@ -204,7 +235,7 @@ class RecordController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -212,7 +243,7 @@ class RecordController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        
     }
 
     /**
@@ -227,25 +258,47 @@ class RecordController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(Request $request, string $id) 
-    {
-        $type = $request->get('type');
-        dd( $type);
-        try {
-            if ($type === "location") {
-                Location::findOrFail($id)->delete();
-            } elseif ($type === "commodity") {
-                Commodity::findOrFail($id)->delete();
-            } elseif ($type === "facilitator") {
-                Facilitator::findOrFail($id)->delete();
-            } elseif ($type === "link") {
-                FacilitatorLocationVehicle::findOrFail($id)->delete();
-            } else {
-                return response()->json(['message' => 'Invalid type specified.'], 400);
+        {
+            $type = $request->get('type');
+                
+            try {
+                if ($type === "location") {
+                    $data=Location::findOrFail($id);
+                    if($data->transactions()->exists()){
+                        return redirect()->route('record.index')->with('error', 'Cannot delete due to related records.');
+                    } 
+                    $data->delete();
+                } elseif ($type === "commodity") {
+                    $data=Commodity::findOrFail($id);
+                    if($data->transactions()->exists()){
+                        return redirect()->route('record.index')->with('error', 'Cannot delete due to related records.');
+                    } 
+                    $data->delete();
+                } elseif ($type === "facilitator") {
+                    $data=Facilitator::findOrFail($id);
+                    if($data->transactions()->exists()){
+                        return redirect()->route('record.index')->with('error', 'Cannot delete due to related records.');
+                    } 
+                    $data->delete();
+                } elseif ($type === "link") {
+                    $data=FacilitatorLocationVehicle::findOrFail($id);
+                    if($data->transactions()->exists()){
+                        return redirect()->route('record.index')->with('error', 'Cannot delete due to related records.');
+                    } 
+                    $data->delete();
+                } else {
+                    return response()->json(['message' => 'Invalid type specified.'], 400);
+                }
+                
+                // Return success response if deletion is successful
+                return redirect()->route('record.index')->with('success', 'Record deleted successfully');
+                
+            } catch (ModelNotFoundException $e) {
+                // Handle case where the model is not found
+                return redirect()->route('record.index')->with('error', 'Record type not found');
+            } catch (\Exception $e) {
+                // Handle any other exceptions                
             }
-
-            return response()->json(['message' => 'Record deleted successfully.'], 200);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error deleting record: ' . $e->getMessage()], 500);
         }
-    }
+
 }

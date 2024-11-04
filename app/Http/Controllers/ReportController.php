@@ -12,6 +12,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        
         //table 1
         $table_one_data = [
             'AM_TRADING' => [

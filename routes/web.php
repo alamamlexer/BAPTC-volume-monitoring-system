@@ -12,6 +12,8 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SpecialRecordsController;
+use App\Http\Controllers\FacilitatorController;
+use App\Http\Controllers\CommodityController;
 
 
 Route::controller(AuthenticationController::class)->group(function(){
@@ -30,6 +32,10 @@ Route::controller(AuthenticationController::class)->group(function(){
 Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('admin',AdminDashboardController::class); 
+    
+    Route::resource('commodity',CommodityController::class); 
+    
+    Route::resource('facilitator',FacilitatorController::class); 
 
     Route::resource('special-records',SpecialRecordsController::class); 
     
@@ -43,7 +49,7 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
     
     Route::resource('trading-outflow', TradingOutflowController::class);
     Route::post('/trading-outflow/submit', [TradingOutflowController::class, 'submit'])->name('trading-outflow.submit');
-    
+    Route::post('/trading-outflow/import', [TradingInflowController::class, 'import'])->name('trading-outflow.import');
 
     Route::resource('short-trip-inflow-and-outflow', ShortTripInflowAndOutflowController::class);
     Route::post('/short-trip-inflow-and-outflow/submit', [ShortTripInflowAndOutflowController::class, 'submit'])->name('short-trip-inflow-and-outflow.submit');
@@ -64,6 +70,7 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     Route::get('/staff-trading-inflow/{trading_inflow}/edit', [TradingInflowController::class, 'edit'])->name('staff-trading-inflow.edit');
     Route::put('/staff-trading-inflow/{trading_inflow}', [TradingInflowController::class, 'update'])->name('staff-trading-inflow.update');
     Route::delete('/staff-trading-inflow/{trading_inflow}', [TradingInflowController::class, 'destroy'])->name('staff-trading-inflow.destroy');
+    Route::post('/staff-trading-inflow/import', [TradingInflowController::class, 'import'])->name('staff-trading-inflow.import');
 
 
     // Trading Outflow Routes For Staff
@@ -74,6 +81,7 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     Route::get('/staff-trading-outflow/{trading_outflow}/edit', [TradingOutflowController::class, 'edit'])->name('staff-trading-outflow.edit');
     Route::put('/staff-trading-outflow/{trading_outflow}', [TradingOutflowController::class, 'update'])->name('staff-trading-outflow.update');
     Route::delete('/staff-trading-outflow/{trading_outflow}', [TradingOutflowController::class, 'destroy'])->name('staff-trading-outflow.destroy');
+    Route::post('/staff-trading-outflow/import', [TradingInflowController::class, 'import'])->name('staff-trading-outflow.import');
 
     // Short Trip Inflow and Short Trip Outflow Routes For Staff
     Route::get('/staff-short-trip-inflow-and-outflow',[ShortTripInflowAndOutflowController::class,'index'])->name('staff-short-trip-inflow-and-outflow.index');

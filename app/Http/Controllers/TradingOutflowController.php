@@ -15,6 +15,8 @@ use App\Models\LocationVehicle;
 use App\Models\Facilitator;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use App\Models\FacilitatorLocationVehicle;
 use Illuminate\Support\Facades\DB;
 
@@ -25,293 +27,202 @@ class TradingOutflowController extends Controller
      */
     public function index(Request $request)
     {
-// For the graph
-    
-    // Get start and end dates from request, with defaults
-    $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
-    $endDate = $request->input('end_date', Carbon::now());
-        
-        
-    $amPmFilter = $request->input('amPmFilter');
-    $attendantFilter = $request->input('attendantFilter');
-    $commodityFilter = $request->input('commodityFilter');
-    $productionOriginFilter = $request->input('productionOriginFilter');
-    $facilitatorFilter = $request->input('facilitatorFilter');
-        
-    $trading_outflows = Transaction::where('transaction_type', 'trading outflow')
-        ->where('transaction_status', 'regular')
-        ->whereBetween('date', [$startDate, $endDate])
-        ->with(['staff', 'commodity', 'vehicle_type','facilitator'])
-        ->get();
-    
-        
-
+ // Get start and end dates from request, with defaults
+ $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+ $endDate = $request->input('end_date', Carbon::now()->toDateString());
 
 
  // For the table
-     $query = Transaction::where('transaction_type', 'trading outflow')
-         ->where('transaction_status', 'regular')
-        ->whereBetween('date', [$startDate, $endDate])
-        ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+ $query = Transaction::where('transaction_type', 'trading outflow')
+     ->where('transaction_status', 'regular')
+     ->whereBetween('date', [$startDate, $endDate])
+     ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+     
 
-        $staffId = $request->input('staff_id');
-        $timeFilter = $request->input('time_filter');
-        $commodityId = $request->input('commodity_filter');
-        $municipality = $request->input('municipality_filter');
-        
-    // Apply filters if provided
-    if ($staffId) {
-        $query->where('staff_id', $staffId);
-    }
-    if ($timeFilter) {
-        $query->where('time', $timeFilter);
-    }
-    if ($commodityId) {
-        $query->where('commodity_id', $commodityId);
-    }
-    if ($municipality) {
-        $query->where('municipality', $municipality);
-    }
-    // Fetch the paginated results
-    $trading_outflows_graph = $query->get();
-    $trading_outflows_table = $query->paginate(5);
-    
-    if ($request->ajax()) {
-        return response()->json([
-            'data' => $trading_outflows_table->items(),
-            'current_page' => $trading_outflows_table->currentPage(),
-            'last_page' => $trading_outflows_table->lastPage(),
-            'total' => $trading_outflows_table->total(),
+ $staffId = $request->input('staff_id');
+ $timeFilter = $request->input('time_filter');
+ $commodityId = $request->input('commodity_filter');
+ $municipality = $request->input('municipality_filter');
 
-        ]);
-    }
- 
-// Fetch all commodities
-$commodities = Commodity::all();
+ // Apply filters if provided
+ if ($request->has('start_date') && $request->has('end_date')) {
+     $query->whereBetween('date', [$request->start_date, $request->end_date]);
+ }
+ if ($startDate) {
+     $query->where('date', '>=', $startDate); // Use >= to include all transactions from that date onward
+ }
+ if ($endDate) {
+     $query->where('date', '<=', $endDate); // Use <= to include transactions up to that date
+ }
+ if ($staffId) {
+     $query->where('staff_id', $staffId);
+ }
+ if ($timeFilter) {
+     $query->where('time', $timeFilter);
+ }
+ if ($commodityId) {
+     $query->where('commodity_id', $commodityId);
+ }
+ if ($municipality) {
+     $query->where('municipality', $municipality);
+ }
+ // Fetch the paginated results
+ $trading_outflows_graph = $query->get();
+ $trading_outflows_table = $query->paginate( 5);
 
-// Fetch all staff members
-$staffs = Staff::all();
+ if ($request->ajax()) {
+     return response()->json([
+         'data' => $trading_outflows_table->items(),
+         'current_page' => $trading_outflows_table->currentPage(),
+         'last_page' => $trading_outflows_table->lastPage(),
+         'total' => $trading_outflows_table->total(),
 
-// Fetch all facilitator members
-$facilitators = Facilitator::all();
+     ]);
+ }
 
-// Fetch distinct municipalities for the dropdown
-$municipalities = Transaction::distinct()->pluck('municipality');
+ // Fetch all commodities
+ $commodities = Commodity::all();
 
-// Fetch distinct production origins
-$productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
-    ->distinct()
-    ->get()
-    ->map(function ($location) {
-        return [
-            'barangay' => $location->barangay,
-            'municipality' => $location->municipality,
-            'province' => $location->province,
-            'region' => $location->region,
-            'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
-        ];
-    });
+ // Fetch all staff members
+ $staffs = Staff::all();
 
-$volumes = [];
-$totalVolumes = [];
-$dates = [];
+ // Fetch all facilitator members
+ $facilitators = Facilitator::all();
 
-foreach ($trading_outflows_graph as $outflow) {
-    $date = Carbon::parse($outflow->date)->toDateString();
-    $commodity = $outflow->commodity->commodity_name;
+ // Fetch distinct municipalities for the dropdown
+ $municipalities = Transaction::distinct()->pluck('municipality');
 
-    if (!isset($volumes[$commodity][$date])) {
-        $volumes[$commodity][$date] = 0;
-        $dates[] = $date;
-    }
+ // Fetch distinct production origins
+ $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+     ->distinct()
+     ->get()
+     ->map(function ($location) {
+         return [
+             'barangay' => $location->barangay,
+             'municipality' => $location->municipality,
+             'province' => $location->province,
+             'region' => $location->region,
+             'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+         ];
+     });
 
-    $volumes[$commodity][$date] += $outflow->volume;
+ $volumes = [];
+ $totalVolumes = [];
+ $dates = [];
 
-    if (!isset($totalVolumes[$date])) {
-        $totalVolumes[$date] = 0;
-    }
-    $totalVolumes[$date] += $outflow->volume;
+ foreach ($trading_outflows_graph as $outflow) {
+     $date = Carbon::parse($outflow->date)->toDateString();
+     $commodity = $outflow->commodity->commodity_name;
+
+     if (!isset($volumes[$commodity][$date])) {
+         $volumes[$commodity][$date] = 0;
+         $dates[] = $date;
+     }
+
+     $volumes[$commodity][$date] += $outflow->volume;
+
+     if (!isset($totalVolumes[$date])) {
+         $totalVolumes[$date] = 0;
+     }
+     $totalVolumes[$date] += $outflow->volume;
+ }
+
+ $dateRange = [];
+ for ($date = Carbon::parse($startDate); $date->lessThanOrEqualTo(Carbon::parse($endDate)); $date->addDay()) {
+     $dateRange[] = $date->toDateString();
+ }
+
+ foreach ($volumes as $commodity => $data) {
+     foreach ($dateRange as $date) {
+         if (!isset($data[$date])) {
+             $data[$date] = 0;
+         }
+     }
+     ksort($data);
+     $volumes[$commodity] = $data;
+ }
+
+ $chartData = [];
+ foreach ($volumes as $commodity => $data) {
+     $chartData[] = [
+         'name' => $commodity,
+         'data' => array_values($data),
+     ];
+ }
+
+ $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
+     return $totalVolumes[$date] ?? 0;
+ }, $dateRange));
+
+ $dates = array_unique(array_merge($dates, $dateRange));
+ sort($dates);
+
+
+
+ //total vehicle today
+ $vehicle = Transaction::where('transaction_type', 'trading outflow')
+     ->where('transaction_status', 'regular')
+     ->whereDate('date', Carbon::today())
+     ->count('id');
+ $today_vehicle = number_format($vehicle);
+
+ //total volume today
+ $volume = Transaction::where('transaction_type', 'trading outflow')
+     ->where('transaction_status', 'regular')
+     ->whereDate('date', Carbon::today())
+     ->sum('volume');
+ $today_volume = number_format($volume, 2);
+
+
+ $user = Auth::user();
+ $userId = Auth::id();
+ if ($user->type == 0) {
+     return view('admin-pages.trading-outflow-report', compact(
+         'today_volume',
+         'today_vehicle',
+         'trading_outflows_graph',
+         'trading_outflows_table',
+         'request',
+         'facilitators',
+         'chartData',
+         'dates',
+         'startDate',
+         'endDate',
+         'commodities',
+         'totalVolumeData',
+         'staffs',
+         'productionOrigins',
+         'municipalities',
+         'userId'
+     ));
+ } elseif ($user->type == 1) {
+     return view('staff-pages.staff-trading-outflow-report', compact(
+         'today_volume',
+         'today_vehicle',
+         'trading_outflows_graph',
+         'trading_outflows_table',
+         'request',
+         'facilitators',
+         'chartData',
+         'dates',
+         'startDate',
+         'endDate',
+         'commodities',
+         'totalVolumeData',
+         'staffs',
+         'productionOrigins',
+         'municipalities',
+         'userId'
+     ));
+ }
 }
-
-$dateRange = [];
-for ($date = Carbon::parse($startDate); $date->lessThanOrEqualTo(Carbon::parse($endDate)); $date->addDay()) {
-    $dateRange[] = $date->toDateString();
-}
-
-foreach ($volumes as $commodity => $data) {
-    foreach ($dateRange as $date) {
-        if (!isset($data[$date])) {
-            $data[$date] = 0;
-        }
-    }
-    ksort($data);
-    $volumes[$commodity] = $data;
-}
-
-$chartData = [];
-foreach ($volumes as $commodity => $data) {
-    $chartData[] = [
-        'name' => $commodity,
-        'data' => array_values($data),
-    ];
-}
-
-$totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
-    return $totalVolumes[$date] ?? 0;
-}, $dateRange));
-
-$dates = array_unique(array_merge($dates, $dateRange));
-sort($dates);
-
-
-
-//total vehicle today
-$vehicle = Transaction::where('transaction_type', 'trading outflow')
-                ->where('transaction_status', 'regular')
-                ->whereDate('date', Carbon::today())
-                ->count('plate_number');
-$today_vehicle = number_format($vehicle);      
-                
-//total volume today
-$volume = Transaction::where('transaction_type', 'trading outflow')
-->where('transaction_status', 'regular')
-->whereDate('date', Carbon::today())
-->sum('volume');
-$today_volume = number_format($volume, 2);
-
-
-
-    // Fetch all staff members
-    $staffs = Staff::all();
-
-    // Fetch distinct production origins
-    $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
-        ->distinct()
-        ->get()
-        ->map(function ($location) {
-            return [
-                'barangay' => $location->barangay,
-                'municipality' => $location->municipality,
-                'province' => $location->province,
-                'region' => $location->region,
-                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
-            ];
-        });
-
-    $volumes = [];
-    $totalVolumes = [];
-    $dates = [];
-
-    foreach ($trading_outflows as $outflow) {
-        $date = \Carbon\Carbon::parse($outflow->date)->toDateString();
-        $commodity = $outflow->commodity->commodity_name;
-
-        if (!isset($volumes[$commodity][$date])) {
-            $volumes[$commodity][$date] = 0;
-            $dates[] = $date;
-        }
-
-        $volumes[$commodity][$date] += $outflow->volume;
-
-        if (!isset($totalVolumes[$date])) {
-            $totalVolumes[$date] = 0;
-        }
-        $totalVolumes[$date] += $outflow->volume;
-    }
-
-    $dateRange = [];
-    for ($date = \Carbon\Carbon::parse($startDate); $date->lessThanOrEqualTo(\Carbon\Carbon::parse($endDate)); $date->addDay()) {
-        $dateRange[] = $date->toDateString();
-    }
-
-    foreach ($volumes as $commodity => $data) {
-        foreach ($dateRange as $date) {
-            if (!isset($data[$date])) {
-                $data[$date] = 0;
-            }
-        }
-        ksort($data);
-        $volumes[$commodity] = $data;
-    }
-
-    $chartData = [];
-    foreach ($volumes as $commodity => $data) {
-        $chartData[] = [
-            'name' => $commodity,
-            'data' => array_values($data),
-        ];
-    }
-
-    $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
-        return $totalVolumes[$date] ?? 0;
-    }, $dateRange));
-
-    $dates = array_unique(array_merge($dates, $dateRange));
-    sort($dates);
-
-    //total vehicle today
-    $vehicle = Transaction::where('transaction_type', 'trading outflow')
-                    ->where('transaction_status', 'regular')
-                    ->whereDate('date', Carbon::today())
-                    ->count('plate_number');
-    $today_vehicle = number_format($vehicle);      
-                    
-    //total volume today
-    $volume = Transaction::where('transaction_type', 'trading outflow')
-    ->where('transaction_status', 'regular')
-    ->whereDate('date', Carbon::today())
-    ->sum('volume');
-    $today_volume = number_format($volume, 2);
-
-    $user = Auth::user();
-    $userId = Auth::id();
-if($user->type==0){
-    return view('admin-pages.trading-outflow-report', compact('today_volume',
-    'today_vehicle',
-                'trading_outflows_graph',
-                'trading_outflows_table',
-                'request',
-                'facilitators', 
-                'chartData', 
-                'dates', 
-                'startDate', 
-                'endDate', 
-                'commodities',
-                'totalVolumeData',
-                'staffs', 
-                'productionOrigins',
-                'municipalities',
-                'userId'));      
-                }
-                
-   elseif($user->type==1){
-    return view('staff-pages.staff-trading-outflow-report', compact('today_volume',
-    'today_vehicle',
-                'trading_outflows_graph',
-                'trading_outflows_table',
-                'request',
-                'facilitators', 
-                'chartData', 
-                'dates', 
-                'startDate', 
-                'endDate', 
-                'commodities',
-                'totalVolumeData',
-                'staffs', 
-                'productionOrigins',
-                'municipalities',
-                'userId'));   
-                }
-
-
-    }
 
 
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         date_default_timezone_set('Asia/Manila');
 
@@ -319,16 +230,48 @@ if($user->type==0){
         $defaultTime = ($currentHour < 12) ? 'AM' : 'PM';
 
         $currentDate = Carbon::today()->toDateString();
-
-        $temporary_transactions = Transaction::where('transaction_status', 'temporary')
+      
+        $temporary_transaction = Transaction::where('transaction_status', 'temporary')
             ->where('transaction_type', 'trading outflow')
-            ->where('date', $currentDate)
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
-            ->paginate(5);
+            ->whereDate('created_at', $currentDate)
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+    
         // Fetch all commodities
 
+        $staffId = $request->input('staff_id');
+        $timeFilter = $request->input('time_filter');
+        $commodityId = $request->input('commodity_filter');
+        $municipality = $request->input('municipality_filter');
+    
+        // Apply filters if provided
+        if ($staffId) {
+            $temporary_transaction->where('staff_id', $staffId);
+        }
+        if ($timeFilter) {
+            $temporary_transaction->where('time', $timeFilter);
+        }
+        if ($commodityId) {
+            $temporary_transaction->where('commodity_id', $commodityId);
+        }
+        if ($municipality) {
+            $temporary_transaction->where('municipality', $municipality);
+        }
+        
+        $temporary_transactions = $temporary_transaction->paginate(5);
+            
+        if ($request->ajax()) {
+            return response()->json([
+                'data' => $temporary_transactions->items(),
+                'current_page' => $temporary_transactions->currentPage(),
+                'last_page' => $temporary_transactions->lastPage(),
+                'total' => $temporary_transactions->total(),
+
+            ]);
+        }
+
+        
         // Fetch distinct production origins
-        $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
+        $productionOrigins = Location::select('barangay', 'municipality', 'province', 'region')
             ->distinct()
             ->get()
             ->map(function ($location) {
@@ -340,16 +283,19 @@ if($user->type==0){
                     'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
                 ];
             });
+        $municipalities = Transaction::distinct()->pluck('municipality');
         $facilitators = Facilitator::all();
         $logged_in_staff = Auth::id();
         $staffs = Staff::all();
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
+        $locations= Location::all();
         $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
 
 
         $user = Auth::user();
+        
+        
         if ($user->type == 0) {
             return view('admin-pages.trading-outflow-form-create', compact(
                 'defaultTime',
@@ -361,7 +307,9 @@ if($user->type==0){
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
-                'location_vehicles'
+                'municipalities',
+                'locations'
+             
             ));
         } elseif ($user->type == 1) {
             return view('staff-pages.staff-trading-outflow-form-create', compact(
@@ -374,10 +322,11 @@ if($user->type==0){
                 'logged_in_staff',
                 'vehicle_types',
                 'commodities',
-                'location_vehicles'
+                'municipalities',
+                'locations'
+               
             ));
         }
-        
     }
 
     /**
@@ -395,15 +344,14 @@ if($user->type==0){
             'volume' => 'required|numeric',
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
-            'facilitator_id' => 'nullable|exists:facilitators,facilitator_id',
             'name' => 'nullable|string',
             'barangay' => 'required',
             'municipality' => 'required',
+            'facilitator_name' => 'nullable',
             'province' => 'required',
             'region' => 'required',
         ]);
-
-
+       
         //Storing new location 
         $location = Location::where('barangay', $validatedData['barangay'])
             ->where('municipality', $validatedData['municipality'])
@@ -425,6 +373,7 @@ if($user->type==0){
                 ->where('region', $validatedData['region'])
                 ->first();
         }
+        
         $location = Location::where('barangay', $validatedData['barangay'])
             ->where('municipality', $validatedData['municipality'])
             ->where('province', $validatedData['province'])
@@ -433,45 +382,71 @@ if($user->type==0){
 
 
         //Storing new vehicle
+        
+        if(!empty($validatedData['plate_number'])){
         $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
-
         if (!$vehicle) {
-            session()->flash('success', 'Trading outflow added successfully!');
-            Vehicle::create([
+            $vehicle= Vehicle::create([
                 'plate_number' => $validatedData['plate_number'],
-                'vehicle_name' => $validatedData['name'],
-                'vehicle_type_id' => $validatedData['vehicle_type_id'],
+                'vehicle_name' => $validatedData['name']?? null,
+                'vehicle_type_id' => $validatedData['vehicle_type_id']?? null,
             ]);
         } else {
-            Vehicle::where('plate_number', $validatedData['plate_number'])->first();
+            $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
         }
-        $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
-
-        $facilitator = Facilitator::where('facilitator_id', $validatedData['facilitator_id'])->first();
-        //Storing a link in the address and location if there is no existing record
-        $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
-            ->where('location_id', $location->location_id)
-            ->where('facilitator_id', $facilitator->facilitator_id)
-            ->first();
-        if (!$facilitator_location_vehicles) {
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
-                'vehicle_id' => $vehicle->vehicle_id,
-                'location_id' => $location->location_id,
-                'facilitator_id' => $facilitator->facilitator_id,
-            ]);
-        } else {
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id,)
+        
+        }
+        else{
+            $vehicle=null;
+        }
+        
+        
+        
+        
+        //storing facilitator
+        if(!empty($validatedData['facilitator_name'])){
+            $facilitator = Facilitator::where( 'facilitator_name', $validatedData['facilitator_name'])->first();
+        }
+        else{
+            $facilitator=null;
+        }
+        
+        
+        if(!empty($vehicle)){
+        
+            if( !empty($location) && !empty($facilitator)){
+            $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
                 ->where('location_id', $location->location_id)
                 ->where('facilitator_id', $facilitator->facilitator_id)
                 ->first();
+            }
+                elseif(!$location && !empty($facilitator)){
+                $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                    ->where('location_id', null)
+                    ->where('facilitator_id', $facilitator->facilitator_id)
+                    ->first();
+                }
+                else{
+                    $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                        ->where('location_id', $location->location_id)
+                        ->where('facilitator_id', null)
+                        ->first();
+                    }
+                
+            if (!$facilitator_location_vehicles){
+            $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
+                    'vehicle_id' => $vehicle->vehicle_id,
+                    'location_id' => $location->location_id?? null,
+                    'facilitator_id' => $facilitator->facilitator_id?? null,
+            ]);
+            }
         }
-
-
+        
         //Get the commodity_id that corresponds to the commodity selected in the view
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
 
         //Store the transaction
-       Transaction::create([
+        Transaction::create([
             'date' => $validatedData['date'],
             'time' => $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
@@ -482,23 +457,22 @@ if($user->type==0){
             'plate_number' => $validatedData['plate_number'] ?? null,
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'name' => $validatedData['name'] ?? null,
-            'facilitator_id' => $validatedData['facilitator_id'] ?? null,
+            'facilitator_id' => $facilitator->facilitator_id?? null,
             'barangay' => $location->barangay,
             'municipality' => $location->municipality,
             'province' => $location->province,
             'region' => $location->region,
         ]);
-        
-        session()->flash('success', 'Trading outflow added successfully!');
+       
+        session()->flash('success', 'Trading Outflow added successfully!');
 
-
-        $user = Auth::user();
-        if ($user->type == 0) {
-            return redirect()->route('trading-outflow.create');
-        } elseif ($user->type == 1) {
-            return redirect()->route('staff-trading-outflow.create');
-        }
+    $user = Auth::user();
+    if ($user->type == 0) {
+        return redirect()->route('trading-outflow.create');
+    } elseif ($user->type == 1) {
+        return redirect()->route('staff-trading-outflow.create');
     }
+}
 
     /**
      * Display the specified resource.
@@ -513,6 +487,7 @@ if($user->type==0){
      */
     public function edit(Transaction $trading_outflow)
     {
+        
         $productionOrigins = Transaction::select('barangay', 'municipality', 'province', 'region')
             ->distinct()
             ->get()
@@ -529,7 +504,6 @@ if($user->type==0){
         $staffs = Staff::all(); // Fetch all staff
         $commodities = Commodity::all();
         $vehicle_types = VehicleType::all();
-        $location_vehicles = LocationVehicle::with(['vehicle', 'location'])->get();
         $logged_in_staff = Auth::id();
         $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
         $transactions = Transaction::with(['commodity', 'staff', 'vehicle_type'])->get();
@@ -546,7 +520,6 @@ if($user->type==0){
                 'logged_in_staff',
                 'commodities',
                 'vehicle_types',
-                'location_vehicles'
             ));
         } elseif ($user->type == 1) {
             return view('staff-pages.staff-trading-outflow-form-edit', compact(
@@ -559,7 +532,6 @@ if($user->type==0){
                 'logged_in_staff',
                 'commodities',
                 'vehicle_types',
-                'location_vehicles'
             ));
         }
     }
@@ -579,14 +551,16 @@ if($user->type==0){
             'volume' => 'required|numeric',
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
-            'facilitator_id' => 'nullable|exists:facilitators,facilitator_id',
+            'facilitator_name' => 'nullable|exists:facilitators,facilitator_name',
             'name' => 'nullable|string',
             'barangay' => 'required',
             'municipality' => 'required',
             'province' => 'required',
             'region' => 'required',
         ]);
-
+        
+        
+        
         // Find or create location
         $location = Location::firstOrCreate(
             [
@@ -598,6 +572,8 @@ if($user->type==0){
         );
 
         // Find or create vehicle
+        
+        if(!empty($validatedData['plate_number'])){
         $vehicle = Vehicle::firstOrCreate(
             [
                 'plate_number' => $validatedData['plate_number'],
@@ -607,15 +583,21 @@ if($user->type==0){
                 'vehicle_type_id' => $validatedData['vehicle_type_id'],
             ]
         );
-
+        }
+        
+        $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
         // Find or create location_vehicle relationship
+        
+        if(!empty($validatedData['plate_number'])){
         $facilitator_location_vehicle = FacilitatorLocationVehicle::firstOrCreate(
             [
                 'vehicle_id' => $vehicle->vehicle_id,
                 'location_id' => $location->location_id,
-                'facilitator_id' => $location->location_id,
+                'facilitator_id' => $facilitator->facilitator_id,
             ]
         );
+        }
+        
 
         // Find the corresponding commodity
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
@@ -631,7 +613,7 @@ if($user->type==0){
             'volume' => $validatedData['volume'],
             'plate_number' => $validatedData['plate_number'] ?? null,
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
-            'facilitator_id' => $validatedData['facilitator_id'] ?? null,
+            'facilitator_id' => $facilitator->facilitator_id ?? null,
             'name' => $validatedData['name'] ?? null,
             'barangay' => $location->barangay,
             'municipality' => $location->municipality,
@@ -656,7 +638,6 @@ if($user->type==0){
             return redirect()->route('staff-trading-outflow.index');
         }
     }
-
     /**
      * Remove the specified resource from storage.
      */
@@ -667,12 +648,12 @@ if($user->type==0){
         try {
             // Find the transaction by ID
             $trading_outflow = Transaction::findOrFail($id);
-    
+
             // Check if the user is authorized to delete the transaction
             if ($user->type == 0 || ($user->type == 1 && $trading_outflow->staff_id == $user->id)) {
                 // Delete the transaction
                 $trading_outflow->delete();
-    
+
                 // Flash success message
                 session()->flash('success', 'Trading outflow deleted successfully!');
             } else {
@@ -685,41 +666,173 @@ if($user->type==0){
             // Handle any other exceptions
             session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-    
+        
+        // Redirect to the appropriate index page based on user type
+        if ($user->type == 0) {
+            if($trading_outflow->transaction_status=='temporary'){
+            return redirect()->route('trading-outflow.create'); // Admin index
+            }
+            elseif($trading_outflow->transaction_status=='regular'){
+            return redirect()->route('trading-outflow.index'); // Admin index
+            }
+            
+        } elseif ($user->type == 1) {
+            if($trading_outflow->transaction_status=='temporary'){
+                return redirect()->route('staff-trading-outflow.create'); // Admin index
+                }
+                elseif($trading_outflow->transaction_status=='regular'){
+                return redirect()->route('staff-trading-outflow.index'); // Admin index
+                }
+        }
+    }
+
+    public function submit()
+    {
+        $user = Auth::user(); // Get the authenticated user
+        $userId = $user->id; // Get the authenticated user's ID
+        // dd($user->type);
+        if($user->type == 0){
+            $temporary_transactions = Transaction::where('transaction_status', 'temporary')
+            ->where('transaction_type', 'trading outflow')
+            ->update([
+                'transaction_status' => 'regular',
+            ]);
+            if ($temporary_transactions > 0) {
+                session()->flash('success', 'Trading outflow submitted!');
+            } else {
+                session()->flash('error', 'No trading outflow added!');
+            }
+        }else{
+        $temporary_transactions = Transaction::where('transaction_status', 'temporary')
+            ->where('transaction_type', 'trading outflow')
+            ->where('staff_id', $userId)
+            ->update([
+                'transaction_status' => 'regular',
+            ]);
+            if ($temporary_transactions > 0) {
+                session()->flash('success', 'Trading outflow submitted!');
+            } else {
+                session()->flash('error', 'No trading outflow added!');
+            }
+        }
+        // Update temporary transactions for the authenticated user
+
         // Redirect to the appropriate index page based on user type
         if ($user->type == 0) {
             return redirect()->route('trading-outflow.index'); // Admin index
         } elseif ($user->type == 1) {
             return redirect()->route('staff-trading-outflow.index'); // Staff index
         }
-    
     }
 
-    public function submit()
-    {
-        $user = Auth::user(); // Get the authenticated user
-    $userId = $user->id; // Get the authenticated user's ID
 
-    // Update temporary transactions for the authenticated user
-    $temporary_transactions = Transaction::where('transaction_status', 'temporary')
-        ->where('transaction_type', 'trading outflow')
-        ->where('staff_id', $userId)
-        ->update([
-            'transaction_status' => 'regular',
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
         ]);
 
-    if ($temporary_transactions > 0) {
-        session()->flash('success', 'Trading outflow submitted!');
-    } else {
-        session()->flash('error', 'No trading outflow added!');
-    }
+        $file = $request->file('file');
 
-    // Redirect to the appropriate index page based on user type
-    if ($user->type == 0) {
-        return redirect()->route('trading-outflow.index'); // Admin index
-    } elseif ($user->type == 1) {
-        return redirect()->route('staff-trading-outflow.index'); // Staff index
-    }
+        // Load the Excel file
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        
+        // Initialize an array to store the rows
+        $rows = [];
 
+        foreach ($worksheet->getRowIterator(2) as $row) { // Start from row 2 to skip headers
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $data = [];
+            foreach ($cellIterator as $cell) {
+                $data[] = $cell->getValue(); // Collect each cell's value
+            }
+
+            $excel_date = $worksheet->getCell("A" . $row->getRowIndex())->getValue();
+            $time = $worksheet->getCell("B" . $row->getRowIndex())->getValue();
+            $transaction_type = $worksheet->getCell("C" . $row->getRowIndex())->getValue();
+            $staff_name = $worksheet->getCell("E" . $row->getRowIndex())->getValue();
+            $commodity_name = $worksheet->getCell("F" . $row->getRowIndex())->getValue();
+            $volume = $worksheet->getCell("G" . $row->getRowIndex())->getValue();
+            $plate_number = $worksheet->getCell("H" . $row->getRowIndex())->getValue();
+            $vehicle_type_name = $worksheet->getCell("I" . $row->getRowIndex())->getValue();
+            $name = $worksheet->getCell("J" . $row->getRowIndex())->getValue();
+            $facilitator_name = $worksheet->getCell("K" . $row->getRowIndex())->getValue();
+            $barangay = $worksheet->getCell("L" . $row->getRowIndex())->getValue();
+            $municipality = $worksheet->getCell("M" . $row->getRowIndex())->getValue();
+            $province = $worksheet->getCell("N" . $row->getRowIndex())->getValue();
+            $region = $worksheet->getCell("O" . $row->getRowIndex())->getValue();
+            
+            
+            if (is_numeric($excel_date)) {
+                $date = Date::excelToDateTimeObject($excel_date)->format('Y-m-d');
+            } else {
+                // Handle non-numeric date values as needed (e.g., log or throw an error)
+                $date = null; // or some default value
+            }
+            $staff = Staff::where('staff_name', $staff_name)->first();
+            if ($staff) {
+                $staff_id = $staff->staff_id; 
+            } else {
+                $staff_id = null; 
+            }
+            
+            $commodity = Commodity::where('commodity_name', $commodity_name)->first();
+            if ($commodity) {
+                $commodity_id = $commodity->commodity_id; 
+            } else {
+                $commodity_id = null; 
+            }
+          
+            if($plate_number){
+            $vehicle = Vehicle::where('plate_number', $plate_number)->first();
+            if ($vehicle) {
+                $vehicle_type_id = $vehicle->vehicle_type_id; 
+            } else {
+                $vehicle_type_id = null; 
+            }
+            }
+            else{
+            $vehicle_type_id = null; 
+            }
+            
+            
+            $facilitator = Facilitator::where('facilitator_name', $facilitator_name)->first();
+            if ($facilitator) {
+                $facilitator_id = $facilitator->facilitator_id; 
+            } else {
+                $facilitator_id = null; 
+            }
+          
+            // Map data to your model fields
+            $rows[] = [
+                'date' => $date,
+                'time' => $time,
+                'transaction_type' => $transaction_type,
+                'transaction_status' => "temporary",
+                'staff_id' => $staff_id,
+                'commodity_id' => $commodity_id,
+                'volume' => $volume,
+                'plate_number' => $plate_number,
+                'vehicle_type_id' => $vehicle_type_id,
+                'name' => $name,
+                'facilitator_id' => $facilitator_id,
+                'barangay' => $barangay,
+                'municipality' => $municipality,
+                'province' => $province,
+                'region' => $region,
+                'created_at' => now(), 
+                'updated_at' => now(),
+
+            ];
+            
+        }
+        
+        // Insert all rows at once for efficiency
+        Transaction::insert($rows);
+
+        return back()->with('success', 'Data imported successfully');
     }
 }
