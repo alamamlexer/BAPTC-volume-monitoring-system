@@ -8,11 +8,14 @@ use App\Models\Commodity;
 use Carbon\Carbon; // Import Carbon for date handling
 use Illuminate\Support\Facades\DB;
 
+
 class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->toDateString());
+
         //table 1
         $table_one_data = [
             'AM_TRADING' => [
@@ -20,6 +23,7 @@ class ReportController extends Controller
                     Transaction::where('time', 'AM')
                         ->where('transaction_type', 'trading inflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0, // Default to 0 if null
                     0, '.', ',' // Format with thousands separator, no decimal places
                 ),
@@ -29,6 +33,7 @@ class ReportController extends Controller
                     Transaction::where('time', 'PM')
                         ->where('transaction_type', 'trading inflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
@@ -37,14 +42,60 @@ class ReportController extends Controller
                 'inflow' => number_format(
                     Transaction::where('transaction_type', 'short trip inflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
+            ],
+           'DRY' => [
+                'dry' =>$washingTransactions = Transaction::with('commodity')
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(function ($transaction) {
+                        return $transaction->transaction_type === 'dry';
+                    })
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ],
+            'COLD' => [
+                'cold' =>$washingTransactions = Transaction::with('commodity')
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(function ($transaction) {
+                        return $transaction->transaction_type === 'cold';
+                    })
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ],
+            'WASHING' => [
+                'washing' =>$washingTransactions = Transaction::with('commodity')
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(function ($transaction) {
+                        return $transaction->transaction_type === 'washing';
+                    })
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ],
+            'INTER_TRADING' => [
+                'intertrading' =>$washingTransactions = Transaction::with('commodity')
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(function ($transaction) {
+                        return $transaction->transaction_type === 'intertrading';
+                    })
+                    ->sum('volume') ?: 0,
+                0, '.', ','
             ],
             'SHORT_TRIP_OUT' => [
                 'outflow' => number_format(
                     Transaction::where('transaction_type', 'short trip outflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
@@ -54,6 +105,7 @@ class ReportController extends Controller
                     Transaction::where('time', 'AM')
                         ->where('transaction_type', 'trading outflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
@@ -63,6 +115,7 @@ class ReportController extends Controller
                     Transaction::where('time', 'PM')
                         ->where('transaction_type', 'trading outflow')
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
@@ -71,6 +124,7 @@ class ReportController extends Controller
                 'all' => number_format(
                     Transaction::whereIn('transaction_type', ['trading inflow', 'short trip inflow'])
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
@@ -79,29 +133,28 @@ class ReportController extends Controller
                 'all' => number_format(
                     Transaction::whereIn('transaction_type', ['trading outflow', 'short trip outflow'])
                         ->where('transaction_status', 'regular')
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->sum('volume') ?: 0,
                     0, '.', ','
                 ),
             ],
         ];
-
+        //table 2
         // Get current month and year
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
         // Calculate peak and lean days for the current month
         $R2_peakDay = Transaction::selectRaw('date, SUM(volume) as total_volume')
-            ->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear)
             ->where('transaction_status', 'regular') // Filter by regular transactions
+            ->whereBetween('date', [$startDate, $endDate])
             ->groupBy('date')
             ->orderByDesc('total_volume')
             ->first();
 
         $R2_leanDay = Transaction::selectRaw('date, SUM(volume) as total_volume')
-            ->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear)
             ->where('transaction_status', 'regular') // Filter by regular transactions
+            ->whereBetween('date', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('total_volume')
             ->first();
@@ -113,77 +166,97 @@ class ReportController extends Controller
         
         //table 3
         
+        
         $totalVolumeTrOu = Transaction::where('transaction_type', 'trading outflow')
         ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
         ->sum('volume');   
-        $totalDaysTrOu = Transaction::where('transaction_type', 'trading outflow')
+    $totalDaysTrOu = Transaction::where('transaction_type', 'trading outflow')
         ->where('transaction_status', 'regular')
-        ->distinct('date') // assuming there's a 'date' column in the transactions table
+        ->whereBetween('date', [$startDate, $endDate])
+        ->distinct('date')
         ->count('date');
-        $dailyAverageTrOu = $totalDaysTrOu > 0 ? $totalVolumeTrOu / $totalDaysTrOu : 0;
-        
-        $totalVolumeTrIn = Transaction::where('transaction_type', 'trading inflow')
+    $dailyAverageTrOu = $totalDaysTrOu > 0 ? $totalVolumeTrOu / $totalDaysTrOu : 0;
+    
+    $totalCountTrOu = Transaction::where('transaction_type', 'trading outflow')
         ->where('transaction_status', 'regular')
-        ->sum('volume');   
-        $totalDaysTrIn = Transaction::where('transaction_type', 'trading inflow')
-        ->where('transaction_status', 'regular')
-        ->distinct('date') // assuming there's a 'date' column in the transactions table
-        ->count('date');
-        $dailyAverageTrIn = $totalDaysTrIn > 0 ? $totalVolumeTrIn / $totalDaysTrIn : 0; 
-        
-        $totalVolumeShOu = Transaction::where('transaction_type', 'short trip outflow')
-        ->where('transaction_status', 'regular')
-        ->sum('volume');   
-        $totalDaysShOu= Transaction::where('transaction_type', 'trading outflow')
-        ->where('transaction_status', 'regular')
-        ->distinct('date') // assuming there's a 'date' column in the transactions table
-        ->count('date');
-        $dailyAverageShOu = $totalDaysShOu > 0 ? $totalVolumeShOu / $totalDaysShOu : 0; 
-        
-        $totalVolumeShIn = Transaction::where('transaction_type', 'trading inflow')
-        ->where('transaction_status', 'regular')
-        ->sum('volume');   
-        $totalDaysShIn = Transaction::where('transaction_type', 'trading inflow')
-        ->where('transaction_status', 'regular')
-        ->distinct('date') // assuming there's a 'date' column in the transactions table
-        ->count('date');
-        $dailyAverageShIn = $totalDaysShIn > 0 ? $totalVolumeShIn / $totalDaysShIn : 0;
-        
-        $totalCountTrOu = Transaction::where('transaction_type', 'trading outflow')
-        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
         ->count();
-        $dailyAvgCountTrOu = $totalDaysTrOu > 0 ? $totalCountTrOu / $totalDaysTrOu : 0;
-        
-        $totalCountTrIn = Transaction::where('transaction_type', 'trading inflow')
-            ->where('transaction_status', 'regular')
-            ->count();
-        $dailyAvgCountTrIn = $totalDaysTrIn > 0 ? $totalCountTrIn / $totalDaysTrIn : 0;
-        
-        $totalCountShOu = Transaction::where('transaction_type', 'short trip outflow')
-            ->where('transaction_status', 'regular')
-            ->count();
-        $dailyAvgCountShOu = $totalDaysShOu > 0 ? $totalCountShOu / $totalDaysShOu : 0;
-        
-        $totalCountShIn = Transaction::where('transaction_type', 'short trip inflow')
-            ->where('transaction_status', 'regular')
-            ->count();
-        $dailyAvgCountShIn = $totalDaysShIn > 0 ? $totalCountShIn / $totalDaysShIn : 0;
-        
-        // Store in the array with formatting
-        $table_three_data = [
-        'trader' => number_format($dailyAverageTrOu, 0, '.', ','), 
-        'farmer' => number_format($dailyAverageTrIn, 0, '.', ','), 
-        'short_trip_in' => number_format($dailyAverageShIn, 0, '.', ','), 
-        'short_trip_out' => number_format($dailyAverageShOu, 0, '.', ','), 
-        'trader_count' => $dailyAvgCountShOu,   
-        'farmer_count' => $dailyAvgCountShIn,   
-        'short_trip_in_count' => $dailyAvgCountShIn, 
-        'short_trip_out_count' => $dailyAvgCountShOu, 
-        ];
+    $dailyAvgCountTrOu = $totalDaysTrOu > 0 ? $totalCountTrOu / $totalDaysTrOu : 0;
+    
+    // Calculate daily averages and counts for trading inflow
+    $totalVolumeTrIn = Transaction::where('transaction_type', 'trading inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->sum('volume');   
+    $totalDaysTrIn = Transaction::where('transaction_type', 'trading inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->distinct('date')
+        ->count('date');
+    $dailyAverageTrIn = $totalDaysTrIn > 0 ? $totalVolumeTrIn / $totalDaysTrIn : 0;
+    
+    $totalCountTrIn = Transaction::where('transaction_type', 'trading inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->count();
+    $dailyAvgCountTrIn = $totalDaysTrIn > 0 ? $totalCountTrIn / $totalDaysTrIn : 0;
+    
+    // Calculate daily averages and counts for short trip outflow
+    $totalVolumeShOu = Transaction::where('transaction_type', 'short trip outflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->sum('volume');   
+    $totalDaysShOu = Transaction::where('transaction_type', 'short trip outflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->distinct('date')
+        ->count('date');
+    $dailyAverageShOu = $totalDaysShOu > 0 ? $totalVolumeShOu / $totalDaysShOu : 0;
+    
+    $totalCountShOu = Transaction::where('transaction_type', 'short trip outflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->count();
+    $dailyAvgCountShOu = $totalDaysShOu > 0 ? $totalCountShOu / $totalDaysShOu : 0;
+    
+    // Calculate daily averages and counts for short trip inflow
+    $totalVolumeShIn = Transaction::where('transaction_type', 'short trip inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->sum('volume');   
+    $totalDaysShIn = Transaction::where('transaction_type', 'short trip inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->distinct('date')
+        ->count('date');
+    $dailyAverageShIn = $totalDaysShIn > 0 ? $totalVolumeShIn / $totalDaysShIn : 0;
+    
+    $totalCountShIn = Transaction::where('transaction_type', 'short trip inflow')
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->count();
+    $dailyAvgCountShIn = $totalDaysShIn > 0 ? $totalCountShIn / $totalDaysShIn : 0;
+
+            // Store in the array with formatted values
+            $table_three_data = [
+                'trader' => number_format($dailyAverageTrOu, 0, '.', ','), 
+                'farmer' => number_format($dailyAverageTrIn, 0, '.', ','), 
+                'short_trip_in' => number_format($dailyAverageShIn, 0, '.', ','), 
+                'short_trip_out' => number_format($dailyAverageShOu, 0, '.', ','), 
+                'trader_count' => number_format($dailyAvgCountTrOu, 0, '.', ','),   
+                'farmer_count' => number_format($dailyAvgCountTrIn, 0, '.', ','),   
+                'short_trip_in_count' => number_format($dailyAvgCountShIn, 0, '.', ','), 
+                'short_trip_out_count' => number_format($dailyAvgCountShOu, 0, '.', ','), 
+            ];
         
         //table 6
         
-        $commodities = Commodity::with('transactions')->get();
+        // Fetch commodities along with their transactions
+$commodities = Commodity::with(['transactions' => function ($query) use ($startDate, $endDate) {
+    // Filter transactions by date range in the query
+    $query->whereBetween('date', [$startDate, $endDate]);
+}])->get();
 
         // Group transactions by municipality for each commodity and calculate volumes
         $table_six_commodities = $commodities->map(function ($commodity) {
@@ -192,6 +265,7 @@ class ReportController extends Controller
                 return [
                     'municipality' => $transactions->first()->municipality, // Get the municipality name
                     'total_volume' => $transactions->sum('volume'), // Sum of volumes for the municipality
+                    
                 ];
             });
     
@@ -214,6 +288,7 @@ class ReportController extends Controller
         
         $table_six_grand_total_volume = $table_six_commodities->sum('total_volume');
 
+    //table 7
         $municipality = $request->input('municipality', null);
 
         // Fetch all transactions for the specified municipality (or all if null)
@@ -221,6 +296,8 @@ class ReportController extends Controller
             ->when($municipality, function ($query) use ($municipality) {
                 return $query->where('municipality', $municipality);
             })
+            ->whereBetween('date', [$startDate, $endDate])
+            ->whereNotIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
             ->get();
 
         // Group by municipality and then by commodity
@@ -267,6 +344,7 @@ class ReportController extends Controller
         // Fetch and aggregate data for Table 8 by province
         $outflows = Transaction::where('transaction_type', 'trading outflow')
         ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
         ->get()
         ->groupBy('province');
     
@@ -307,6 +385,52 @@ class ReportController extends Controller
     $formattedGrandTotalVolume = number_format($grandTotalVolume, 0, '.', ',');
     $formattedGrandTotalFrequency = $grandTotalFrequency;
 
+    //table 9 
+     // Fetch washing transactions with commodity data
+     $washingTransactions = Transaction::with('commodity')
+     ->whereBetween('date', [$startDate, $endDate])
+     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+     ->get()
+     ->filter(function ($transaction) {
+        return $transaction->transaction_type === 'washing';
+    });
+    // Initialize an array to hold the transformed data
+    $formattedTransactions = $washingTransactions->map(function ($transaction) {
+        return [
+            'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
+            'volume' => $transaction->volume,
+        ];
+    });
+    
+    // Calculate total volume
+    $totalVolume = $formattedTransactions->sum('volume');
+
+
+    //table 10
+
+    //table 11
+    $province = $request->input('province', null);
+    $intertradingTransactions = Transaction::with('commodity')
+    ->when($province, function ($query) use ($province) {
+        return $query->where('province', $province);
+    })
+    ->whereBetween('date', [$startDate, $endDate])
+    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+    ->get()
+    ->filter(function ($transaction) {
+       return $transaction->transaction_type === 'intertrading';
+   });
+   // Initialize an array to hold the transformed data
+   $formattedTransactions = $intertradingTransactions->map(function ($transaction) {
+       return [
+           'province' => $transaction->province,
+           'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
+           'volume' => $transaction->volume,
+       ];
+   });
+   $totalVolume = $formattedTransactions->sum('volume');
+
+
         // Passing data to the view
         return view('admin-pages.report', compact(
             'table_one_data',
@@ -325,6 +449,14 @@ class ReportController extends Controller
             'table_eight_data',
             'formattedGrandTotalVolume',
             'formattedGrandTotalFrequency',
+            'startDate',
+            'endDate',
+            'transactions',
+            'totalVolume',
+            'formattedTransactions',
+            'washingTransactions',
+            'intertradingTransactions',
+           
             
         ));
         

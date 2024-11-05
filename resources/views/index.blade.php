@@ -33,6 +33,21 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -42,14 +57,14 @@
 
       <a href="index.html" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1 class="sitename">BAPTC - Volume</h1>
+        <img src="{{asset('assets/img/BAPTC_logo.png')}}" alt="BAPTC Logo"> 
+        <h1 class="">BAPTC - Volume</h1>
       </a>
 
       <nav id="navmenu" class="navmenu d-flex align-items-center">
         <ul class="list-unstyled m-0 d-flex flex-row"> <!-- Keep it as flex row -->
             <li class="py-0 mx-1"> <!-- Set minimal margin for spacing -->
-                <a href="{{route('login')}}" class="text-decoration-none" style="font-size: 0.8rem;">Staff Login</a> <!-- Reduce font size -->
+                <h6 href="{{route('login')}}" class="text-decoration-none" style="font-size: 1rem;">Staff Login</h6> <!-- Reduce font size -->
             </li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -65,12 +80,10 @@
 
       <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
         <div class="row gy-5">
-          <div class="col-md-5 order-2 order-lg-1 d-flex flex-column justify-content-center">
-            <h2>Benguet Agri-Pinoy Trading Center (BAPTC)</h2>
+          <div class="col-md-7 order-2 order-lg-1 d-flex flex-column justify-content-center">
+            <h2>Benguet Agri-Pinoy Trading Center (BAPTC) Volume Monitoring System</h2>
             <p>Sed autem laudantium dolores. Voluptatem itaque ea consequatur eveniet. Eum quas beatae cumque eum quaerat.</p>
             <div class="d-flex">
-              <a href="#about" class="btn-get-started">Get Started</a>
-              <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
             </div>
           </div>
           <div class="col-lg-6 order-1 order-lg-2">
@@ -83,39 +96,68 @@
         <div class="container position-relative">
           <div class="row gy-4 mt-5">
 
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-6 col-md-6">
               <div class="icon-box">
-                <div class="icon"><i class="bi bi-easel"></i></div>
-                <h4 class="title"><a href="" class="stretched-link">Lorem Ipsum</a></h4>
+                <div class="col-md-12">
+                  <h1>Trading Inflows</h1>
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Address</th>
+                              <th>Number of Cars</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          @foreach ($grouped_inflows as $inflow)
+                              <tr>
+                                  <td>{{ $inflow['municipality'] }}</td>
+                                  <td>{{ $inflow['vehicle_count'] }}</td>
+                              </tr>
+                          @endforeach
+                      </tbody>
+                  </table>
+              </div>
+              
               </div>
             </div><!--End Icon Box -->
 
-            <div class="col-xl-3 col-md-6">
-              <div class="icon-box">
-                <div class="icon"><i class="bi bi-gem"></i></div>
-                <h4 class="title"><a href="" class="stretched-link">Sed ut perspiciatis</a></h4>
+
+
+            <div class="col-xl-6 col-md-6">
+              <div class="icon-box">     
+                  <div class="col-md-12">
+                    <h1>Trading Outflows</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Number of Cars</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($grouped_outflows as $outflow)
+                                <tr>
+                                    <td>{{ $outflow['municipality'] }}</td>
+                                    <td>{{ $outflow['vehicle_count'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
               </div>
             </div><!--End Icon Box -->
 
-            <div class="col-xl-3 col-md-6">
-              <div class="icon-box">
-                <div class="icon"><i class="bi bi-geo-alt"></i></div>
-                <h4 class="title"><a href="" class="stretched-link">Magni Dolores</a></h4>
-              </div>
-            </div><!--End Icon Box -->
 
-            <div class="col-xl-3 col-md-6">
-              <div class="icon-box">
-                <div class="icon"><i class="bi bi-command"></i></div>
-                <h4 class="title"><a href="" class="stretched-link">Nemo Enim</a></h4>
-              </div>
-            </div><!--End Icon Box -->
 
           </div>
         </div>
       </div>
 
     </section><!-- /Hero Section -->
+    <div class="row">
+    
+</div>
 
     {{-- <!-- About Section -->
     <section id="about" class="about section">
@@ -568,7 +610,7 @@
 
   </main>
 
-  <footer id="footer" class="footer" style="background-color: #F6F9FF;">
+  {{-- <footer id="footer" class="footer" style="background-color: #F6F9FF;">
 
     <div class="container">
       <div class="copyright text-center ">
@@ -589,7 +631,7 @@
       </div>
     </div>
 
-  </footer>
+  </footer> --}}
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

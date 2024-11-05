@@ -159,7 +159,7 @@ class SpecialRecordsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $special_records)
+    public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
             'transaction_status' => 'required|string',
@@ -175,47 +175,60 @@ class SpecialRecordsController extends Controller
             'province' => 'required|string',
             'region' => 'required|string',
         ]);
-    
-        // Find or create location based on validated data
+        
+        // Load the record you want to update
+        $special_records = Transaction::find($id);
+        if (!$special_records) {
+            session()->flash('error', 'Record not found.');
+            return redirect()->back();
+        }
+        
+        // Find or create related data
         $location = Location::firstOrCreate([
             'barangay' => $validatedData['barangay'],
             'municipality' => $validatedData['municipality'],
             'province' => $validatedData['province'],
             'region' => $validatedData['region'],
         ]);
-    
-        // Find or create the facilitator if the name is provided
+        
         $facilitator = null;
         if (!empty($validatedData['facilitator_name'])) {
             $facilitator = Facilitator::firstOrCreate([
                 'facilitator_name' => $validatedData['facilitator_name'],
             ]);
         }
-    
-        // Get the commodity ID based on the name
+        
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
-    
-        // Update the transaction record
-        $special_records->update([
-            'date' => $validatedData['date'],
-            'time' => $validatedData['time'],
-            'transaction_type' => $validatedData['transaction_type'],
-            'transaction_status' => $validatedData['transaction_status'],
-            'staff_id' => $validatedData['staff_id'],
-            'commodity_id' => $commodity->commodity_id,
-            'volume' => $validatedData['volume'],
-            'facilitator_id' => $facilitator ? $facilitator->facilitator_id : null,
-            'barangay' => $location->barangay,
-            'municipality' => $location->municipality,
-            'province' => $location->province,
-            'region' => $location->region,
-        ]);
-    
-        // Flash success message and redirect based on user type and transaction status
-        session()->flash('success', 'Trading inflow updated successfully!');
-        $user = Auth::user();
-        if ($user->type == 0) {
-            return redirect()->route('special-records.index');
+        
+        if ($commodity) {
+            $updated = $special_records->update([
+                'date' => $validatedData['date'],
+                'time' => $validatedData['time'],
+                'transaction_type' => $validatedData['transaction_type'],
+                'transaction_status' => $validatedData['transaction_status'],
+                'staff_id' => $validatedData['staff_id'],
+                'commodity_id' => $commodity->commodity_id,
+                'volume' => $validatedData['volume'],
+                'facilitator_id' => $facilitator ? $facilitator->facilitator_id : null,
+                'barangay' => $location->barangay,
+                'municipality' => $location->municipality,
+                'province' => $location->province,
+                'region' => $location->region,
+            ]);
+        
+            if ($updated) {
+                session()->flash('success', 'Special Records updated successfully!');
+            } else {
+                session()->flash('error', 'Failed to update Special Records.');
+            }
+        
+            $user = Auth::user();
+            return $user->type == 0
+                ? redirect()->route('special-records.index')
+                : redirect()->route('some-other-route');
+        } else {
+            session()->flash('error', 'Commodity not found.');
+            return redirect()->back();
         } 
     }
 

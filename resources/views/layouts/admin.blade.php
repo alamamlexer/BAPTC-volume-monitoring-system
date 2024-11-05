@@ -67,7 +67,7 @@
       </form>
     </div><!-- End Search Bar --> --}}
 
-    <nav class="header-nav ms-auto">
+    {{-- <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 
         <li class="nav-item d-block d-lg-none">
@@ -280,7 +280,7 @@
         </li><!-- End Profile Nav -->
 
       </ul>
-    </nav><!-- End Icons Navigation -->
+    </nav><!-- End Icons Navigation --> --}}
 
   </header><!-- End Header -->
 
@@ -317,7 +317,7 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('special-records.create')}}">
+        <a class="nav-link collapsed" href="{{route('special-records.index')}}">
           <i class="bi bi-journal-text"></i>
           <span>Special Records</span>
         </a>
@@ -353,11 +353,15 @@
       <!-- End Profile Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Logout</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+            @csrf
+            <button type="submit" class="nav-link collapsed">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+    
+          </li><!-- End Login Page Nav -->
 
 
     </ul>

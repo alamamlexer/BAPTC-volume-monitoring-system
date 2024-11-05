@@ -327,7 +327,7 @@
                                             @csrf
                                             <div class="row">
                                                 <!-- Responsive column for file input and Import button -->
-                                                <div class="col-md-6 col-sm-12 d-flex align-items-center">
+                                                <div class="col-md-9 col-sm-12 d-flex align-items-center">
                                                     <input type="file" name="file" id="file" class="form-control me-2" required>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 mt-2 mt-md-0">

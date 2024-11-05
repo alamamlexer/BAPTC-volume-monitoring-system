@@ -2,6 +2,7 @@
 @section('page_title', 'Trading Inflow Form')
 @section('content')
 
+ 
     <!-- Page Title -->
     <div class="pagetitle">
         <h1>Form Layouts</h1>
@@ -282,16 +283,16 @@
                             
                           
                             
-                                        
+                                 <div class="text-center">
+                                <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
+                                <button type="reset" class="btn btn-secondary">Reset</button>
+                                <a href="{{ route('staff-trading-inflow.index') }}" class="btn btn-danger">Back</a>
+                            </div>       
 
 
                             </div>  
                             
-                            <div class="text-center">
-                                <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
-                                <button type="reset" class="btn btn-secondary">Reset</button>
-                                <a href="{{ route('staff-trading-inflow.index') }}" class="btn btn-danger">Back</a>
-                            </div>
+                            
                         </form>
                     </div>
                 </div>
@@ -316,13 +317,18 @@
                                         Submit 
                                     </button>
                                 </form>
-
+                                    
+                                    <div class="row">
+                                    <div class="col">
+                                    <p class="form-label"></p>
+                                    </div>
+                                    </div>
                                     <div class="form-floating">
                                         <form action="{{ route('staff-trading-inflow.import') }}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="row">
                                                 <!-- Responsive column for file input and Import button -->
-                                                <div class="col-md-6 col-sm-12 d-flex align-items-center">
+                                                <div class="col-md-9 col-sm-12 d-flex align-items-center">
                                                     <input type="file" name="file" id="file" class="form-control me-2" required>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 mt-2 mt-md-0">
@@ -427,7 +433,7 @@
                         </div>
                         
                         
-                        <div id="paginationLinks">
+                        <div  id="paginationLinks">
                         </div>    
                         
                     </div>

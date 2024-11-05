@@ -14,11 +14,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SpecialRecordsController;
 use App\Http\Controllers\FacilitatorController;
 use App\Http\Controllers\CommodityController;
+use App\Http\Controllers\StaffProfileController;            
 
 
 Route::controller(AuthenticationController::class)->group(function(){
 
-    Route::get('/register','register')->name('register');
     Route::post('/register-save-farmer','register_save_farmer')->name('register_save_farmer');
     Route::post('/register-save-staff','register_save_staff')->name('register_save_staff');
     
@@ -53,13 +53,18 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('short-trip-inflow-and-outflow', ShortTripInflowAndOutflowController::class);
     Route::post('/short-trip-inflow-and-outflow/submit', [ShortTripInflowAndOutflowController::class, 'submit'])->name('short-trip-inflow-and-outflow.submit');
-    
+    Route::post('/short-trip-inflow-and-outflow/import', [ShortTripInflowAndOutflowController::class, 'import'])->name('short-trip-inflow-and-outflow.import');
+
     Route::resource('user-management', UserManagementController::class);
+    Route::post('user-management/{id}/activate', [UserManagementController::class, 'activate'])->name('user-management.activate');
+    Route::post('user-management/{id}/deactivate', [UserManagementController::class, 'deactivate'])->name('user-management.deactivate');
 });
 
 Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
 
     Route::get('/staff-dashboard',[AdminDashboardController::class,'index'])->name('staff-dashboard');
+    Route::get('/staff/profile/{id}', [StaffProfileController::class, 'show'])->name('staff.profile');
+    Route::put('/staff/profile/{id}', [StaffProfileController::class, 'update'])->name('staff.profile.update');
     
 
     // Trading Inflow Routes For Staff

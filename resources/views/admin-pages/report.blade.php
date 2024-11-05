@@ -14,7 +14,20 @@
 
 
 <section class="section dashboard">
-
+<div class="row mb-3">
+                      <form method="GET" action="{{ route('report.index') }}" class="mb-3">
+                        <div class="input-group">
+                        <div class="col-md-2">
+                        <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
+                        </div>
+                        <div class="col-md-2">
+                        <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
+                        </div>
+                            <button class="btn btn-primary" type="submit">Filter</button>
+                      
+                        </div>
+                    </form>
+                    </div>
   <!-- TABLE 1 -->
             <div class="row">
             <div class="col-lg-12">
@@ -53,22 +66,22 @@
             </tr>
             <tr>
                 <td class="text-end">-Dry Storage (includes the cold storage converted intro dry storage)</td>
-                <td class="text-end">0</td>
+                <td class="text-end">{{ $table_one_data['DRY']['dry'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td class="text-end">-Cold Storage no.8 (Only functional cold storage)</td>
-                <td class="text-end">0</td>
+                <td class="text-end">{{ $table_one_data['COLD']['cold'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td class="text-end">Carrot Washing Facility</td>
-                <td class="text-end">0</td>
+                <td class="text-end">{{ $table_one_data['WASHING']['washing'] ?? 0 }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td class="text-end">Inter Trading</td>
-                <td class="text-end">0</td>
+                <td class="text-end">{{ $table_one_data['INTER_TRADING']['intertrading'] ?? 0 }}</td>
                 <td></td>
             </tr>
 
@@ -428,34 +441,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <td class="text-center">Commodity name</td>
-                    <td class="text-center"></td>
-                </tr>
-                <tr>
-                    <th class="text-center">TOTAL WEIGHT IN KG</th>
-                    <td class="text-center"></td>
-                </tr>
+                
+            @foreach ($washingTransactions as $transaction)
+            <tr>
+                <td class="col-md-4 text-center">{{ $transaction['commodity']->commodity_name }}</td>
+                <td class="col-md-4 text-center">{{ $transaction['volume'] }}</td>
+            </tr>
+            @endforeach
+                
+        <tr>
+            <td class="col-md-4 text-center"><strong>Total Volume</strong></td>
+            <td class="col-md-4 text-center"><strong>{{ $totalVolume }}</strong></td>
+        </tr>
             </tbody>
         </table>
       </div>
@@ -466,7 +463,7 @@
     
 
 
-<!-- TABLE 11 -->
+<!-- TABLE 10 -->
 <div class="row">
     <div class="col-lg-12">
     <div class="card">
@@ -494,7 +491,7 @@
                     </tr>
                     <tr>
                         <th colspan="2" class="text-end">Sub-total.</th>
-                        <td class="text-center">TOTAL</td>
+                        <td class="col-md-4 text-center"><strong>TOTAL</td>
                     </tr>
                 </tbody>
             
@@ -527,7 +524,7 @@
                     </tr>
                     <tr>
                         <th colspan="2" class="text-end">Sub-total.</th>
-                        <td class="text-center">TOTAL</td>
+                        <td class="col-md-4 text-center"><strong>TOTAL</td>
                     </tr>
                 </tbody>
             
@@ -575,12 +572,28 @@
     <div class="card-body">
         <h5 class="card-title"><b>XI. MONITORED TRADING TRANSACTION FROM THE INTER TRADING</b></h5>
         <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
+       <table class="table">
       <thead>
+            <tr>
+                <th class="col-md-4 text-center">COMMODITY</th>
+                <th class="col-md-4 text-center">VOLUME (KG)</th>
+                <th class="col-md-4 text-center">PRODUCTION SOURCE</th>
+            </tr>
       </thead>
       <tbody>
+        @foreach ($intertradingTransactions as $transaction)
+            <tr>
+                <td class="col-md-4 text-center">{{ $transaction['commodity']->commodity_name }}</td>
+                <td class="col-md-4 text-center">{{ $transaction['volume'] }}</td>
+                <td class="col-md-4 text-center">{{ $transaction['province'] }}</td>
+            </tr>
+        @endforeach  
+            <tr>
+                <td class="col-md-4 text-center"><strong>Grand Total (KG)</strong></td>
+                <th colspan="2" class="text-center">{{ $totalVolume }}</th>
+            </tr>
       </tbody>
-      </table>  --}}
+      </table>  
       </div>
     </div>
     </div>

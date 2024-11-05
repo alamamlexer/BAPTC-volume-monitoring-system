@@ -227,7 +227,7 @@
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>
-                            <a href="{{ route('trading-inflow.index') }}" class="btn btn-danger">Back</a>
+                            <a href="{{ route('special-records.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>
                 </div>

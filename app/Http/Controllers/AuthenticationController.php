@@ -12,36 +12,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 class AuthenticationController extends Controller
 {
-    public function register(){
-        return view('register');
-    }
-    
-    public function register_save_farmer(Request $request){
-    
-        
-        $validatedData = $request->validate([
-            'plate_number' => 'required|string|unique:farmers,plate_number|max:255',
-            'farmer_name' => 'string|max:255',
-            'contact_number' => 'required|string|max:15',
-            'password' => 'required|string|confirmed',
-        ]);
+  
 
-        $farmer=Farmer::create([
-            'farmer_name' =>  $validatedData['farmer_name'],
-            'contact_number' => $validatedData['contact_number'],
-            'plate_number' => $validatedData['plate_number'],
-        ]);
-        User::create([
-        'farmer_id'=>$farmer->id,
-        'username' =>  $farmer->plate_number,
-        'password' => Hash::make($validatedData['password']),
-        'type' => '2' //0=admin, 1=inspector, 2=farmer
-        ]);
-        
-        session()->flash('success', 'Account created!');
-        
-        return redirect()->route('login');
-    }
     
     public function register_save_staff(Request $request){
     
@@ -73,32 +45,39 @@ class AuthenticationController extends Controller
         return view('login');
     }
 
-    public function login_action(Request $request){
-    
-        Validator::make($request->all(),[
-            'username' => 'required',
-            'password' => 'required',
-        ])->validate();
-        
-        if (!Auth::attempt($request->only('username', 'password'), $request->boolean('remember'))) {
-            throw ValidationException::withMessages([
-                'username' => trans('auth.failed')
-            ]);
-        }
-        
+    public function login_action(Request $request)
+{
+    Validator::make($request->all(), [
+        'username' => 'required',
+        'password' => 'required',
+    ])->validate();
+
+    // Attempt to authenticate the user
+    if (Auth::attempt($request->only('username', 'password'), $request->boolean('remember'))) {
+        // Check if the user is active
+        if (Auth::user()->is_active) {
             $request->session()->regenerate(); 
-        
+
             session()->flash('success', 'Login successful.');
-            
-            if(Auth::user()->type==0){
+
+            if (Auth::user()->type == 0) {
                 return redirect()->route('admin.index'); 
-            }
-            elseif(Auth::user()->type==1){
+            } elseif (Auth::user()->type == 1) {
                 return redirect()->route('staff-dashboard');
             }
-           
-        
+        } else {
+            // Log the user out if they are not active
+            Auth::logout();
+            session()->flash('error', 'Your account is deactivated. Please contact the administrator.');
+            return redirect()->route('login');
+        }
     }
+
+    // If authentication fails
+    throw ValidationException::withMessages([
+        'username' => trans('auth.failed')
+    ]);
+}
     
     public function logout(Request $request){
     

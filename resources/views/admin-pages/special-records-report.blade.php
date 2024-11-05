@@ -16,7 +16,7 @@
 
     <div class="row">
         <!-- Date and Time Card -->
-        <div class="col-md-4">
+        {{-- <div class="col-md-4">
             <div class="card info-card sales-card">
                 <div class="card-body">
                     <h5 class="card-title">Date and Time</h5>
@@ -30,7 +30,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-lg-12">
             <div class="card">

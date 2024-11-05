@@ -742,21 +742,20 @@ section,
 
 .hero .icon-box .title a {
   color: color-mix(in srgb, var(--default-color), transparent 20%);
-  transition: 0.3s;
+ 
 }
 
 .hero .icon-box .icon {
   margin-bottom: 20px;
   padding-top: 10px;
   display: inline-block;
-  transition: all 0.3s ease-in-out;
   font-size: 48px;
   line-height: 1;
-  color: var(--accent-color);
+
 }
 
 .hero .icon-box:hover {
-  background-color: var(--accent-color);
+ 
 }
 
 .hero .icon-box:hover .title a,

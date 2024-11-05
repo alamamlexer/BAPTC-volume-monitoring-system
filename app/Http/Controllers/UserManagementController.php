@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Models\Staff;
 use Illuminate\Database\QueryException;
 class UserManagementController extends Controller
 {
@@ -11,11 +13,67 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        $users = User::with('farmers','staffs')->whereIn('type',[1,2])->get();
+        $users = User::with('staffs')->whereIn('type',[1,2])->get();
         
         
         return view('admin-pages.user-management',compact('users'));
     }
+
+    public function activate($id)
+{
+    $user = User::findOrFail($id);
+    $user->is_active = true;
+    $user->save();
+
+    session()->flash('success', 'User activated successfully.');
+    return redirect()->route('user-management.index');
+}
+
+public function deactivate($id)
+{
+    $user = User::findOrFail($id);
+    $user->is_active = false;
+    $user->save();
+
+    session()->flash('success', 'User deactivated successfully.');
+    return redirect()->route('user-management.index');
+}
+
+
+    public function store(Request $request)
+{
+    $validatedData = $request->validate([
+        'staff_name' => 'required|string|max:255|unique:staff,staff_name',
+        'contact_number' => 'required|string|max:15',
+        'email' => 'required|string|unique:staff,email',
+        'password' => 'required|string|confirmed',
+    ]);
+
+    try {
+        // Create the Staff record
+        $staff = Staff::create([
+            'staff_name' => $validatedData['staff_name'],
+            'contact_number' => $validatedData['contact_number'],
+            'email' => $validatedData['email'],
+        ]);
+
+        // Create the User record and link to the staff, set is_active to false
+        User::create([
+            'staff_id' => $staff->staff_id, // Use the newly created staff_id
+            'username' => $staff->staff_name,
+            'password' => Hash::make($validatedData['password']),
+            'type' => '1', // 0=admin, 1=staff
+            'is_active' => true, // Set to inactive by default
+        ]);
+
+        session()->flash('success', 'Account created successfully and is inactive by default.');
+        return redirect()->route('user-management.index');
+    } catch (\Exception $e) {
+        session()->flash('error', 'Error creating staff: ' . $e->getMessage());
+        return redirect()->back()->withInput();
+    }
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -23,29 +81,6 @@ class UserManagementController extends Controller
     public function create()
     {
         return view('admin-pages.user-inspector-assistant-create',);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'transaction_status' => 'required',
-            'transaction_type' => 'required',
-            'date' => 'required|date',
-            'time' => 'required',
-            'staff_id' => 'required|exists:staff,staff_id', 
-            'commodity_name' => 'required|exists:commodities,commodity_name', 
-            'volume' => 'required|integer', 
-            'plate_number' => 'required',
-            'vehicle_type_id' => 'required|exists:vehicle_types,vehicle_type_id', 
-            'name' => 'required',
-            'barangay' => 'required',
-            'municipality' => 'required',
-            'province' => 'required',
-            'region' => 'required',
-        ]);  
     }
 
     /**
@@ -91,4 +126,5 @@ class UserManagementController extends Controller
         }
         }
     }
+    
 }

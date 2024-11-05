@@ -62,7 +62,7 @@
       </form>
     </div><!-- End Search Bar --> --}}
 
-    <nav class="header-nav ms-auto">
+    {{-- <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 
         <li class="nav-item d-block d-lg-none">
@@ -272,7 +272,7 @@
         </li><!-- End Profile Nav -->
 
       </ul>
-    </nav><!-- End Icons Navigation -->
+    </nav><!-- End Icons Navigation --> --}}
 
   </header><!-- End Header -->
 
@@ -314,18 +314,23 @@
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/profile">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
+    <a class="nav-link collapsed" href="{{ route('staff.profile', ['id' => auth()->user()->id]) }}">
+        <i class="bi bi-person"></i>
+        <span>Profile</span>
+    </a>
+</li><!-- End Profile Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
+
+<li class="nav-item">
+  <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+      @csrf
+      <button type="submit" class="nav-link collapsed">
           <i class="bi bi-box-arrow-in-right"></i>
           <span>Logout</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+      </button>
+  </form>
+
+    </li><!-- End Login Page Nav -->
 
 
     </ul>
