@@ -24,10 +24,10 @@ return new class extends Migration
             $table->foreignId('vehicle_type_id')->nullable()->constrained('vehicle_types','vehicle_type_id'); 
             $table->string('name')->nullable();
             $table->foreignId('facilitator_id')->nullable()->constrained('facilitators','facilitator_id'); 
-            $table->string('barangay'); 
-            $table->string('municipality'); 
-            $table->string('province'); 
-            $table->string('region'); 
+            $table->string('barangay')->nullable(); 
+            $table->string('municipality')->nullable(); 
+            $table->string('province')->nullable(); 
+            $table->string('region')->nullable(); 
             $table->timestamps();
         });
     }

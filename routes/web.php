@@ -97,6 +97,8 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     Route::put('/staff-short-trip-inflow-and-outflow/{short_trip_inflow_and_outflow}',[ShortTripInflowAndOutflowController::class,'update'])->name('staff-short-trip-inflow-and-outflow.update');
     Route::delete('/staff-short-trip-inflow-and-outflow/{short_trip_inflow_and_outflow}',[ShortTripInflowAndOutflowController::class,'destroy'])->name('staff-short-trip-inflow-and-outflow.destroy');
     
+    //Report routes
+    Route::get('/staff-report',[ReportController::class,'index'])->name('staff-report.index');
     
   
     

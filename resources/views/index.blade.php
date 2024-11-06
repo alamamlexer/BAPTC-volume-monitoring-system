@@ -64,7 +64,7 @@
       <nav id="navmenu" class="navmenu d-flex align-items-center">
         <ul class="list-unstyled m-0 d-flex flex-row"> <!-- Keep it as flex row -->
             <li class="py-0 mx-1"> <!-- Set minimal margin for spacing -->
-                <h6 href="{{route('login')}}" class="text-decoration-none" style="font-size: 1rem;">Staff Login</h6> <!-- Reduce font size -->
+                <a href="{{route('login')}}" class="text-decoration-none" style="font-size: 1rem;">Staff Login</a> <!-- Reduce font size -->
             </li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

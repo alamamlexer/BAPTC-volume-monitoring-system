@@ -23,21 +23,69 @@ class SpecialRecordsController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+    {   
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->toDateString());
+
         $transactionType = $request->input('transaction_type');
 
         $query = Transaction::with(['commodity', 'facilitator'])
             ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading']) // Include only allowed types
+            ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('created_at', 'desc');
 
-        // Optional: Filter by transaction type if it's provided
-        if ($transactionType && in_array($transactionType, ['dry', 'cold', 'washing', 'intertrading'])) {
-            $query->where('transaction_type', $transactionType);
-        }
+            $staffId = $request->input('staff_id');
+            $commodityId = $request->input('commodity_filter');
+            $municipality = $request->input('municipality_filter');
+    
+            // Apply filters if provided
+            if ($request->has('start_date') && $request->has('end_date')) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            }
+            if ($startDate) {
+                $query->where('date', '>=', $startDate); // Use >= to include all transactions from that date onward
+            }
+            if ($endDate) {
+                $query->where('date', '<=', $endDate); // Use <= to include transactions up to that date
+            }
+            if ($staffId) {
+                $query->where('staff_id', $staffId);
+            }
+            if ($commodityId) {
+                $query->where('commodity_id', $commodityId);
+            }
+            if ($municipality) {
+                $query->where('municipality', $municipality);
+            }
+            // Fetch the paginated results
+            $specialRecords = $query->paginate( 5);
+            // dd($specialRecords);
+            if ($request->ajax()) {
+                return response()->json([
+                    'data' => $specialRecords->items(),
+                    'current_page' => $specialRecords->currentPage(),
+                    'last_page' => $specialRecords->lastPage(),
+                    'total' => $specialRecords->total(),
+    
+                ]);
+            }
+            
+            $transaction_types=['dry', 'cold', 'washing', 'intertrading'];
+            $commodities = Commodity::all();
+            $municipalities = Transaction::distinct()->pluck('municipality');
+            $staffs = Staff::all();
+            // dd(  $transaction_type);
+    
 
-        $specialRecords = $query->get();
-
-        return view('admin-pages.special-records-report', compact('specialRecords', 'transactionType'));
+        return view('admin-pages.special-records-report', compact('startDate',
+                                                                                    'endDate',
+                                                                                    'specialRecords', 
+                                                                                    'transactionType',
+                                                                                    'transaction_types',
+                                                                                    'commodities',
+                                                                                    'municipalities',
+                                                                                    'staffs',
+                                                                                    ));
 
     
     }

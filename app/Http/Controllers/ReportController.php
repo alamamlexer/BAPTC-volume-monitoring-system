@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Commodity;
 use Carbon\Carbon; // Import Carbon for date handling
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -321,7 +322,8 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
                     ];
                 });
             });
-
+        
+        
         // Prepare totals and subtotals for the view
         $subtotals = $transactionsByMunicipality->map(function ($commodities) {
             return [
@@ -430,7 +432,9 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
    });
    $totalVolume = $formattedTransactions->sum('volume');
 
-
+   $user = Auth::user();
+   $userId = Auth::id();
+   if ($user->type == 0) {
         // Passing data to the view
         return view('admin-pages.report', compact(
             'table_one_data',
@@ -451,7 +455,6 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'formattedGrandTotalFrequency',
             'startDate',
             'endDate',
-            'transactions',
             'totalVolume',
             'formattedTransactions',
             'washingTransactions',
@@ -459,6 +462,36 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
            
             
         ));
+   } elseif ($user->type == 1) {
+        // Passing data to the view
+        return view('staff-pages.staff-report', compact(
+            'table_one_data',
+            'table_three_data',
+            'R2_peakDayDate',
+            'R2_peakDay',
+            'R2_leanDayDate',
+            'R2_leanDay',
+            'table_six_commodities',
+            'table_six_grand_total_volume',
+            'transactionsByMunicipality',
+            'subtotals',
+            'grandTotalVolume',
+            'grandTotalFrequency',
+            'totalGrandPercentage',
+            'table_eight_data',
+            'formattedGrandTotalVolume',
+            'formattedGrandTotalFrequency',
+            'startDate',
+            'endDate',
+            'totalVolume',
+            'formattedTransactions',
+            'washingTransactions',
+            'intertradingTransactions',
+           
+            
+        ));
+   }
+       
         
         }
 }

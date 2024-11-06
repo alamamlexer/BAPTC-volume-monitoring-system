@@ -579,10 +579,10 @@ $today_vehicle = number_format($vehicle);
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
             'facilitator_name' => 'nullable|exists:facilitators,facilitator_name',
             'name' => 'nullable|string',
-            'barangay' => 'required',
-            'municipality' => 'required',
-            'province' => 'required',
-            'region' => 'required',
+            'barangay' => 'nullable',
+            'municipality' => 'nullable',
+            'province' => 'nullable',
+            'region' => 'nullable',
         ]);
         
         
@@ -641,10 +641,10 @@ $today_vehicle = number_format($vehicle);
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'facilitator_id' => $facilitator->facilitator_id ?? null,
             'name' => $validatedData['name'] ?? null,
-            'barangay' => $location->barangay,
-            'municipality' => $location->municipality,
-            'province' => $location->province,
-            'region' => $location->region,
+            'barangay' => $location->barangay?? null,
+            'municipality' => $location->municipality?? null,
+            'province' => $location->province?? null,
+            'region' => $location->region?? null,
         ]);
 
         session()->flash('success', 'Short Trip Trading updated successfully!');

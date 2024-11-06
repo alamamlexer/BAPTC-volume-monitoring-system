@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Short Trip Trading Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
+                    <form class="row g-3 " action="{{ route('staff-short-trip-inflow-and-outflow.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
@@ -35,7 +35,15 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-5" hidden>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="transaction_type" name="transaction_type"
+                                    value="trading inflow">
+                                <label for="transaction_type"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
                                     placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
@@ -46,7 +54,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-floating">
                                 <select class="form-select" id="time" name="time" required>
                                     <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
@@ -255,7 +263,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="barangay" name="barangay"
-                                    placeholder="Barangay" value="{{ old('barangay') }}" required>
+                                    placeholder="Barangay" value="{{ old('barangay') }}" >
                                 <label for="barangay">Barangay</label>
                                 @if ($errors->has('barangay'))
                                 <span class="text-danger">{{ $errors->first('barangay') }}</span>
@@ -266,7 +274,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="municipality" name="municipality"
-                                    placeholder="Municipality" value="{{ old('municipality') }}" required>
+                                    placeholder="Municipality" value="{{ old('municipality') }}" >
                                 <label for="municipality">Municipality</label>
                                 @if ($errors->has('municipality'))
                                 <span class="text-danger">{{ $errors->first('municipality') }}</span>
@@ -277,7 +285,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="province" name="province"
-                                    placeholder="Province" value="{{ old('province') }}" required>
+                                    placeholder="Province" value="{{ old('province') }}" >
                                 <label for="province">Province</label>
                                 @if ($errors->has('province'))
                                 <span class="text-danger">{{ $errors->first('province') }}</span>
@@ -288,7 +296,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="region" name="region"
-                                    placeholder="Region" value="{{ old('region') }}" required>
+                                    placeholder="Region" value="{{ old('region') }}" >
                                 <label for="region">Region</label>
                                 @if ($errors->has('region'))
                                 <span class="text-danger">{{ $errors->first('region') }}</span>
@@ -306,7 +314,7 @@
                 <div class="text-center">
                     <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
                     <button type="reset" class="btn btn-secondary">Reset</button>
-                    <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
+                    <a href="{{ route('staff-short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                 </div>
                 </form>
             </div>
@@ -322,7 +330,7 @@
 
                     <div class="row mb-3">
                         <div class="col-auto">
-                            <form action="{{ route('short-trip-inflow-and-outflow.submit') }}" method="POST">
+                            <form action="{{ route('staff-short-trip-inflow-and-outflow.submit') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
                                 {{-- <button type="submit" class="btn btn-success">
@@ -752,7 +760,7 @@
             const typeFilter = document.getElementById('typeFilter').value;
 
             // Construct the AJAX URL
-            const url = "{{ route('short-trip-inflow-and-outflow.create') }}"; // Make sure to replace this with your route
+            const url = "{{ route('staff-short-trip-inflow-and-outflow.create') }}"; // Make sure to replace this with your route
 
             // Create query parameters
             const queryParams = new URLSearchParams({
@@ -799,10 +807,10 @@
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff?.staff_name ?? 'N/A'}</td>
                             <td>
-                                <a href="/short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                <a href="/staff-short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
                                     <i class="bx bxs-edit"></i> Edit
                                 </a>
-                                <form action="/short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
+                                <form action="/staff-short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">

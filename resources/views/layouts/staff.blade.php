@@ -314,6 +314,13 @@
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
+        <a class="nav-link collapsed" href="{{route('staff-report.index')}}">
+            <i class="bi bi-person"></i>
+            <span>Reports</span>
+        </a>
+    </li>
+    
+      <li class="nav-item">
     <a class="nav-link collapsed" href="{{ route('staff.profile', ['id' => auth()->user()->id]) }}">
         <i class="bi bi-person"></i>
         <span>Profile</span>

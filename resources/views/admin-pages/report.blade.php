@@ -356,7 +356,7 @@
                                     <td class="text-end" colspan="2"><strong>Subtotal</strong></td>
                                     <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_volume'] }}</strong></td>
                                     <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_frequency'] }}</strong></td>
-                                    <td class="text-center"><strong>{{ number_format(($subtotals[$municipality]['subtotal_volume'] / $grandTotalVolume) * 100, 2) }}%</strong></td>
+                                    <td class="text-center"><strong>{{ $grandTotalVolume > 0 ? number_format(($subtotals[$municipality]['subtotal_volume'] / $grandTotalVolume) * 100, 2) : '0.00' }}%%</strong></td>
                                 </tr>
 
                                 @php $counter++; @endphp
