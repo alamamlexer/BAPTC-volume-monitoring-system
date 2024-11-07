@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Staff;
 use App\Models\Vehicle;
+use App\Models\Log;
 use App\Models\VehicleType;
 use App\Models\Commodity;
 use App\Models\Location;
@@ -230,111 +231,113 @@ $today_vehicle = number_format($vehicle);
 
 
 
+
     /**
      * Show the form for creating a new resource.
      */
-   public function create(Request $request)
-{
-    date_default_timezone_set('Asia/Manila');
-
-    $currentHour = date('H'); // 24-hour format
-    $defaultTime = ($currentHour < 12) ? 'AM' : 'PM';
-    $currentDate = Carbon::today()->toDateString();
-  
-    $temporary_transaction = Transaction::where('transaction_status', 'temporary')
-        ->whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
-        ->whereDate('created_at', $currentDate)
-        ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
-
-    // Get filter inputs
-    $staffId = $request->input('staff_id');
-    $timeFilter = $request->input('time_filter');
-    $commodityId = $request->input('commodity_filter');
-    $municipality = $request->input('municipality_filter');
-    $typeFilter = $request->input('type_filter'); // Add this line
-
-    // Apply filters if provided
-    if ($staffId) {
-        $temporary_transaction->where('staff_id', $staffId);
-    }
-    if ($timeFilter) {
-        $temporary_transaction->where('time', $timeFilter);
-    }
-    if ($commodityId) {
-        $temporary_transaction->where('commodity_id', $commodityId);
-    }
-    if ($municipality) {
-        $temporary_transaction->where('municipality', $municipality);
-    }
-    if ($typeFilter) { // Apply type filter
-        $temporary_transaction->where('transaction_type', $typeFilter);
-    }
-
-    $temporary_transactions = $temporary_transaction->paginate(5);
-        
-    if ($request->ajax()) {
-        return response()->json([
-            'data' => $temporary_transactions->items(),
-            'current_page' => $temporary_transactions->currentPage(),
-            'last_page' => $temporary_transactions->lastPage(),
-            'total' => $temporary_transactions->total(),
-        ]);
-    }
-
-    // Fetch additional data for views
-    $productionOrigins = Location::select('barangay', 'municipality', 'province', 'region')
-        ->distinct()
-        ->get()
-        ->map(function ($location) {
-            return [
-                'barangay' => $location->barangay,
-                'municipality' => $location->municipality,
-                'province' => $location->province,
-                'region' => $location->region,
-                'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
-            ];
-        });
-    $municipalities = Transaction::distinct()->pluck('municipality');
-    $facilitators = Facilitator::all();
-    $logged_in_staff = Auth::id();
-    $staffs = Staff::all();
-    $commodities = Commodity::all();
-    $vehicle_types = VehicleType::all();
-    $locations = Location::all();
-    $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
-
-    $user = Auth::user();
+    public function create(Request $request)
+    {
+        date_default_timezone_set('Asia/Manila');
     
-    if ($user->type == 0) {
-        return view('admin-pages.short-trip-inflow-and-outflow-form-create', compact(
-            'defaultTime',
-            'staffs',
-            'productionOrigins',
-            'facilitator_location_vehicles',
-            'facilitators',
-            'temporary_transactions',
-            'logged_in_staff',
-            'vehicle_types',
-            'commodities',
-            'municipalities',
-            'locations'
-        ));
-    } elseif ($user->type == 1) {
-        return view('staff-pages.staff-short-trip-inflow-and-outflow-form-create', compact(
-            'defaultTime',
-            'staffs',
-            'productionOrigins',
-            'facilitator_location_vehicles',
-            'facilitators',
-            'temporary_transactions',
-            'logged_in_staff',
-            'vehicle_types',
-            'commodities',
-            'municipalities',
-            'locations'
-        ));
+        $currentHour = date('H'); // 24-hour format
+        $defaultTime = ($currentHour < 12) ? 'AM' : 'PM';
+        $currentDate = Carbon::today()->toDateString();
+      
+        $temporary_transaction = Transaction::where('transaction_status', 'temporary')
+            ->whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
+            ->whereDate('created_at', $currentDate)
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+    
+        // Get filter inputs
+        $staffId = $request->input('staff_id');
+        $timeFilter = $request->input('time_filter');
+        $commodityId = $request->input('commodity_filter');
+        $municipality = $request->input('municipality_filter');
+        $typeFilter = $request->input('type_filter'); // Add this line
+    
+        // Apply filters if provided
+        if ($staffId) {
+            $temporary_transaction->where('staff_id', $staffId);
+        }
+        if ($timeFilter) {
+            $temporary_transaction->where('time', $timeFilter);
+        }
+        if ($commodityId) {
+            $temporary_transaction->where('commodity_id', $commodityId);
+        }
+        if ($municipality) {
+            $temporary_transaction->where('municipality', $municipality);
+        }
+        if ($typeFilter) { // Apply type filter
+            $temporary_transaction->where('transaction_type', $typeFilter);
+        }
+    
+        $temporary_transactions = $temporary_transaction->paginate(5);
+            
+        if ($request->ajax()) {
+            return response()->json([
+                'data' => $temporary_transactions->items(),
+                'current_page' => $temporary_transactions->currentPage(),
+                'last_page' => $temporary_transactions->lastPage(),
+                'total' => $temporary_transactions->total(),
+            ]);
+        }
+    
+        // Fetch additional data for views
+        $productionOrigins = Location::select('barangay', 'municipality', 'province', 'region')
+            ->distinct()
+            ->get()
+            ->map(function ($location) {
+                return [
+                    'barangay' => $location->barangay,
+                    'municipality' => $location->municipality,
+                    'province' => $location->province,
+                    'region' => $location->region,
+                    'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+                ];
+            });
+        $municipalities = Transaction::distinct()->pluck('municipality');
+        $facilitators = Facilitator::all();
+        $logged_in_staff = Auth::id();
+        $staffs = Staff::all();
+        $commodities = Commodity::all();
+        $vehicle_types = VehicleType::all();
+        $locations = Location::all();
+        $facilitator_location_vehicles = FacilitatorLocationVehicle::with(['vehicle', 'location', 'facilitator'])->get();
+    
+        $user = Auth::user();
+        
+        if ($user->type == 0) {
+            return view('admin-pages.short-trip-inflow-and-outflow-form-create', compact(
+                'defaultTime',
+                'staffs',
+                'productionOrigins',
+                'facilitator_location_vehicles',
+                'facilitators',
+                'temporary_transactions',
+                'logged_in_staff',
+                'vehicle_types',
+                'commodities',
+                'municipalities',
+                'locations'
+            ));
+        } elseif ($user->type == 1) {
+            return view('staff-pages.staff-short-trip-inflow-and-outflow-form-create', compact(
+                'defaultTime',
+                'staffs',
+                'productionOrigins',
+                'facilitator_location_vehicles',
+                'facilitators',
+                'temporary_transactions',
+                'logged_in_staff',
+                'vehicle_types',
+                'commodities',
+                'municipalities',
+                'locations'
+            ));
+        }
     }
-}
+    
 
 
     /**
@@ -342,6 +345,7 @@ $today_vehicle = number_format($vehicle);
      */
     public function store(Request $request)
     {
+        // Validate the request data
         $validatedData = $request->validate([
             'transaction_status' => 'required',
             'transaction_type' => 'required',
@@ -353,126 +357,85 @@ $today_vehicle = number_format($vehicle);
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
             'name' => 'nullable|string',
-            'barangay' => 'nullable',
-            'municipality' => 'nullable',
-            'facilitator_name' => 'nullable',
-            'province' => 'nullable',
-            'region' => 'nullable',
+            'barangay' => 'nullable|string',
+            'municipality' => 'nullable|string',
+            'facilitator_name' => 'nullable|string',
+            'province' => 'nullable|string',
+            'region' => 'nullable|string',
         ]);
-       
-        if (
-            isset($validation['barangay'], $validation['municipality'], $validation['province'], $validation['region']) &&
-            !empty($validation['barangay']) &&
-            !empty($validation['municipality']) &&
-            !empty($validation['province']) &&
-            !empty($validation['region'])
-        ) {
-        $no_location=true;
-        }
-        else{
-        $no_location=false;
-        }
-       
-        
-       
-        if ($no_location==true) {
-        $location = Location::where('barangay', $validatedData['barangay'])
-            ->where('municipality', $validatedData['municipality'])
-            ->where('province', $validatedData['province'])
-            ->where('region', $validatedData['region'])
-            ->first();
-
-        if (!$location) {
-            Location::Create([
-                'barangay' => $validatedData['barangay'],
-                'municipality' => $validatedData['municipality'],
-                'province' => $validatedData['province'],
-                'region' => $validatedData['region'],
+    
+        // Determine if all location fields are provided (i.e., not null or empty)
+        $no_location = !(
+            $validatedData['barangay'] &&
+            $validatedData['municipality'] &&
+            $validatedData['province'] &&
+            $validatedData['region']
+        );
+    
+        if (!$no_location) {
+            // Create or find the location if all location fields are provided
+            $location = Location::firstOrCreate([
+                'barangay' => $validatedData['barangay'] ?? null,
+                'municipality' => $validatedData['municipality'] ?? null,
+                'province' => $validatedData['province'] ?? null,
+                'region' => $validatedData['region'] ?? null,
             ]);
         } else {
-            Location::where('barangay', $validatedData['barangay'])
-                ->where('municipality', $validatedData['municipality'])
-                ->where('province', $validatedData['province'])
-                ->where('region', $validatedData['region'])
-                ->first();
+            // If not all location fields are provided, do not create a location
+            $location = null;
         }
-        
-        $location = Location::where('barangay', $validatedData['barangay'])
-            ->where('municipality', $validatedData['municipality'])
-            ->where('province', $validatedData['province'])
-            ->where('region', $validatedData['region'])
-            ->first();
+    
+        // Storing new vehicle
+        $vehicle = null;
+        if (!empty($validatedData['plate_number'])) {
+            $vehicle = Vehicle::firstOrCreate(
+                ['plate_number' => $validatedData['plate_number']],
+                [
+                    'vehicle_name' => $validatedData['name'] ?? null,
+                    'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
+                ]
+            );
         }
-        //Storing new location 
-        
-
-        //Storing new vehicle
-        
-        if(!empty($validatedData['plate_number'])){
-        $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
-        if (!$vehicle) {
-            $vehicle= Vehicle::create([
-                'plate_number' => $validatedData['plate_number'],
-                'vehicle_name' => $validatedData['name']?? null,
-                'vehicle_type_id' => $validatedData['vehicle_type_id']?? null,
-            ]);
-        } else {
-            $vehicle = Vehicle::where('plate_number', $validatedData['plate_number'])->first();
+    
+        // Storing facilitator
+        $facilitator = null;
+        if (!empty($validatedData['facilitator_name'])) {
+            $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
         }
-        
-        }
-        else{
-            $vehicle=null;
-        }
-        
-        
-        
-        
-        //storing facilitator
-        
-        if(!empty($validatedData['facilitator_name'])){
-            $facilitator = Facilitator::where( 'facilitator_name', $validatedData['facilitator_name'])->first();
-        }
-        else{
-            $facilitator=null;
-        }
-        
-        
-        if(!empty($vehicle) && $no_location=false){
-        
-            if( !empty($location) && !empty($facilitator)){
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
-                ->where('location_id', $location->location_id)
-                ->where('facilitator_id', $facilitator->facilitator_id)
-                ->first();
-            }
-                elseif(!$location && !empty($facilitator)){
+    
+        // Handling FacilitatorLocationVehicle creation if plate_number and location are present
+        if (!empty($vehicle) && $no_location == false) {
+            if (!empty($location) && !empty($facilitator)) {
+                $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                    ->where('location_id', $location->location_id)
+                    ->where('facilitator_id', $facilitator->facilitator_id)
+                    ->first();
+            } elseif (!$location && !empty($facilitator)) {
                 $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
                     ->where('location_id', null)
                     ->where('facilitator_id', $facilitator->facilitator_id)
                     ->first();
-                }
-                else{
-                    $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
-                        ->where('location_id', $location->location_id)
-                        ->where('facilitator_id', null)
-                        ->first();
-                    }
-                
-            if (!$facilitator_location_vehicles){
-            $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
+            } else {
+                $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                    ->where('location_id', $location->location_id)
+                    ->where('facilitator_id', null)
+                    ->first();
+            }
+    
+            if (!$facilitator_location_vehicles) {
+                $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
                     'vehicle_id' => $vehicle->vehicle_id,
-                    'location_id' => $location->location_id?? null,
-                    'facilitator_id' => $facilitator->facilitator_id?? null,
-            ]);
+                    'location_id' => $location ? $location->location_id : null,
+                    'facilitator_id' => $facilitator ? $facilitator->facilitator_id : null,
+                ]);
             }
         }
-        
-        //Get the commodity_id that corresponds to the commodity selected in the view
+    
+        // Get the commodity_id
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
-
-        //Store the transaction
-        $test=Transaction::create([
+    
+        // Store the transaction
+        $test = Transaction::create([
             'date' => $validatedData['date'],
             'time' => $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
@@ -483,23 +446,47 @@ $today_vehicle = number_format($vehicle);
             'plate_number' => $validatedData['plate_number'] ?? null,
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'name' => $validatedData['name'] ?? null,
-            'facilitator_id' => $facilitator->facilitator_id?? null,
-            'barangay' => $location->barangay?? null,
-            'municipality' => $location->municipality?? null,
-            'province' => $location->province?? null,
-            'region' => $location->region?? null,
+            'facilitator_id' => $facilitator ? $facilitator->facilitator_id : null,
+            'barangay' => $location ? $location->barangay : null,
+            'municipality' => $location ? $location->municipality : null,
+            'province' => $location ? $location->province : null,
+            'region' => $location ? $location->region : null,
         ]);
-       
+    
         session()->flash('success', 'Trading inflow added successfully!');
 
-    $user = Auth::user();
-    if ($user->type == 0) {
-        return redirect()->route('short-trip-inflow-and-outflow.create');
-    } elseif ($user->type == 1) {
-        return redirect()->route('staff-short-trip-inflow-and-outflow.create');
-    }
-}
+        $user = Auth::user();
 
+        $author = Auth::user();
+
+        Log::create([
+            'action_type'=>'create',
+            'transaction' => implode(', ', array_filter([
+                            isset($validatedData['transaction_type']) ? "{$validatedData['transaction_type']}" : null,
+                            isset($validatedData['transaction_status']) ? "{$validatedData['transaction_status']}" : null,
+                            isset($commodity->commodity_name) ? "{$commodity->commodity_name}" : null,
+                            isset($validatedData['volume']) ? "{$validatedData['volume']}" .' kg': null,
+                            isset($validatedData['plate_number']) ? "{$validatedData['plate_number']}" : null,
+                            isset($validatedData['vehicle_type_id']) ? "{$validatedData['vehicle_type_id']}" : null,
+                            isset($validatedData['name']) ? "{$validatedData['name']}" : null,
+                            isset($validatedData['barangay']) ? "{$validatedData['barangay']}" : null,
+                            isset($validatedData['municipality']) ? "{$validatedData['municipality']}" : null,
+                            isset($validatedData['province']) ? "{$validatedData['province']}" : null,
+                            isset($validatedData['region']) ? "{$validatedData['region']}" : null,
+                            isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
+                            ])),
+            'author'=> $author->username,
+        ]);
+
+
+
+        $user = Auth::user();
+        if ($user->type == 0) {
+            return redirect()->route('short-trip-inflow-and-outflow.create');
+        } elseif ($user->type == 1) {
+            return redirect()->route('staff-short-trip-inflow-and-outflow.create');
+        }
+    }
     /**
      * Display the specified resource.
      */
@@ -561,7 +548,6 @@ $today_vehicle = number_format($vehicle);
             ));
         }
     }
-
     /**
      * Update the specified resource in storage.
      */
@@ -577,57 +563,63 @@ $today_vehicle = number_format($vehicle);
             'volume' => 'required|numeric',
             'plate_number' => 'nullable|string',
             'vehicle_type_id' => 'nullable|exists:vehicle_types,vehicle_type_id',
-            'facilitator_name' => 'nullable|exists:facilitators,facilitator_name',
             'name' => 'nullable|string',
-            'barangay' => 'nullable',
-            'municipality' => 'nullable',
-            'province' => 'nullable',
-            'region' => 'nullable',
+            'barangay' => 'nullable|string',
+            'municipality' => 'nullable|string',
+            'facilitator_name' => 'nullable|string',
+            'province' => 'nullable|string',
+            'region' => 'nullable|string',
         ]);
         
+        $outdated_data = $short_trip_inflow_and_outflow->toArray();
         
-        
-        // Find or create location
-        $location = Location::firstOrCreate(
-            [
+        // Determine if location fields are provided
+        $no_location = !($validatedData['barangay'] && $validatedData['municipality'] && $validatedData['province'] && $validatedData['region']);
+    
+        if (!$no_location) {
+            // Check if the location exists, and create if necessary
+            $location = Location::firstOrCreate([
                 'barangay' => $validatedData['barangay'],
                 'municipality' => $validatedData['municipality'],
                 'province' => $validatedData['province'],
                 'region' => $validatedData['region'],
-            ]
-        );
-
-        // Find or create vehicle
-        
-        if(!empty($validatedData['plate_number'])){
-        $vehicle = Vehicle::firstOrCreate(
-            [
-                'plate_number' => $validatedData['plate_number'],
-            ],
-            [
-                'vehicle_name' => $validatedData['name']?? null,
-                'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
-            ]
-        );
+            ]);
+        } else {
+            $location = null;  // Skip creating/updating location if data is not provided
         }
-        
+    
+        // If plate_number exists, create or update vehicle
+        if (!empty($validatedData['plate_number'])) {
+            $vehicle = Vehicle::firstOrCreate(
+                [
+                    'plate_number' => $validatedData['plate_number'],
+                ],
+                [
+                    'vehicle_name' => $validatedData['name'] ?? null,
+                    'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
+                ]
+            );
+        } else {
+            $vehicle = null;
+        }
+    
+        // Find or create facilitator
         $facilitator = Facilitator::where('facilitator_name', $validatedData['facilitator_name'])->first();
-        // Find or create location_vehicle relationship
-        
-        if(!empty($validatedData['plate_number'])){
-        $facilitator_location_vehicle = FacilitatorLocationVehicle::firstOrCreate(
-            [
-                'vehicle_id' => $vehicle->vehicle_id,
-                'location_id' => $location->location_id,
-                'facilitator_id' => $facilitator->facilitator_id,
-            ]
-        );
+    
+        // If plate_number exists, create or update facilitator_location_vehicle
+        if ($vehicle && $location) {
+            $facilitator_location_vehicle = FacilitatorLocationVehicle::firstOrCreate(
+                [
+                    'vehicle_id' => $vehicle->vehicle_id,
+                    'location_id' => $location ? $location->location_id : null,
+                    'facilitator_id' => $facilitator ? $facilitator->facilitator_id : null,
+                ]
+            );
         }
-        
-
+    
         // Find the corresponding commodity
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
-
+    
         // Update the transaction
         $short_trip_inflow_and_outflow->update([
             'date' => $validatedData['date'],
@@ -641,14 +633,49 @@ $today_vehicle = number_format($vehicle);
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'facilitator_id' => $facilitator->facilitator_id ?? null,
             'name' => $validatedData['name'] ?? null,
-            'barangay' => $location->barangay?? null,
-            'municipality' => $location->municipality?? null,
-            'province' => $location->province?? null,
-            'region' => $location->region?? null,
+            'barangay' => $location ? $location->barangay : null,
+            'municipality' => $location ? $location->municipality : null,
+            'province' => $location ? $location->province : null,
+            'region' => $location ? $location->region : null,
         ]);
 
         session()->flash('success', 'Short Trip Trading updated successfully!');
         $user = Auth::user();
+        $author = Auth::user();
+         
+       
+       
+  
+        $updated_data = $short_trip_inflow_and_outflow->getChanges();
+    
+    $test = Log::create([
+        'action_type' => 'update',
+        'transaction' =>  implode(', ', array_filter([
+            isset($outdated_data['transaction_type']) ? $outdated_data['transaction_type'] : null,
+            isset($outdated_data['transaction_status']) ? $outdated_data['transaction_status'] : null,
+            isset($outdated_data['commodity_name']) ? $outdated_data['commodity_name'] : null,
+            isset($outdated_data['volume']) ? $outdated_data['volume'] . ' kg' : null, 
+            isset($outdated_data['plate_number']) ? $outdated_data['plate_number'] : null,
+            isset($outdated_data['barangay']) ? $outdated_data['barangay'] : null,
+            isset($outdated_data['municipality']) ? $outdated_data['municipality'] : null,
+            isset($outdated_data['province']) ? $outdated_data['province'] : null,
+            isset($outdated_data['region']) ? $outdated_data['region'] : null,
+
+            isset($outdated_data['facilitator_name']) ? $outdated_data['facilitator_name'] : null,
+        ])) . " || UPDATED -> " . implode(', ', array_filter([
+            isset($updated_data['transaction_type']) ? $updated_data['transaction_type'] : null,
+            isset($updated_data['transaction_status']) ? $updated_data['transaction_status'] : null,
+            isset($commodity->commodity_name) ? $commodity->commodity_name : null,
+            isset($updated_data['volume']) ? $updated_data['volume'] . ' kg' : null, 
+            isset($updated_data['plate_number']) ? $updated_data['plate_number'] : null,
+            isset($updated_data['barangay']) ? 'Barangay: '.$updated_data['barangay'] : null,
+            isset($updated_data['municipality']) ? 'Municipality: '.$updated_data['municipality'] : null,
+            isset($updated_data['province']) ? 'Province: '.$updated_data['province'] : null,
+            isset($updated_data['region']) ?'Region: '. $updated_data['region'] : null,
+            isset($facilitator->facilitator_name) ? $facilitator->facilitator_name : null,
+        ])),
+        'author' => $author->username,
+    ]);
 
         if ($short_trip_inflow_and_outflow->transaction_status === 'temporary') {
             if ($user->type == 0) {
@@ -670,15 +697,42 @@ $today_vehicle = number_format($vehicle);
      */
     public function destroy(string $id)
     {
+        $user = Auth::user(); // Get the authenticated user
+
         try {
             // Find the transaction by ID
             $trading_inflow = Transaction::findOrFail($id);
 
-            // Delete the transaction
-            $trading_inflow->delete();
+            // Check if the user is authorized to delete the transaction
+            if ($user->type == 0 || ($user->type == 1 && $trading_inflow->staff_id == $user->id)) {
+                // Delete the transaction
+                $trading_inflow->delete();
 
-            // Flash success message
-            session()->flash('success', 'Trading inflow deleted successfully!');
+                // Flash success message
+                session()->flash('success', 'Trading inflow deleted successfully!');
+                $user = Auth::user();
+        
+        
+        $author = Auth::user();
+        Log::create([
+            'action_type'=>'delete',
+            'transaction' => implode(', ', array_filter([
+                            isset($trading_inflow->transaction_type) ? $trading_inflow->transaction_type: null,
+                            isset($trading_inflow->transaction_status) ? $trading_inflow->transaction_status: null,
+                            isset($trading_inflow->commodity->commodity_name) ? $trading_inflow->commodity->commodity_name: null,
+                            isset($trading_inflow->volume) ? $trading_inflow->volume .' kg': null,
+                            isset($trading_inflow->plate_number) ? $trading_inflow->plate_number: null,
+                            isset($trading_inflow->barangay) ? $trading_inflow->barangay: null,
+                            isset($trading_inflow->municipality) ? $trading_inflow->municipality: null,
+                            isset($trading_inflow->province) ? $trading_inflow->province: null,
+                            isset($trading_inflow->region) ? $trading_inflow->region: null,
+                            isset($trading_inflow->facilitator->facilitator_name) ? $trading_inflow->facilitator->facilitator_name: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
+            } else {
+                session()->flash('error', 'You are not authorized to delete this transaction.');
+            }
         } catch (QueryException $e) {
             // Handle any errors, e.g., if the transaction can't be deleted
             session()->flash('error', 'Error deleting trading inflow: ' . $e->getMessage());
@@ -686,26 +740,24 @@ $today_vehicle = number_format($vehicle);
             // Handle any other exceptions
             session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-
-
-        $user = Auth::user();
-
-        if ($trading_inflow->transaction_status === 'temporary') {
-            if ($user->type == 0) {
-                return redirect()->route('short-trip-inflow-and-outflow.create');
-            } elseif ($user->type == 1) {
-                return redirect()->route('staff-short-trip-inflow-and-outflow.create');
-            }
-        }
-
+        
+        // Redirect to the appropriate index page based on user type
         if ($user->type == 0) {
-            return redirect()->route('short-trip-inflow-and-outflow.index');
+            if($trading_inflow->transaction_status=='temporary'){
+            return redirect()->route('trading-inflow.create'); // Admin index
+            }
+            elseif($trading_inflow->transaction_status=='regular'){
+            return redirect()->route('trading-inflow.index'); // Admin index
+            }
+            
         } elseif ($user->type == 1) {
-            return redirect()->route('staff-short-trip-inflow-and-outflow.index');
+            if($trading_inflow->transaction_status=='temporary'){
+                return redirect()->route('staff-trading-inflow.create'); // Admin index
+                }
+                elseif($trading_inflow->transaction_status=='regular'){
+                return redirect()->route('staff-trading-inflow.index'); // Admin index
+                }
         }
-
-        // Redirect to the index page or the relevant page
-
     }
     public function submit()
     {
@@ -717,6 +769,13 @@ $today_vehicle = number_format($vehicle);
                 'transaction_status' => 'regular',
             ]);
         if ($temporary_transactions > 0) {
+            $author = Auth::user();
+            
+            Log::create([
+            'action_type'=>'submit',
+            'transaction' => 'short trip',
+            'author'=> $author->username,
+        ]);
             session()->flash('success', 'Short Trip submitted!');
         } else {
             session()->flash('error', 'No short trip added!');
@@ -833,6 +892,13 @@ $today_vehicle = number_format($vehicle);
             
         }
         
+        $author = Auth::user();
+        
+            Log::create([
+            'action_type'=>'import',
+            'transaction' => $rows['transaction_type'],
+            'author'=> $author->username,
+        ]);
         // Insert all rows at once for efficiency
         Transaction::insert($rows);
 

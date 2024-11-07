@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Log;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Auth;
 
 class StaffProfileController extends Controller
 {
@@ -29,7 +30,7 @@ class StaffProfileController extends Controller
     ]);
 
     $user = User::findOrFail($id);
-
+    
     // Verify the current password
     if (!Hash::check($request->current_password, $user->password)) {
         return redirect()->back()
@@ -46,10 +47,23 @@ class StaffProfileController extends Controller
     if ($request->filled('new_password')) {
         $user->password = Hash::make($request->new_password); // Hash the new password
     }
-
+    
     // Save the changes
     $user->staffs->save();
     $user->save(); // Save the User model
+    $author = Auth::user();
+         
+       
+       
+  
+    $updated_data = $user->getChanges();
+
+$test = Log::create([
+    'action_type' => 'update',
+    'transaction' => 'profile' ,
+    'author' => $author->username,
+]);
+
 
     return redirect()->route('staff.profile', $user->id)->with('success', 'Profile updated successfully!');
 }

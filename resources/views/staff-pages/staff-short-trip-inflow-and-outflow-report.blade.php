@@ -334,7 +334,10 @@ fetch(url + '?' + queryParams.toString(), {
                     <td>${transaction.name ?? 'N/A'}</td>
                     <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
                     <td>${transaction.volume}</td>
-                    <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
+                    <td>${transaction.barangay || transaction.municipality || transaction.province || transaction.region 
+                                 ? `${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}`
+                                    : 'N/A'}
+                            </td>
                     <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                     <td>${transaction.staff?.staff_name ?? 'N/A'}</td>
                     <td>${editButton}</td>

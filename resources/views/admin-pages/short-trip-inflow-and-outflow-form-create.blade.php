@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Short Trip Trading Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('staff-short-trip-inflow-and-outflow.store') }}" method="POST">
+                    <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
@@ -314,7 +314,7 @@
                 <div class="text-center">
                     <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
                     <button type="reset" class="btn btn-secondary">Reset</button>
-                    <a href="{{ route('staff-short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
+                    <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                 </div>
                 </form>
             </div>
@@ -330,7 +330,7 @@
 
                     <div class="row mb-3">
                         <div class="col-auto">
-                            <form action="{{ route('staff-short-trip-inflow-and-outflow.submit') }}" method="POST">
+                            <form action="{{ route('short-trip-inflow-and-outflow.submit') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
                                 {{-- <button type="submit" class="btn btn-success">
@@ -760,7 +760,7 @@
             const typeFilter = document.getElementById('typeFilter').value;
 
             // Construct the AJAX URL
-            const url = "{{ route('staff-short-trip-inflow-and-outflow.create') }}"; // Make sure to replace this with your route
+            const url = "{{ route('short-trip-inflow-and-outflow.create') }}"; // Make sure to replace this with your route
 
             // Create query parameters
             const queryParams = new URLSearchParams({
@@ -803,14 +803,17 @@
                             <td>${transaction.name ?? 'N/A'}</td>
                             <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
                             <td>${transaction.volume}</td>
-                            <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
+                            <td>${transaction.barangay || transaction.municipality || transaction.province || transaction.region 
+                                 ? `${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}`
+                                    : 'N/A'}
+                            </td>
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff?.staff_name ?? 'N/A'}</td>
                             <td>
-                                <a href="/staff-short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                <a href="/short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
                                     <i class="bx bxs-edit"></i> Edit
                                 </a>
-                                <form action="/staff-short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
+                                <form action="/short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">

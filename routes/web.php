@@ -14,7 +14,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SpecialRecordsController;
 use App\Http\Controllers\FacilitatorController;
 use App\Http\Controllers\CommodityController;
-use App\Http\Controllers\StaffProfileController;            
+use App\Http\Controllers\StaffProfileController;  
+use App\Http\Controllers\LogController;  
 
 
 Route::controller(AuthenticationController::class)->group(function(){
@@ -31,7 +32,11 @@ Route::controller(AuthenticationController::class)->group(function(){
 
 Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
+    
+
     Route::resource('admin',AdminDashboardController::class); 
+    
+    Route::get('/log',[LogController::class,'index'])->name('log.index');
     
     Route::resource('commodity',CommodityController::class); 
     
@@ -97,10 +102,19 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     Route::put('/staff-short-trip-inflow-and-outflow/{short_trip_inflow_and_outflow}',[ShortTripInflowAndOutflowController::class,'update'])->name('staff-short-trip-inflow-and-outflow.update');
     Route::delete('/staff-short-trip-inflow-and-outflow/{short_trip_inflow_and_outflow}',[ShortTripInflowAndOutflowController::class,'destroy'])->name('staff-short-trip-inflow-and-outflow.destroy');
     
+    //special records
+    Route::get('/staff-special-record',[SpecialRecordsController::class,'index'])->name('staff-special-record.index');
+    Route::get('/staff-special-record/create',[SpecialRecordsController::class,'create'])->name('staff-special-record.create');
+    Route::post('/staff-special-record',[SpecialRecordsController::class,'store'])->name('staff-special-record.store');
+    Route::post('/staff-special-record/submit', [SpecialRecordsController::class, 'submit'])->name('staff-special-record.submit');
+    Route::get('/staff-special-record/{special_record}/edit', [SpecialRecordsController::class, 'edit'])->name('staff-special-record.edit');
+    Route::put('/staff-special-record/{special_record}', [SpecialRecordsController::class, 'update'])->name('staff-special-record.update');
+    
     //Report routes
     Route::get('/staff-report',[ReportController::class,'index'])->name('staff-report.index');
     
-  
+    Route::get('/staff-record',[RecordController::class,'index'])->name('staff-record.index');
+    Route::post('/staff-record',[RecordController::class,'store'])->name('staff-record.store');
     
 });
 

@@ -730,6 +730,7 @@
         });
     </script>
     <script>
+        const userId = {{ auth()->user()->id }};
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
 
@@ -780,53 +781,68 @@
                     }
                 })
                 .then(response => response.json())
-                .then(data => {
-                    // Update table body
-                    const tableBody = document.getElementById('TableBody');
-                    tableBody.innerHTML = '';
+        .then(data => {
+            // Update table body
+            const tableBody = document.getElementById('TableBody');
+            tableBody.innerHTML = ''; // Clear the table body
 
-                    if (data.data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="12" class="text-center">No records added</td></tr>';
-                    } else {
-                        data.data.forEach((transaction, index) => {
-                            const transactionType = transaction.transaction_type === 'short trip inflow' ? 'In' :
-                                transaction.transaction_type === 'short trip outflow' ? 'Out' :
-                                'Unknown';
+            if (data.data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="12" class="text-center">No records added</td></tr>';
+            } else {
+                data.data.forEach((transaction, index) => {
+                    // Determine the transaction type (Inflow or Outflow)
+                    const transactionType = transaction.transaction_type === 'short trip inflow' ? 'In' :
+                        transaction.transaction_type === 'short trip outflow' ? 'Out' :
+                        'Unknown';
 
-                            tableBody.innerHTML += `
+                    // Conditionally render buttons for the logged-in user (userId)
+                    let editButton = (userId === transaction.staff_id)
+                        ? `<a href="/staff-short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                            <i class="bx bxs-edit"></i> Edit
+                        </a>`
+                        : `<span class="text-muted">Unauthorized Access</span>`;
+
+                    let deleteButton = (userId === transaction.staff_id) 
+                        ? `
+                            <form action="/staff-short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+                                    <i class="bx bxs-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        `
+                        : ''; // No delete button if not the owner
+
+                    tableBody.innerHTML += `
                         <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
                             <td>${index + 1}</td>
-                            <td>${transaction.date}</td>
-                            <td>${transaction.time}</td>
+                            <td>${transaction.date || 'N/A'}</td>
+                            <td>${transaction.time || 'N/A'}</td>
                             <td>${transactionType}</td>
                             <td>${transaction.plate_number ?? 'N/A'}</td>
                             <td>${transaction.name ?? 'N/A'}</td>
                             <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
                             <td>${transaction.volume}</td>
-                            <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
+                            <td>${transaction.barangay || transaction.municipality || transaction.province || transaction.region 
+                                 ? `${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}`
+                                    : 'N/A'}
+                            </td>
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff?.staff_name ?? 'N/A'}</td>
                             <td>
-                                <a href="/staff-short-trip-inflow-and-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
-                                    <i class="bx bxs-edit"></i> Edit
-                                </a>
-                                <form action="/staff-short-trip-inflow-and-outflow/${transaction.id}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
-                                        <i class="bx bxs-trash-alt"></i> Delete
-                                    </button>
-                                </form>
+                                ${editButton}
+                                ${deleteButton}
                             </td>
                         </tr>
                     `;
-                        });
-                    }
-                    // Update pagination
-                    updatePagination(data.current_page, data.last_page);
-                })
-                .catch(error => console.error('Error:', error));
-        }
+                });
+            }
+            // Update pagination
+            updatePagination(data.current_page, data.last_page);
+        })
+        .catch(error => console.error('Error:', error));
+}
 
         function updatePagination(currentPage, lastPage) {
             const paginationLinks = document.getElementById('paginationLinks');

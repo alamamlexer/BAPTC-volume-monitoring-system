@@ -341,7 +341,13 @@
           <span>Records</span>
         </a>
       </li>
-
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{route('log.index')}}">
+          <i class="bi bi-person"></i>
+          <span>Logs</span>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('user-management.index')}}">

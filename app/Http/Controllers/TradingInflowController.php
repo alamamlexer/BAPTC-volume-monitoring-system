@@ -12,6 +12,7 @@ use App\Models\Commodity;
 use App\Models\Location;
 use App\Models\Facilitator;
 use App\Models\FacilitatorLocationVehicle;
+use App\Models\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -226,6 +227,7 @@ class TradingInflowController extends Controller
      */
     public function create(Request $request)
     {
+        
         date_default_timezone_set('Asia/Manila');
 
         $currentHour = date('H'); // 24-hour format
@@ -297,6 +299,7 @@ class TradingInflowController extends Controller
 
         $user = Auth::user();
         
+      
         
         if ($user->type == 0) {
             return view('admin-pages.trading-inflow-form-create', compact(
@@ -465,10 +468,32 @@ class TradingInflowController extends Controller
             'province' => $location->province,
             'region' => $location->region,
         ]);
-       
+        
         session()->flash('success', 'Trading inflow added successfully!');
+        
+        
+        $user = Auth::user();
 
-    $user = Auth::user();
+        $author = Auth::user();
+
+        Log::create([
+            'action_type'=>'create',
+            'transaction' => implode(', ', array_filter([
+                            isset($validatedData['transaction_type']) ? "{$validatedData['transaction_type']}" : null,
+                            isset($validatedData['transaction_status']) ? "{$validatedData['transaction_status']}" : null,
+                            isset($commodity->commodity_name) ? "{$commodity->commodity_name}" : null,
+                            isset($validatedData['volume']) ? "{$validatedData['volume']}" .' kg': null,
+                            isset($validatedData['plate_number']) ? "{$validatedData['plate_number']}" : null,
+                            isset($validatedData['barangay']) ? "{$validatedData['barangay']}" : null,
+                            isset($validatedData['municipality']) ? "{$validatedData['municipality']}" : null,
+                            isset($validatedData['province']) ? "{$validatedData['province']}" : null,
+                            isset($validatedData['region']) ? "{$validatedData['region']}" : null,
+                            isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
+                            ])),
+            'author'=> $author->username,
+        ]);
+
+    
     if ($user->type == 0) {
         return redirect()->route('trading-inflow.create');
     } elseif ($user->type == 1) {
@@ -543,6 +568,10 @@ class TradingInflowController extends Controller
      */
     public function update(Request $request, Transaction $trading_inflow)
     {
+        
+        $outdated_data = $trading_inflow->toArray();
+        
+        
         $validatedData = $request->validate([
             'transaction_status' => 'required',
             'transaction_type' => 'required',
@@ -560,6 +589,7 @@ class TradingInflowController extends Controller
             'province' => 'required',
             'region' => 'required',
         ]);
+        
         
         
         
@@ -617,15 +647,58 @@ class TradingInflowController extends Controller
             'vehicle_type_id' => $validatedData['vehicle_type_id'] ?? null,
             'facilitator_id' => $facilitator->facilitator_id ?? null,
             'name' => $validatedData['name'] ?? null,
-            'barangay' => $location->barangay,
-            'municipality' => $location->municipality,
-            'province' => $location->province,
-            'region' => $location->region,
+            'barangay' => $validatedData['barangay'],
+            'municipality' => $validatedData['municipality'],
+            'province' => $validatedData['province'],
+            'region' => $validatedData['region'],
         ]);
+        
+        
+        
+       
 
         session()->flash('success', 'Trading inflow updated successfully!');
         $user = Auth::user();
 
+       
+        
+        //log
+         $author = Auth::user();
+         
+       
+       
+  
+            $updated_data = $trading_inflow->getChanges();
+        
+        $test = Log::create([
+            'action_type' => 'update',
+            'transaction' =>  implode(', ', array_filter([
+                isset($outdated_data['transaction_type']) ? $outdated_data['transaction_type'] : null,
+                isset($outdated_data['transaction_status']) ? $outdated_data['transaction_status'] : null,
+                isset($outdated_data['commodity_name']) ? $outdated_data['commodity_name'] : null,
+                isset($outdated_data['volume']) ? $outdated_data['volume'] . ' kg' : null, 
+                isset($outdated_data['plate_number']) ? $outdated_data['plate_number'] : null,
+                isset($outdated_data['barangay']) ? $outdated_data['barangay'] : null,
+                isset($outdated_data['municipality']) ? $outdated_data['municipality'] : null,
+                isset($outdated_data['province']) ? $outdated_data['province'] : null,
+                isset($outdated_data['region']) ? $outdated_data['region'] : null,
+
+                isset($outdated_data['facilitator_name']) ? $outdated_data['facilitator_name'] : null,
+            ])) . " || UPDATED -> " . implode(', ', array_filter([
+                isset($updated_data['transaction_type']) ? $updated_data['transaction_type'] : null,
+                isset($updated_data['transaction_status']) ? $updated_data['transaction_status'] : null,
+                isset($commodity->commodity_name) ? $commodity->commodity_name : null,
+                isset($updated_data['volume']) ? $updated_data['volume'] . ' kg' : null, 
+                isset($updated_data['plate_number']) ? $updated_data['plate_number'] : null,
+                isset($updated_data['barangay']) ? 'Barangay: '.$updated_data['barangay'] : null,
+                isset($updated_data['municipality']) ? 'Municipality: '.$updated_data['municipality'] : null,
+                isset($updated_data['province']) ? 'Province: '.$updated_data['province'] : null,
+                isset($updated_data['region']) ?'Region: '. $updated_data['region'] : null,
+                isset($facilitator->facilitator_name) ? $facilitator->facilitator_name : null,
+            ])),
+            'author' => $author->username,
+        ]);
+    
         if ($trading_inflow->transaction_status === 'temporary') {
             if ($user->type == 0) {
                 return redirect()->route('trading-inflow.create');
@@ -659,6 +732,26 @@ class TradingInflowController extends Controller
 
                 // Flash success message
                 session()->flash('success', 'Trading inflow deleted successfully!');
+                $user = Auth::user();
+        
+        
+        $author = Auth::user();
+        Log::create([
+            'action_type'=>'delete',
+            'transaction' => implode(', ', array_filter([
+                            isset($trading_inflow->transaction_type) ? $trading_inflow->transaction_type: null,
+                            isset($trading_inflow->transaction_status) ? $trading_inflow->transaction_status: null,
+                            isset($trading_inflow->commodity->commodity_name) ? $trading_inflow->commodity->commodity_name: null,
+                            isset($trading_inflow->volume) ? $trading_inflow->volume .' kg': null,
+                            isset($trading_inflow->plate_number) ? $trading_inflow->plate_number: null,
+                            isset($trading_inflow->barangay) ? $trading_inflow->barangay: null,
+                            isset($trading_inflow->municipality) ? $trading_inflow->municipality: null,
+                            isset($trading_inflow->province) ? $trading_inflow->province: null,
+                            isset($trading_inflow->region) ? $trading_inflow->region: null,
+                            isset($trading_inflow->facilitator->facilitator_name) ? $trading_inflow->facilitator->facilitator_name: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
             } else {
                 session()->flash('error', 'You are not authorized to delete this transaction.');
             }
@@ -696,10 +789,19 @@ class TradingInflowController extends Controller
         if($user->type == 0){
             $temporary_transactions = Transaction::where('transaction_status', 'temporary')
             ->where('transaction_type', 'trading inflow')
+            ->where('staff_id', $userId)
             ->update([
                 'transaction_status' => 'regular',
             ]);
             if ($temporary_transactions > 0) {
+                $author = Auth::user();
+            
+            Log::create([
+            'action_type'=>'submit',
+            'transaction' => 'trading inflow',
+            'author'=> $author->username,
+        ]);
+        
                 session()->flash('success', 'Trading inflow submitted!');
             } else {
                 session()->flash('error', 'No trading inflow added!');
@@ -712,6 +814,14 @@ class TradingInflowController extends Controller
                 'transaction_status' => 'regular',
             ]);
             if ($temporary_transactions > 0) {
+                $author = Auth::user();
+            
+                Log::create([
+                'action_type'=>'submit',
+                'transaction' => 'trading inflow',
+                'author'=> $author->username,
+            ]);
+        
                 session()->flash('success', 'Trading inflow submitted!');
             } else {
                 session()->flash('error', 'No trading inflow added!');
@@ -832,6 +942,15 @@ class TradingInflowController extends Controller
         
         // Insert all rows at once for efficiency
         Transaction::insert($rows);
+        
+            $author = Auth::user();
+        
+            Log::create([
+            'action_type'=>'import',
+            'transaction' => $rows['transaction_type'],
+            'author'=> $author->username,
+        ]);
+    
 
         return back()->with('success', 'Data imported successfully');
     }

@@ -17,6 +17,8 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->toDateString());
 
+
+
         //table 1
         $table_one_data = [
             'AM_TRADING' => [
@@ -49,7 +51,7 @@ class ReportController extends Controller
                 ),
             ],
            'DRY' => [
-                'dry' =>$washingTransactions = Transaction::with('commodity')
+                'dry' =>$Transactions = Transaction::with('commodity')
                     ->whereBetween('date', [$startDate, $endDate])
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
@@ -60,7 +62,7 @@ class ReportController extends Controller
                 0, '.', ','
             ],
             'COLD' => [
-                'cold' =>$washingTransactions = Transaction::with('commodity')
+                'cold' =>$Transactions = Transaction::with('commodity')
                     ->whereBetween('date', [$startDate, $endDate])
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
@@ -71,7 +73,7 @@ class ReportController extends Controller
                 0, '.', ','
             ],
             'WASHING' => [
-                'washing' =>$washingTransactions = Transaction::with('commodity')
+                'washing' =>$Transactions = Transaction::with('commodity')
                     ->whereBetween('date', [$startDate, $endDate])
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
@@ -82,7 +84,7 @@ class ReportController extends Controller
                 0, '.', ','
             ],
             'INTER_TRADING' => [
-                'intertrading' =>$washingTransactions = Transaction::with('commodity')
+                'intertrading' =>$Transactions = Transaction::with('commodity')
                     ->whereBetween('date', [$startDate, $endDate])
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
@@ -390,22 +392,23 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
     //table 9 
      // Fetch washing transactions with commodity data
      $washingTransactions = Transaction::with('commodity')
-     ->whereBetween('date', [$startDate, $endDate])
-     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
-     ->get()
-     ->filter(function ($transaction) {
+    ->whereBetween('date', [$startDate, $endDate])
+    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+    ->get()
+    ->filter(function ($transaction) {
         return $transaction->transaction_type === 'washing';
     });
-    // Initialize an array to hold the transformed data
-    $formattedTransactions = $washingTransactions->map(function ($transaction) {
-        return [
-            'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
-            'volume' => $transaction->volume,
-        ];
-    });
-    
-    // Calculate total volume
-    $totalVolume = $formattedTransactions->sum('volume');
+
+// Transform the filtered transactions
+$formattedTransactions = $washingTransactions->map(function ($transaction) {
+    return [
+        'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
+        'volume' => $transaction->volume ?? 0, // Default volume to 0 if null
+    ];
+});
+
+// Calculate the total volume
+$totalVolume = $formattedTransactions->sum('volume');
 
 
     //table 10
@@ -432,8 +435,336 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
    });
    $totalVolume = $formattedTransactions->sum('volume');
 
+
+   //table 12
+    $currentYear = Carbon::now()->year;
+    
+
+    $past_year = $request->input('year', $currentYear-1);
+    $current_year = $request->input('year', $currentYear);
+    $month = $request->input('month', Carbon::now()->month);
+    
+    $month_name = Carbon::createFromFormat('m', $month)->format('F');
+    $table_twelve_data = [
+    // OUTPAST and OUTCURRENT
+        'OUTPAST' => [
+            'outflow' => number_format(
+                $outPast = Transaction::where('transaction_type', 'trading outflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'OUTCURRENT' => [
+            'outflow' => number_format(
+                $outCurrent = Transaction::where('transaction_type', 'trading outflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'OUTFLOW_DIFFERENCE' => [
+            'difference' => number_format(
+                $outCurrent - $outPast,
+                0, '.', ','
+            ),
+            'percentage' => $outPast != 0
+                ? number_format((($outCurrent - $outPast) / $outPast) * 100, 2, '.', ',') . '%'
+                : ($outCurrent != 0 ? '100%' : '0%'),
+        ],
+
+        // INPAST and INCURRENT
+        'INPAST' => [
+            'inflow' => number_format(
+                $inPast = Transaction::where('transaction_type', 'trading inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'INCURRENT' => [
+            'inflow' => number_format(
+                $inCurrent = Transaction::where('transaction_type', 'trading inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'INFLOW_DIFFERENCE' => [
+            'difference' => number_format(
+                $inCurrent - $inPast,
+                0, '.', ','
+            ),
+            'percentage' => $inPast != 0
+                ? number_format((($inCurrent - $inPast) / $inPast) * 100, 2, '.', ',') . '%'
+                : ($inCurrent != 0 ? '100%' : '0%'),
+        ],
+
+        // INSPAST and INSCURRENT
+        'INSPAST' => [
+            'inflow' => number_format(
+                $inspPast = Transaction::where('transaction_type', 'short trip inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'INSCURRENT' => [
+            'inflow' => number_format(
+                $inspCurrent = Transaction::where('transaction_type', 'short trip inflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'SHORT_TRIP_INFLOW_DIFFERENCE' => [
+            'difference' => number_format(
+                $inspCurrent - $inspPast,
+                0, '.', ','
+            ),
+            'percentage' => $inspPast != 0
+                ? number_format((($inspCurrent - $inspPast) / $inspPast) * 100, 2, '.', ',') . '%'
+                : ($inspCurrent != 0 ? '100%' : '0%'),
+        ],
+
+        // OUTSPAST and OUTSCURRENT
+        'OUTSPAST' => [
+            'outflow' => number_format(
+                $outsPast = Transaction::where('transaction_type', 'short trip outflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'OUTSCURRENT' => [
+            'outflow' => number_format(
+                $outsCurrent = Transaction::where('transaction_type', 'short trip outflow')
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'SHORT_TRIP_OUTFLOW_DIFFERENCE' => [
+            'difference' => number_format(
+                $outsCurrent - $outsPast,
+                0, '.', ','
+            ),
+            'percentage' => $outsPast != 0
+                ? number_format((($outsCurrent - $outsPast) / $outsPast) * 100, 2, '.', ',') . '%'
+                : ($outsCurrent != 0 ? '100%' : '0%'),
+        ],
+
+
+        'PASTDRY' => [
+            'dry' => number_format(
+                $pastDry = Transaction::with('commodity')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'dry')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'CURRENTDRY' => [
+            'dry' => number_format(
+                $currentDry = Transaction::with('commodity')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'dry')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'DRY_DIFFERENCE' => [
+            'dry' => number_format($currentDry - $pastDry, 0, '.', ','),
+            'percentage' => $pastDry != 0
+                ? number_format((($currentDry - $pastDry) / $pastDry) * 100, 2, '.', ',') . '%'
+                : ($currentDry != 0 ? '100%' : '0%'),
+        ],
+
+        // COLD Commodity
+        'PASTCOLD' => [
+            'cold' => number_format(
+                $pastCold = Transaction::with('commodity')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'cold')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'CURRENTCOLD' => [
+            'cold' => number_format(
+                $currentCold = Transaction::with('commodity')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'cold')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'COLD_DIFFERENCE' => [
+            'cold' => number_format($currentCold - $pastCold, 0, '.', ','),
+            'percentage' => $pastCold != 0
+                ? number_format((($currentCold - $pastCold) / $pastCold) * 100, 2, '.', ',') . '%'
+                : ($currentCold != 0 ? '100%' : '0%'),
+        ],
+
+        // INTERTRADING Commodity
+        'PASTINTERTRADING' => [
+            'intertrading' => number_format(
+                $pastIntertrading = Transaction::with('commodity')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'intertrading')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'CURRENTINTERTRADING' => [
+            'intertrading' => number_format(
+                $currentIntertrading = Transaction::with('commodity')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'intertrading')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'INTERTRADING_DIFFERENCE' => [
+            'intertrading' => number_format($currentIntertrading - $pastIntertrading, 0, '.', ','),
+            'percentage' => $pastIntertrading != 0
+                ? number_format((($currentIntertrading - $pastIntertrading) / $pastIntertrading) * 100, 2, '.', ',') . '%'
+                : ($currentIntertrading != 0 ? '100%' : '0%'),
+        ],
+
+        // WASHING Commodity
+        'PASTWASHING' => [
+            'washing' => number_format(
+                $pastWashing = Transaction::with('commodity')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'washing')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'CURRENTWASHING' => [
+            'washing' => number_format(
+                $currentWashing = Transaction::with('commodity')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+                    ->get()
+                    ->filter(fn($transaction) => $transaction->transaction_type === 'washing')
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'WASHING_DIFFERENCE' => [
+            'washing' => number_format($currentWashing - $pastWashing, 0, '.', ','),
+            'percentage' => $pastWashing != 0
+                ? number_format((($currentWashing - $pastWashing) / $pastWashing) * 100, 2, '.', ',') . '%'
+                : ($currentWashing != 0 ? '100%' : '0%'),
+        ],
+
+        // TOTALPAST_INCOME_VOLUME and TOTALCURRENT_INCOME_VOLUME
+        'TOTALPAST_INCOME_VOLUME' => [
+            'all' => number_format(
+                $totalPastIncome = Transaction::whereIn('transaction_type', ['trading inflow', 'short trip inflow'])
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'TOTALCURRENT_INCOME_VOLUME' => [
+            'all' => number_format(
+                $totalCurrentIncome = Transaction::whereIn('transaction_type', ['trading inflow', 'short trip inflow'])
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'INCOME_DIFFERENCE' => [
+            'all' => number_format(
+                $totalCurrentIncome - $totalPastIncome,
+                0, '.', ','
+            ),
+            'percentage' => $totalPastIncome != 0
+                ? number_format((($totalCurrentIncome - $totalPastIncome) / $totalPastIncome) * 100, 2, '.', ',') . '%'
+                : ($totalCurrentIncome != 0 ? '100%' : '0%'),
+        ],
+
+        // TOTALPAST_OUTGOING_VOLUME and TOTALCURRENT_OUTGOING_VOLUME
+        'TOTALPAST_OUTGOING_VOLUME' => [
+            'all' => number_format(
+                $totalPastOutgoing = Transaction::whereIn('transaction_type', ['trading outflow', 'short trip outflow'])
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $past_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'TOTALCURRENT_OUTGOING_VOLUME' => [
+            'all' => number_format(
+                $totalCurrentOutgoing = Transaction::whereIn('transaction_type', ['trading outflow', 'short trip outflow'])
+                    ->where('transaction_status', 'regular')
+                    ->whereYear('created_at', $current_year)
+                    ->whereMonth('created_at', $month)
+                    ->sum('volume') ?: 0,
+                0, '.', ','
+            ),
+        ],
+        'OUTGOING_DIFFERENCE' => [
+            'all' => number_format(
+                $totalCurrentOutgoing - $totalPastOutgoing,
+                0, '.', ','
+            ),
+            'percentage' => $totalPastOutgoing != 0
+                ? number_format((($totalCurrentOutgoing - $totalPastOutgoing) / $totalPastOutgoing) * 100, 2, '.', ',') . '%'
+                : ($totalCurrentOutgoing != 0 ? '100%' : '0%'),
+        ],
+    ];
+
+
+
+
    $user = Auth::user();
-   $userId = Auth::id();
    if ($user->type == 0) {
         // Passing data to the view
         return view('admin-pages.report', compact(
@@ -459,6 +790,9 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'formattedTransactions',
             'washingTransactions',
             'intertradingTransactions',
+            'table_twelve_data',
+            'month_name', 'past_year', 'current_year',
+            
            
             
         ));
@@ -487,7 +821,9 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'formattedTransactions',
             'washingTransactions',
             'intertradingTransactions',
-           
+            'table_twelve_data',
+            'month_name', 'past_year', 'current_year',
+             
             
         ));
    }

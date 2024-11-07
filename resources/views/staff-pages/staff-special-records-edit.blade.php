@@ -1,5 +1,5 @@
-@extends('layouts.admin')
-@section('page_title', 'Trading Inflow Form')
+@extends('layouts.staff')
+@section('page_title', 'Edit Special Record Form')
 @section('content')
 
 <!-- Page Title -->
@@ -21,11 +21,11 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Special Records Form</h5>
+                    <h5 class="card-title">Edit Special Records Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('special-records.store') }}" method="POST">
+                    <form class="row g-3 " action="{{ route('staff-special-record.update', $special_records) }}" method="POST">
                         @csrf
-
+                        @method('PUT')
                         {{-- input for transaction_status = "trading"  --}}
                         <div class="col-md-5" hidden>
                             <div class="form-floating">
@@ -39,7 +39,7 @@
                         <div class="col-md-3">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
-                                    placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
+                                    placeholder="Date" value="{{($special_records->date) }}" required readonly>
                                 <label for="date">Date</label>
                                 @if ($errors->has('date'))
                                 <span class="text-danger">{{ $errors->first('date') }}</span>
@@ -48,25 +48,33 @@
                         </div>
 
                         <div class="col-md-3">
-                            <div class="form-floating">
-                                <select class="form-select" id="time" name="time" required>
-                                    <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
-                                    <option value="PM" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>PM</option>
-                                </select>
-                                <label for="time">Time</label>
-                                @if ($errors->has('time'))
-                                <span class="text-danger">{{ $errors->first('time') }}</span>
-                                @endif
-                            </div>
-                        </div>
+            <div class="form-control" required>
+                <fieldset>
+                    <legend class="col-form-label col-sm-5 pt-0">Time</legend>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="time" id="inlineRadio1" value="AM"
+                            {{ $special_records->time == 'AM' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="inlineRadio1">AM</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="time" id="inlineRadio2" value="PM"
+                        {{ $special_records->time == 'PM' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="inlineRadio2">PM</label>
+                    </div>
+                </fieldset>
+                @if ($errors->has('time'))
+                <span class="text-danger">{{ $errors->first('time') }}</span>
+            @endif
+            </div>
+        </div>
 
                         <div class="col-md-3">
                             <div class="form-floating">
-                                <select class="form-select" id="transaction_type" name="transaction_type" required>
-                                    <option value="dry" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Dry</option>
-                                    <option value="cold" {{ old('time', $defaultTime) == 'PM' ? 'selected' : '' }}>Cold</option>
-                                    <option value="washing" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Washing</option>
-                                    <option value="intertrading" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Intertrading</option>
+                                <select class="form-select" id="transaction_type" name="transaction_type" value="{{($special_records->transaction_type) }}" required >
+                                    <option value="dry" {{ old('transaction_type', $special_records->transaction_type) == 'dry' ? 'selected' : '' }}>Dry</option>
+                                    <option value="cold" {{ old('transaction_type', $special_records->transaction_type) == 'cold' ? 'selected' : '' }}>Cold</option>
+                                    <option value="washing" {{ old('transaction_type', $special_records->transaction_type) == 'washing' ? 'selected' : '' }}>Washing</option>
+                                    <option value="intertrading" {{ old('transaction_type', $special_records->transaction_type) == 'intertrading' ? 'selected' : '' }}>Intertrading</option>
                                 </select>
                                 <label for="time">Transaction type</label>
                             </div>
@@ -77,7 +85,7 @@
                                 <div class="form-floating">
                                     <input type="text" class="form-control filter-input"  name="facilitator_name" 
                                         placeholder="Select or type facilitator..."  aria-label="Facilitator"
-                                        autocomplete="off" data-dropdown="facilitatorDropdown" value="{{ old('facilitator_name') }}">
+                                        autocomplete="off" data-dropdown="facilitatorDropdown" value="{{$special_records->facilitator->facilitator_name ?? ''}}">
                                     <label for="facilitator_name">Facilitator</label>
                                     @if ($errors->has('facilitator_name'))
                                         <span class="text-danger">{{ $errors->first('facilitator_name') }}</span>
@@ -122,7 +130,7 @@
                         <div class="col-md-4 position-relative" data-col="5">
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="origin" placeholder="Select or type origin..."
-                                    autocomplete="off" data-dropdown="originDropdown" value="{{ old('origin') }}">
+                                    autocomplete="off" data-dropdown="originDropdown" value="{{$special_records->barangay}}, {{$special_records->municipality}}, {{$special_records->province}}, {{$special_records->region}}">
                                 <label for="origin">Origin</label>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
@@ -142,7 +150,7 @@
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="commodity_name"
                                     placeholder="Select or type commodity..." required aria-label="Commodity"
-                                    autocomplete="off" data-dropdown="commodityDropdown" value="{{ old('commodity_name') }}">
+                                    autocomplete="off" data-dropdown="commodityDropdown" value="{{ $special_records->commodity->commodity_name}}">
                                 <label for="commodity_name">Commodity</label>
                                 @if ($errors->has('commodity_name'))
                                 <span class="text-danger">{{ $errors->first('commodity_name') }}</span>
@@ -162,7 +170,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="volume" name="volume"
-                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required>
+                                    placeholder="Volume(kg)" value="{{$special_records->volume}}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
                                 <span class="text-danger">{{ $errors->first('volume') }}</span>
@@ -175,7 +183,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="barangay" name="barangay"
-                                    placeholder="Barangay" value="{{ old('barangay') }}" >
+                                    placeholder="Barangay" value="{{ $special_records->barangay }}" >
                                 <label for="barangay">Barangay</label>
                                 @if ($errors->has('barangay'))
                                 <span class="text-danger">{{ $errors->first('barangay') }}</span>
@@ -186,7 +194,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="municipality" name="municipality"
-                                    placeholder="Municipality" value="{{ old('municipality') }}" >
+                                    placeholder="Municipality" value="{{ $special_records->municipality }}" >
                                 <label for="municipality">Municipality</label>
                                 @if ($errors->has('municipality'))
                                 <span class="text-danger">{{ $errors->first('municipality') }}</span>
@@ -197,7 +205,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="province" name="province"
-                                    placeholder="Province" value="{{ old('province') }}" >
+                                    placeholder="Province" value="{{ $special_records->province }}" >
                                 <label for="province">Province</label>
                                 @if ($errors->has('province'))
                                 <span class="text-danger">{{ $errors->first('province') }}</span>
@@ -208,7 +216,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="region" name="region"
-                                    placeholder="Region" value="{{ old('region') }}" >
+                                    placeholder="Region" value="{{ $special_records->region }}" >
                                 <label for="region">Region</label>
                                 @if ($errors->has('region'))
                                 <span class="text-danger">{{ $errors->first('region') }}</span>
@@ -217,9 +225,9 @@
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+                            <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>
-                            <a href="{{ route('special-records.index') }}" class="btn btn-danger">Back</a>
+                            <a href="{{ route('staff-special-record.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>
                 </div>

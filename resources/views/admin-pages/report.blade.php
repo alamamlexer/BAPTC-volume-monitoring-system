@@ -389,7 +389,7 @@
             <div class="card-body">
                 <h5 class="card-title"><b>VIII. MONITORED MARKET DESTINATION OF BROUGHT COMMODITIES</b></h5>
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th class="text-center">NO</th>
@@ -433,7 +433,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>IX. MONITORED VOLUME OF COMMODITIES AT THE CARROT WASHING FACILITY</b></h5>
       <div class="table-responsive">
-        <table class="table mx-auto">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th class="col-md-4 text-center">COMMODITY</th>
@@ -442,7 +442,7 @@
             </thead>
             <tbody>
                 
-            @foreach ($washingTransactions as $transaction)
+            @foreach($washingTransactions as $transaction)
             <tr>
                 <td class="col-md-4 text-center">{{ $transaction['commodity']->commodity_name }}</td>
                 <td class="col-md-4 text-center">{{ $transaction['volume'] }}</td>
@@ -470,7 +470,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>X. MONITORED VOLUME OF TRADED ASSORTED COMMODITIES IN THE DRY AND COLD STORAGE FACILITY</b></h5>
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th class="col-md-4 text-center">DRY STORAGE NO.</th>
@@ -572,7 +572,7 @@
     <div class="card-body">
         <h5 class="card-title"><b>XI. MONITORED TRADING TRANSACTION FROM THE INTER TRADING</b></h5>
         <div class="table-responsive">
-       <table class="table">
+       <table class="table table-bordered">
       <thead>
             <tr>
                 <th class="col-md-4 text-center">COMMODITY</th>
@@ -607,14 +607,96 @@
     <div class="col-lg-12">
     <div class="card">
     <div class="card-body">
-        <h5 class="card-title"><b>XII. COMPARISON BETWEEN THE MONITORED VEGETABLE VOLUME IN MAY 2023 AND MAY 2024</b></h5>
+        <h5 class="card-title"><b>XII. COMPARISON BETWEEN THE MONITORED VEGETABLE VOLUME IN {{$month_name}} {{$past_year}} AND {{$month_name}} {{$current_year}}</b></h5>
         <div class="table-responsive">
-      {{-- <table class="table">Place the table here and add a class="table"
+      <table class="table table-bordered">
       <thead>
+       
+            <th rowspan="2" class="text-center align-middle ">PARTICULAR</th>
+            <th colspan="2" class="text-center">TOTAL VOLUME (KG)</th>
+            <th rowspan="2" class="text-center align-middle ">DIFFERENCE</th>
+            <th rowspan="2" class="text-center align-middle ">DIFFERENCE PERCENTAGE</th>
+        <tr>
+            <th class="text-center">{{$month_name}} {{$past_year}}</th>
+            <th class="text-center">{{$month_name}} {{$current_year}}</th> 
+        </tr>
       </thead>
       <tbody>
+        <tr>
+            <td class="text-center">TRADER</td>
+            <td class="text-center">{{ $table_twelve_data['OUTPAST']['outflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTCURRENT']['outflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTFLOW_DIFFERENCE']['difference'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTFLOW_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">FARMER</td>
+            <td class="text-center">{{ $table_twelve_data['INPAST']['inflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INCURRENT']['inflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INFLOW_DIFFERENCE']['difference'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INFLOW_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-center">SHORT TRIP</td>
+        </tr>
+        <tr>
+            <td class="text-center">IN</td>
+            <td class="text-center">{{ $table_twelve_data['INSPAST']['inflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INSCURRENT']['inflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['SHORT_TRIP_INFLOW_DIFFERENCE']['difference'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['SHORT_TRIP_INFLOW_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">OUT</td>
+            <td class="text-center">{{ $table_twelve_data['OUTSPAST']['outflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTSCURRENT']['outflow'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['SHORT_TRIP_OUTFLOW_DIFFERENCE']['difference'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['SHORT_TRIP_OUTFLOW_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">DRY STORAGE</td>
+            <td class="text-center">{{ $table_twelve_data['PASTDRY']['dry'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['CURRENTDRY']['dry'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['DRY_DIFFERENCE']['dry'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['DRY_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">COLD STORAGE (NO.8;Functional)</td>
+            <td class="text-center">{{ $table_twelve_data['PASTCOLD']['cold'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['CURRENTCOLD']['cold'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['COLD_DIFFERENCE']['cold'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['COLD_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">INTER TRADING</td>
+            <td class="text-center">{{ $table_twelve_data['PASTINTERTRADING']['intertrading'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['CURRENTINTERTRADING']['intertrading'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INTERTRADING_DIFFERENCE']['intertrading'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INTERTRADING_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">CARROT WASHING FACILITY</td>
+            <td class="text-center">{{ $table_twelve_data['PASTWASHING']['washing'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['CURRENTWASHING']['washing'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['WASHING_DIFFERENCE']['washing'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['WASHING_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">TOTAL INCOMING VOLUME (KG)</td>
+            <td class="text-center">{{ $table_twelve_data['TOTALPAST_INCOME_VOLUME']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['TOTALCURRENT_INCOME_VOLUME']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INCOME_DIFFERENCE']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['INCOME_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
+        <tr>
+            <td class="text-center">TOTAL OUTGOING VOLUME (KG)</td>
+            <td class="text-center">{{ $table_twelve_data['TOTALPAST_OUTGOING_VOLUME']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['TOTALCURRENT_OUTGOING_VOLUME']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTGOING_DIFFERENCE']['all'] ?? 0 }}</td>
+            <td class="text-center">{{ $table_twelve_data['OUTGOING_DIFFERENCE']['percentage'] ?? 0 }}</td>
+        </tr>
       </tbody>
-      </table>  --}}
+      </table>  
       </div>
     </div>
     </div>

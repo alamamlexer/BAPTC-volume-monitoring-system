@@ -40,7 +40,7 @@
                           <div class="col-md-12">
                             <div class="form-floating">
                               <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="{{ old('username') }}" required>
-                              <label for="username">Username or Plate Number</label>
+                              <label for="username">Username</label>
                               </div>
                               @error('username')
                                   <span class="text-danger md-3">{{$message}}</span>

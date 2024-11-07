@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
+use App\Models\Log;
 
 
 class RecordController extends Controller
@@ -177,7 +177,13 @@ class RecordController extends Controller
         $locations = Location::orderBy('barangay')->paginate(10);
         $facilitators = Facilitator::orderBy('facilitator_name')->paginate(10);
     
+        $user = Auth::user();
+        $userId = Auth::id();
+        if ($user->type == 0) {
         return view('admin-pages.record-list', compact('links','commodities', 'locations', 'facilitators'));
+    } elseif ($user->type == 1) {
+        return view('staff-pages.staff-record-list', compact('links','commodities', 'locations', 'facilitators'));
+        }
     }
 
     
@@ -202,32 +208,57 @@ class RecordController extends Controller
         $validatedData = $request->validate([
             'facilitator_name' => 'required|unique:facilitators,facilitator_name',
             'facilitator_code' => 'required|unique:facilitators,facilitator_code',
-        ],[
-            'facilitator_name.unique' => session()->flash('error', 'The facilitator name already exists!'),
-            'facilitator_code.unique' => session()->flash('error', 'The facilitator code already exists!'),
         ]);
-        Facilitator::create([
+
+        $facilitator=Facilitator::create([
             'facilitator_name' => $validatedData['facilitator_name'],
             'facilitator_code' => $validatedData['facilitator_code'],
         ]);
-        session()->flash('success', 'Facilitator added successfully!');
+        $author = Auth::user();
+        
+                Log::create([
+                    'action_type'=>'create',
+                    'transaction' => implode(', ', array_filter([
+                    'records-facilitator',
+                        isset($facilitator->facilitator_code) ? $facilitator->facilitator_code: null,
+                        isset($facilitator->facilitator_name) ? $facilitator->facilitator_name: null,
+                                    ])),
+                    'author'=> $author->username,
+                ]);
+        session()->flash('success', 'Facilitator added successfully!');  
         }
         elseif($record_type=='commodity'){
             $validatedData = $request->validate([
                 'commodity_name' => 'required|unique:commodities,commodity_name',
-            ],[
-                'commodity_name.unique' => session()->flash('error', 'The commodity already exists!'),
             ]);
-            Commodity::create([
+            
+            $commodity=Commodity::create([
                 'commodity_name' => $validatedData['commodity_name'],
             ]);
+            $author = Auth::user();
+        
+                Log::create([
+                    'action_type'=>'create',
+                    'transaction' => implode(', ', array_filter([
+                        ' records-commodity',
+                        isset($commodity->commodity_name) ? $commodity->commodity_name: null,
+                                    ])),
+                    'author'=> $author->username,
+                ]);
             session()->flash('success', 'Commodity added successfully!');
         }
         else{
             session()->flash('error', 'Record type not found!');
         }
-        
-         return redirect()->route('record.index');
+        $user = Auth::user();
+
+    
+    if ($user->type == 0) {
+        return redirect()->route('record.index');
+    } elseif ($user->type == 1) {
+        return redirect()->route('staff-record.index');
+    }
+         
     }
 
     /**

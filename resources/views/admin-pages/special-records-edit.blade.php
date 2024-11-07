@@ -183,7 +183,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="barangay" name="barangay"
-                                    placeholder="Barangay" value="{{ $special_records->barangay }}" required>
+                                    placeholder="Barangay" value="{{ $special_records->barangay }}" >
                                 <label for="barangay">Barangay</label>
                                 @if ($errors->has('barangay'))
                                 <span class="text-danger">{{ $errors->first('barangay') }}</span>
@@ -194,7 +194,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="municipality" name="municipality"
-                                    placeholder="Municipality" value="{{ $special_records->municipality }}" required>
+                                    placeholder="Municipality" value="{{ $special_records->municipality }}" >
                                 <label for="municipality">Municipality</label>
                                 @if ($errors->has('municipality'))
                                 <span class="text-danger">{{ $errors->first('municipality') }}</span>
@@ -205,7 +205,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="province" name="province"
-                                    placeholder="Province" value="{{ $special_records->province }}" required>
+                                    placeholder="Province" value="{{ $special_records->province }}" >
                                 <label for="province">Province</label>
                                 @if ($errors->has('province'))
                                 <span class="text-danger">{{ $errors->first('province') }}</span>
@@ -216,7 +216,7 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="region" name="region"
-                                    placeholder="Region" value="{{ $special_records->region }}" required>
+                                    placeholder="Region" value="{{ $special_records->region }}" >
                                 <label for="region">Region</label>
                                 @if ($errors->has('region'))
                                 <span class="text-danger">{{ $errors->first('region') }}</span>

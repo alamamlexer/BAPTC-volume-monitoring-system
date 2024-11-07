@@ -14,6 +14,8 @@ use App\Models\Location;
 use App\Models\LocationVehicle;
 use App\Models\Facilitator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Log;
+
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -466,6 +468,28 @@ class TradingOutflowController extends Controller
        
         session()->flash('success', 'Trading Outflow added successfully!');
 
+        $user = Auth::user();
+
+        $author = Auth::user();
+
+        Log::create([
+            'action_type'=>'create',
+            'transaction' => implode(', ', array_filter([
+                            isset($validatedData['transaction_type']) ? "{$validatedData['transaction_type']}" : null,
+                            isset($validatedData['transaction_status']) ? "{$validatedData['transaction_status']}" : null,
+                            isset($commodity->commodity_name) ? "{$commodity->commodity_name}" : null,
+                            isset($validatedData['volume']) ? "{$validatedData['volume']}" .' kg': null,
+                            isset($validatedData['plate_number']) ? "{$validatedData['plate_number']}" : null,
+                            isset($validatedData['barangay']) ? "{$validatedData['barangay']}" : null,
+                            isset($validatedData['municipality']) ? "{$validatedData['municipality']}" : null,
+                            isset($validatedData['province']) ? "{$validatedData['province']}" : null,
+                            isset($validatedData['region']) ? "{$validatedData['region']}" : null,
+                            isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
+                            ])),
+            'author'=> $author->username,
+        ]);
+
+
     $user = Auth::user();
     if ($user->type == 0) {
         return redirect()->route('trading-outflow.create');
@@ -541,6 +565,7 @@ class TradingOutflowController extends Controller
      */
     public function update(Request $request, Transaction $trading_outflow)
     {
+        $outdated_data = $trading_outflow->toArray();
         $validatedData = $request->validate([
             'transaction_status' => 'required',
             'transaction_type' => 'required',
@@ -623,7 +648,37 @@ class TradingOutflowController extends Controller
 
         session()->flash('success', 'Trading outflow updated successfully!');
         $user = Auth::user();
+        $author = Auth::user();
+        $updated_data = $trading_outflow->getChanges();
+        
+        $test = Log::create([
+            'action_type' => 'update',
+            'transaction' =>  implode(', ', array_filter([
+                isset($outdated_data['transaction_type']) ? $outdated_data['transaction_type'] : null,
+                isset($outdated_data['transaction_status']) ? $outdated_data['transaction_status'] : null,
+                isset($outdated_data['commodity_name']) ? $outdated_data['commodity_name'] : null,
+                isset($outdated_data['volume']) ? $outdated_data['volume'] . ' kg' : null, 
+                isset($outdated_data['plate_number']) ? $outdated_data['plate_number'] : null,
+                isset($outdated_data['barangay']) ? $outdated_data['barangay'] : null,
+                isset($outdated_data['municipality']) ? $outdated_data['municipality'] : null,
+                isset($outdated_data['province']) ? $outdated_data['province'] : null,
+                isset($outdated_data['region']) ? $outdated_data['region'] : null,
 
+                isset($outdated_data['facilitator_name']) ? $outdated_data['facilitator_name'] : null,
+            ])) . " || UPDATED -> " . implode(', ', array_filter([
+                isset($updated_data['transaction_type']) ? $updated_data['transaction_type'] : null,
+                isset($updated_data['transaction_status']) ? $updated_data['transaction_status'] : null,
+                isset($commodity->commodity_name) ? $commodity->commodity_name : null,
+                isset($updated_data['volume']) ? $updated_data['volume'] . ' kg' : null, 
+                isset($updated_data['plate_number']) ? $updated_data['plate_number'] : null,
+                isset($updated_data['barangay']) ? 'Barangay: '.$updated_data['barangay'] : null,
+                isset($updated_data['municipality']) ? 'Municipality: '.$updated_data['municipality'] : null,
+                isset($updated_data['province']) ? 'Province: '.$updated_data['province'] : null,
+                isset($updated_data['region']) ?'Region: '. $updated_data['region'] : null,
+                isset($facilitator->facilitator_name) ? $facilitator->facilitator_name : null,
+            ])),
+            'author' => $author->username,
+        ]);
         if ($trading_outflow->transaction_status === 'temporary') {
             if ($user->type == 0) {
                 return redirect()->route('trading-outflow.create');
@@ -656,6 +711,26 @@ class TradingOutflowController extends Controller
 
                 // Flash success message
                 session()->flash('success', 'Trading outflow deleted successfully!');
+                $user = Auth::user();
+        
+        
+        $author = Auth::user();
+        Log::create([
+            'action_type'=>'delete',
+            'transaction' => implode(', ', array_filter([
+                            isset($trading_outflow->transaction_type) ? $trading_outflow->transaction_type: null,
+                            isset($trading_outflow->transaction_status) ? $trading_outflow->transaction_status: null,
+                            isset($trading_outflow->commodity->commodity_name) ? $trading_outflow->commodity->commodity_name: null,
+                            isset($trading_outflow->volume) ? $trading_outflow->volume .' kg': null,
+                            isset($trading_outflow->plate_number) ? $trading_outflow->plate_number: null,
+                            isset($trading_outflow->barangay) ? $trading_outflow->barangay: null,
+                            isset($trading_outflow->municipality) ? $trading_outflow->municipality: null,
+                            isset($trading_outflow->province) ? $trading_outflow->province: null,
+                            isset($trading_outflow->region) ? $trading_outflow->region: null,
+                            isset($trading_outflow->facilitator->facilitator_name) ? $trading_outflow->facilitator->facilitator_name: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
             } else {
                 session()->flash('error', 'You are not authorized to delete this transaction.');
             }
@@ -698,6 +773,13 @@ class TradingOutflowController extends Controller
                 'transaction_status' => 'regular',
             ]);
             if ($temporary_transactions > 0) {
+                $author = Auth::user();
+            
+                Log::create([
+                'action_type'=>'submit',
+                'transaction' => 'trading inflow',
+                'author'=> $author->username,
+            ]);
                 session()->flash('success', 'Trading outflow submitted!');
             } else {
                 session()->flash('error', 'No trading outflow added!');
@@ -833,6 +915,13 @@ class TradingOutflowController extends Controller
         // Insert all rows at once for efficiency
         Transaction::insert($rows);
 
+        $author = Auth::user();
+        
+        Log::create([
+        'action_type'=>'import',
+        'transaction' => $rows['transaction_type'],
+        'author'=> $author->username,
+    ]);
         return back()->with('success', 'Data imported successfully');
     }
 }

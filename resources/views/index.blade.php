@@ -82,7 +82,7 @@
         <div class="row gy-5">
           <div class="col-md-7 order-2 order-lg-1 d-flex flex-column justify-content-center">
             <h2>Benguet Agri-Pinoy Trading Center (BAPTC) Volume Monitoring System</h2>
-            <p>Sed autem laudantium dolores. Voluptatem itaque ea consequatur eveniet. Eum quas beatae cumque eum quaerat.</p>
+
             <div class="d-flex">
             </div>
           </div>

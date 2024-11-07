@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 @section('page_title', 'Trading Inflow Form')
 @section('content')
 
@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Special Records Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('special-records.store') }}" method="POST">
+                    <form class="row g-3 " action="{{ route('staff-special-record.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
@@ -219,7 +219,7 @@
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>
-                            <a href="{{ route('special-records.index') }}" class="btn btn-danger">Back</a>
+                            <a href="{{ route('staff-special-record.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>
                 </div>

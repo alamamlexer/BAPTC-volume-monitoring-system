@@ -698,6 +698,7 @@
             });
             </script>
             <script>
+                const userId = {{ auth()->user()->id }};
              document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         
@@ -745,49 +746,59 @@
             }
         })
         .then(response => response.json())
-        .then(data => {
-            // Update table body
-            const tableBody = document.getElementById('TableBody');
-            tableBody.innerHTML = '';
+    .then(data => {
+        const tableBody = document.getElementById('TableBody');
+        tableBody.innerHTML = ''; // Clear the table body
 
-            if (data.data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
-            } else {
-                data.data.forEach((transaction,index) => {
-                    console.log('Index:', index)
-                    tableBody.innerHTML += `
-                        <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
-                            <td>${index + 1}</td>
-                            <td>${transaction.date}</td>
-                            <td>${transaction.time}</td>
-                            <td>${transaction.plate_number ?? 'N/A'}</td>
-                            <td>${transaction.name ?? 'N/A'}</td>
-                            <td>${transaction.commodity.commodity_name}</td>
-                            <td>${transaction.volume}</td>
-                            <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
-                            <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
-                            <td>${transaction.staff.staff_name}</td>
-                            <td>
-                                <a href="/staff-trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
-                                    <i class="bx bxs-edit"></i> Edit
-                                </a>
-                                <form action="/staff-trading-outflow/${transaction.id}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
-                                        <i class="bx bxs-trash-alt"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-            // Update pagination
+        if (data.data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
+        } else {
+            data.data.forEach((transaction, index) => {
+                // Determine if the logged-in user is the owner of the record
+                let editButton = (userId === transaction.staff_id)
+                    ? `<a href="/staff-trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                        <i class="bx bxs-edit"></i> Edit
+                    </a>`
+                    : `<span class="text-muted">Unauthorized Access</span>`;
+
+                // The delete button is shown only if the logged-in user is the one who added the transaction
+                let deleteButton = (userId === transaction.staff_id) 
+                    ? `
+                        <form action="/staff-trading-outflow/${transaction.id}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+                                <i class="bx bxs-trash-alt"></i> Delete
+                            </button>
+                        </form>
+                    `
+                    : '';
+
+                tableBody.innerHTML += `
+                    <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
+                        <td>${index + 1}</td>
+                        <td>${transaction.date || 'N/A'}</td>
+                        <td>${transaction.time || 'N/A'}</td>
+                        <td>${transaction.plate_number ?? 'N/A'}</td>
+                        <td>${transaction.name ?? 'N/A'}</td>
+                        <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
+                        <td>${transaction.volume || 'N/A'}</td>
+                        <td>${transaction.barangay ?? 'N/A'}, ${transaction.municipality ?? 'N/A'}, ${transaction.province ?? 'N/A'}, ${transaction.region ?? 'N/A'}</td>
+                        <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
+                        <td>${transaction.staff.staff_name ?? 'N/A'}</td>
+                        <td>
+                            ${editButton}
+                            ${deleteButton}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        // Update pagination
         updatePagination(data.current_page, data.last_page);
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    })
+    .catch(error => console.error('Error:', error));
+}
     
     function updatePagination(currentPage, lastPage) {
     const paginationLinks = document.getElementById('paginationLinks');
@@ -856,3 +867,5 @@
     </section>
 
 @endsection
+staff-trading-outflow-form-create.blade.php
+50 KB

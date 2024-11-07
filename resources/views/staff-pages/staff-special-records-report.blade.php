@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 
 @section('page_title', 'Special Records')
 
@@ -90,7 +90,7 @@
 
                     <div class="row mb-3">
                             <div class="col-sm-10">
-                                <a href="{{ route('special-records.create') }}" class="btn btn-primary">Add New Special record</a>
+                                <a href="{{ route('staff-special-record.create') }}" class="btn btn-primary">Add New Special record</a>
                             </div>
                         </div>
 
@@ -146,7 +146,7 @@
         const endDate = document.getElementById('end_date').value;
 
         // Construct the AJAX URL
-        const url = "{{ route('special-records.index') }}";
+        const url = "{{ route('staff-special-record.index') }}";
 
         // Create query parameters
         const queryParams = new URLSearchParams({
@@ -189,7 +189,7 @@
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff.staff_name}</td>
                             <td>
-                                <a href="/special-records/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                <a href="/staff-special-record/${transaction.id}/edit" class="btn btn-outline-primary m-1">
                                     <i class="bx bxs-edit"></i> Edit
                                 </a>
                             </td>

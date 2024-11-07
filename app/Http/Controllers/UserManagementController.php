@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Staff;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 class UserManagementController extends Controller
 {
@@ -26,6 +28,16 @@ class UserManagementController extends Controller
     $user->save();
 
     session()->flash('success', 'User activated successfully.');
+    
+    $author = Auth::user();
+        
+        Log::create([
+            'action_type'=>'activate',
+            'transaction' => implode(', ', array_filter([
+                            isset($user->username) ? $user->username: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
     return redirect()->route('user-management.index');
 }
 
@@ -34,7 +46,15 @@ public function deactivate($id)
     $user = User::findOrFail($id);
     $user->is_active = false;
     $user->save();
-
+    $author = Auth::user();
+        
+    Log::create([
+        'action_type'=>'deactivate',
+        'transaction' => implode(', ', array_filter([
+                        isset($user->username) ? $user->username: null,
+                        ])),
+        'author'=> $author->username,
+    ]);
     session()->flash('success', 'User deactivated successfully.');
     return redirect()->route('user-management.index');
 }
@@ -58,14 +78,23 @@ public function deactivate($id)
         ]);
 
         // Create the User record and link to the staff, set is_active to false
-        User::create([
+            $user=User::create([
             'staff_id' => $staff->staff_id, // Use the newly created staff_id
             'username' => $staff->staff_name,
             'password' => Hash::make($validatedData['password']),
             'type' => '1', // 0=admin, 1=staff
             'is_active' => true, // Set to inactive by default
+            
         ]);
-
+        $author = Auth::user();
+        
+        Log::create([
+            'action_type'=>'create',
+            'transaction' => implode(', ', array_filter([
+                            isset($user->username) ? $user->username: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
         session()->flash('success', 'Account created successfully and is inactive by default.');
         return redirect()->route('user-management.index');
     } catch (\Exception $e) {
