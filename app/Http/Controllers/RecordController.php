@@ -74,9 +74,9 @@ class RecordController extends Controller
                     'id' => $facilitator->facilitator_id,
                     'code' => $facilitator->facilitator_code,
                     'name' => $facilitator->facilitator_name,
-                    'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $facilitator->id . '?type=facilitator\')">
-                                    <i class="bx bxs-trash-alt"></i> Delete
-                                 </button>',
+                    // 'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $facilitator->id . '?type=facilitator\')">
+                    //                 <i class="bx bxs-trash-alt"></i> Delete
+                    //              </button>',
                 ];
             }
     
@@ -103,9 +103,9 @@ class RecordController extends Controller
                 $data[] = [
                     'id' => $commodity->commodity_id,
                     'name' => $commodity->commodity_name,
-                    'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $commodity->id . '?type=commodity\')">
-                                    <i class="bx bxs-trash-alt"></i> Delete
-                                 </button>',
+                    // 'action' => '<button class="btn btn-outline-danger" onclick="deleteRecord(\'record/' . $commodity->id . '?type=commodity\')">
+                    //                 <i class="bx bxs-trash-alt"></i> Delete
+                    //              </button>',
                 ];
             }
     

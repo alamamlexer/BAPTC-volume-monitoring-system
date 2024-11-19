@@ -76,20 +76,20 @@
   <main class="main">
 
     <!-- Hero Section -->
-    <section id="hero" class="hero section "style="background-color: #F6F9FF;">
+    
+    
+ <section id="hero" class="hero section" style="background-image: url('{{ asset('assets/img/background.png') }}'); background-size: cover; background-position: center;"
+">
 
       <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
-        <div class="row gy-5">
-          <div class="col-md-7 order-2 order-lg-1 d-flex flex-column justify-content-center">
-            <h2>Benguet Agri-Pinoy Trading Center (BAPTC) Volume Monitoring System</h2>
-
-            <div class="d-flex">
-            </div>
+          <div class="row gy-5">
+              <div class="col-md-7 order-2 order-lg-1 d-flex flex-column justify-content-center">
+                  <h2 class="text-center" style="text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.7);">Benguet Agri-Pinoy Trading Center Volume Monitoring System</h2>
+              </div>
+              <div class="col-lg-6 order-1 order-lg-2">
+                  <img src="assets/img/bacground.png" class="img-fluid" alt="">
+              </div>
           </div>
-          <div class="col-lg-6 order-1 order-lg-2">
-            <img src="assets/img/hero-img.png" class="img-fluid" alt="">
-          </div>
-        </div>
       </div>
 
       <div class="icon-boxes position-relative" data-aos="fade-up" data-aos-delay="200">

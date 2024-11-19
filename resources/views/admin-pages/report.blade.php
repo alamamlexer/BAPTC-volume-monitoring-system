@@ -1,13 +1,13 @@
 @extends('layouts.admin')
-@section('page_title', 'Reports')
+@section('page_title', 'Analytical Reports')
 @section('content')
 
     <!-- Page Title -->
     <div class="pagetitle">
-        <h1>Reports</h1>
+        <h1>Analytical Reports</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item active"><a href="/">Reports</a></li>
+                <li class="breadcrumb-item active">Reports analyzing the consolidated data for market trends or patterns</li>
             </ol>
         </nav>
     </div>
@@ -451,7 +451,7 @@
                 
         <tr>
             <td class="col-md-4 text-center"><strong>Total Volume</strong></td>
-            <td class="col-md-4 text-center"><strong>{{ $totalVolume }}</strong></td>
+            <td class="col-md-4 text-center"><strong>{{ $washtotalVolume }}</strong></td>
         </tr>
             </tbody>
         </table>

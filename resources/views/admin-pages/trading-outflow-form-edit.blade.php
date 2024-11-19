@@ -4,11 +4,10 @@
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Trading Outflow</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Trading Outflow</a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new trading outflow</a></li>
+            <li class="breadcrumb-item active">Edit trading outflow</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Trading Outflow Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3" action="{{ route('trading-outflow.update', $trading_outflow->id) }}" method="POST">
                         @csrf
@@ -51,7 +50,7 @@
                         <div class="col-md-4">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
-                                    placeholder="Date" value="{{$trading_outflow->date}}" required>
+                                    placeholder="Date" value="{{$trading_outflow->date}}" required readonly>
                                 <label for="date">Date</label>
                                 @if ($errors->has('date'))
                                 <span class="text-danger">{{ $errors->first('date') }}</span>
@@ -170,7 +169,7 @@
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="origin" placeholder="Select or type origin..."
                                     autocomplete="off" data-dropdown="originDropdown" required value="{{$trading_outflow->barangay}}, {{$trading_outflow->municipality}}, {{$trading_outflow->province}}, {{$trading_outflow->region}}">
-                                <label for="origin">Origin</label>
+                                <label for="origin">Destination</label>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
                                     @foreach ($facilitator_location_vehicles as $location_vehicle)
@@ -210,7 +209,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{$trading_outflow->volume}}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -219,7 +218,7 @@
                             </div>
                         </div>
 
-                        <p class="form-label">If there is no existing record, please fill the following:</p>
+                      <p class="form-label">Please provide the following information for new plate numbers or origins:</p>
 
 
 
@@ -303,7 +302,6 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
                             <a href="{{ route('trading-outflow.index') }}" class="btn btn-danger">Back</a>
                         </div>
 

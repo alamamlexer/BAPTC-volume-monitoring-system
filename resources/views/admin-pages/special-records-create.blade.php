@@ -1,14 +1,13 @@
 @extends('layouts.admin')
-@section('page_title', 'Trading Inflow Form')
+@section('page_title', 'Special Records Form')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Special Record</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Special Records</a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new special records</a></li>
+           <li class="breadcrumb-item active">Add a new trading inflow</li>
         </ol>
     </nav>
 </div>
@@ -21,13 +20,13 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Special Records Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3 " action="{{ route('special-records.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
-                        <div class="col-md-5" hidden>
+                        <div class="col-md-4" hidden>
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="transaction_status"
                                     name="transaction_status" value="temporary">
@@ -36,7 +35,7 @@
                         </div>
 
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
                                     placeholder="Date" value="{{ old('date', date('Y-m-d')) }}" required readonly>
@@ -47,7 +46,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-floating">
                                 <select class="form-select" id="time" name="time" required>
                                     <option value="AM" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>AM</option>
@@ -60,7 +59,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-floating">
                                 <select class="form-select" id="transaction_type" name="transaction_type" required>
                                     <option value="dry" {{ old('time', $defaultTime) == 'AM' ? 'selected' : '' }}>Dry</option>
@@ -161,7 +160,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{ old('volume') }}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -170,7 +169,7 @@
                             </div>
                         </div>
 
-                        <p class="form-label">If there is no existing record, please fill the following:</p>
+                       <p class="form-label">Please provide the following information for new origins:</p>
 
                         <div class="col-md-2">
                             <div class="form-floating">
@@ -218,7 +217,7 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
+                            <button type="reset" class="btn btn-secondary">Clear All</button>
                             <a href="{{ route('special-records.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>

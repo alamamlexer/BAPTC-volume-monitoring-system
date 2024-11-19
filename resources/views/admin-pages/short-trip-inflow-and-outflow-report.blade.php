@@ -8,7 +8,7 @@
     <h1>Short Trip</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Short Trip</a></li>
+            <li class="breadcrumb-item active">Transactions involving the import or export of smaller volumes of commodities from nearby farms, local markets, and trading posts</li>
         </ol>
     </nav>
 </div>
@@ -37,7 +37,7 @@
         <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
             <div class="card info-card sales-card">
                 <div class="card-body">
-                    <h5 class="card-title">Vehicles </h5>
+                    <h5 class="card-title">Daily Overall Vehicles </h5>
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                             <i class="ri-car-fill"></i>
@@ -54,7 +54,7 @@
         <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
             <div class="card info-card revenue-card">
                 <div class="card-body">
-                    <h5 class="card-title">Volume (kg)</h5>
+                    <h5 class="card-title">Daily Overall Volume (kg)</h5>
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                             <i class="ri-scales-2-fill"></i>
@@ -68,29 +68,37 @@
         </div><!-- End Revenue Card -->
     </div>
 
+
+    <!-- Short Trip Inflow Chart -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card mb-4"> <!-- Added margin bottom for spacing -->
+            <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Trading Inflow Chart</h5>
-                    <!-- Filter Form -->
-                    <!-- Chart Container -->
-                    <div id="areaChart" style="height: 350px;"></div>
+                    <h5 class="card-title">Inflow Chart</h5>
+                    <div id="inflowChart" style="height: 350px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
 
-
-
-
+    <!-- Short Trip Outflow Chart -->
+    <div class="row">
+        <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Outflow Chart</h5>
+                    <div id="outflowChart" style="height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Short Trip Inflow Table</h5>
+                    <h5 class="card-title">Short Trip Inflow and Outflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
                         <form method="GET" action="{{ route('short-trip-inflow-and-outflow.index') }}" class="mb-3">
@@ -157,7 +165,7 @@
 
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
-                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
+                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin/Destination:</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                 <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)
@@ -301,20 +309,20 @@
                     }
                 })
                 .then(response => response.json())
-        .then(data => {
-            // Update table body
-            const tableBody = document.getElementById('TableBody');
-            tableBody.innerHTML = '';
+                .then(data => {
+                    // Update table body
+                    const tableBody = document.getElementById('TableBody');
+                    tableBody.innerHTML = '';
 
-            if (data.data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="12" class="text-center">No records added</td></tr>';
-            } else {
-                data.data.forEach((transaction, index) => {
-                    const transactionType = transaction.transaction_type === 'short trip inflow' ? 'In' :
-                        transaction.transaction_type === 'short trip outflow' ? 'Out' :
-                        'Unknown';
+                    if (data.data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="12" class="text-center">No records added</td></tr>';
+                    } else {
+                        data.data.forEach((transaction, index) => {
+                            const transactionType = transaction.transaction_type === 'short trip inflow' ? 'In' :
+                                transaction.transaction_type === 'short trip outflow' ? 'Out' :
+                                'Unknown';
 
-                    tableBody.innerHTML += `
+                            tableBody.innerHTML += `
                         <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
                             <td>${index + 1}</td>
                             <td>${transaction.date}</td>
@@ -407,43 +415,35 @@
         function filterByMunicipality() {
             fetchFilteredData();
         }
-        function filterByType() {
-            fetchFilteredData(); 
-        }
 
+        function filterByType() {
+            fetchFilteredData();
+        }
     </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const totalVolumeData = @json($totalVolumeData);
-            const series = @json($chartData);
+            const inflowVolumeData = @json($inflowVolumeData);
+            const outflowVolumeData = @json($outflowVolumeData);
 
-            // Assuming dates is in the format of "YYYY-MM-DD"
+            const inflowSeries = @json($inflowChartData);
+            const outflowSeries = @json($outflowChartData);
+
             const dates = @json($dates).map(date => Date.parse(date)); // Convert to timestamps
 
-            // Prepare the combined series
-            const combinedSeries = [{
-                name: 'Total Volume',
-                data: totalVolumeData
-            }, ...series];
-
-            // Initialize Trading Inflow Chart
-            Highcharts.chart('areaChart', {
+            // Inflow Chart
+            Highcharts.chart('inflowChart', {
                 chart: {
                     type: 'line',
-                    height: 350,
-                    animation: {
-                        duration: 2000,
-                        easing: 'easeOutBounce'
-                    }
+                    height: 350
                 },
                 title: {
-                    text: 'Volume of Short Trip Trading Inflows by Commodity'
+                    text: 'Volume of Short Trip Trading Inflows'
                 },
                 xAxis: {
                     type: 'datetime',
                     dateTimeLabelFormats: {
-                        day: '%b %e, %Y' // Format as "Oct 1, 2024"
+                        day: '%b %e, %Y'
                     },
                     tickInterval: 24 * 3600 * 1000 // One day
                 },
@@ -453,10 +453,13 @@
                     },
                     opposite: true
                 },
-                series: combinedSeries.map((serie, index) => ({
+                series: [{
+                    name: 'Total Inflow Volume',
+                    data: inflowVolumeData.map((value, i) => [dates[i], value])
+                }, ...inflowSeries.map((serie) => ({
                     ...serie,
-                    data: serie.data.map((value, i) => [dates[i], value]) // Pair each data point with its corresponding date
-                })),
+                    data: serie.data.map((value, i) => [dates[i], value])
+                }))],
                 legend: {
                     horizontalAlign: 'left'
                 },
@@ -471,7 +474,54 @@
                     }
                 },
                 exporting: {
-                    enabled: true,
+                    enabled: true
+                }
+            });
+
+            // Outflow Chart
+            Highcharts.chart('outflowChart', {
+                chart: {
+                    type: 'line',
+                    height: 350
+                },
+                title: {
+                    text: 'Volume of Short Trip Trading Outflows'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                        day: '%b %e, %Y'
+                    },
+                    tickInterval: 24 * 3600 * 1000 // One day
+                },
+                yAxis: {
+                    title: {
+                        text: 'Volume'
+                    },
+                    opposite: true
+                },
+                series: [{
+                    name: 'Total Outflow Volume',
+                    data: outflowVolumeData.map((value, i) => [dates[i], value])
+                }, ...outflowSeries.map((serie) => ({
+                    ...serie,
+                    data: serie.data.map((value, i) => [dates[i], value])
+                }))],
+                legend: {
+                    horizontalAlign: 'left'
+                },
+                plotOptions: {
+                    series: {
+                        dataLabels: {
+                            enabled: false
+                        },
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                },
+                exporting: {
+                    enabled: true
                 }
             });
         });
@@ -531,8 +581,6 @@
         updateDateTime();
     </script>
 </section>
-
-
 
 
 @endsection

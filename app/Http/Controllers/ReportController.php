@@ -392,23 +392,22 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
     //table 9 
      // Fetch washing transactions with commodity data
      $washingTransactions = Transaction::with('commodity')
-    ->whereBetween('date', [$startDate, $endDate])
-    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
-    ->get()
-    ->filter(function ($transaction) {
-        return $transaction->transaction_type === 'washing';
-    });
+     ->whereBetween('date', [$startDate, $endDate])
+     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+     ->get()
+     ->filter(function ($transaction) {
+         return $transaction->transaction_type === 'washing';
+     });
+ 
+ // Transform the filtered transactions
+ $washformattedTransactions = $washingTransactions->map(function ($transaction) {
+     return [
+         'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
+         'volume' => $transaction->volume ?? 0, // Default volume to 0 if null
+     ];
+ });
+ $washtotalVolume = $washformattedTransactions->sum('volume');
 
-// Transform the filtered transactions
-$formattedTransactions = $washingTransactions->map(function ($transaction) {
-    return [
-        'commodity_name' => $transaction->commodity ? $transaction->commodity->name : 'N/A', // Check for null
-        'volume' => $transaction->volume ?? 0, // Default volume to 0 if null
-    ];
-});
-
-// Calculate the total volume
-$totalVolume = $formattedTransactions->sum('volume');
 
 
     //table 10
@@ -438,7 +437,6 @@ $totalVolume = $formattedTransactions->sum('volume');
 
    //table 12
     $currentYear = Carbon::now()->year;
-    
 
     $past_year = $request->input('year', $currentYear-1);
     $current_year = $request->input('year', $currentYear);
@@ -451,8 +449,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'outflow' => number_format(
                 $outPast = Transaction::where('transaction_type', 'trading outflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -461,8 +459,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'outflow' => number_format(
                 $outCurrent = Transaction::where('transaction_type', 'trading outflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -482,8 +480,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'inflow' => number_format(
                 $inPast = Transaction::where('transaction_type', 'trading inflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -492,8 +490,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'inflow' => number_format(
                 $inCurrent = Transaction::where('transaction_type', 'trading inflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -513,8 +511,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'inflow' => number_format(
                 $inspPast = Transaction::where('transaction_type', 'short trip inflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -523,8 +521,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'inflow' => number_format(
                 $inspCurrent = Transaction::where('transaction_type', 'short trip inflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -544,8 +542,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'outflow' => number_format(
                 $outsPast = Transaction::where('transaction_type', 'short trip outflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -554,8 +552,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'outflow' => number_format(
                 $outsCurrent = Transaction::where('transaction_type', 'short trip outflow')
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -574,8 +572,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'PASTDRY' => [
             'dry' => number_format(
                 $pastDry = Transaction::with('commodity')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'dry')
@@ -586,8 +584,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'CURRENTDRY' => [
             'dry' => number_format(
                 $currentDry = Transaction::with('commodity')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'dry')
@@ -606,8 +604,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'PASTCOLD' => [
             'cold' => number_format(
                 $pastCold = Transaction::with('commodity')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'cold')
@@ -618,8 +616,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'CURRENTCOLD' => [
             'cold' => number_format(
                 $currentCold = Transaction::with('commodity')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'cold')
@@ -638,8 +636,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'PASTINTERTRADING' => [
             'intertrading' => number_format(
                 $pastIntertrading = Transaction::with('commodity')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'intertrading')
@@ -650,8 +648,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'CURRENTINTERTRADING' => [
             'intertrading' => number_format(
                 $currentIntertrading = Transaction::with('commodity')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'intertrading')
@@ -670,8 +668,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'PASTWASHING' => [
             'washing' => number_format(
                 $pastWashing = Transaction::with('commodity')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'washing')
@@ -682,8 +680,8 @@ $totalVolume = $formattedTransactions->sum('volume');
         'CURRENTWASHING' => [
             'washing' => number_format(
                 $currentWashing = Transaction::with('commodity')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
                     ->get()
                     ->filter(fn($transaction) => $transaction->transaction_type === 'washing')
@@ -703,8 +701,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'all' => number_format(
                 $totalPastIncome = Transaction::whereIn('transaction_type', ['trading inflow', 'short trip inflow'])
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -713,8 +711,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'all' => number_format(
                 $totalCurrentIncome = Transaction::whereIn('transaction_type', ['trading inflow', 'short trip inflow'])
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -734,8 +732,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'all' => number_format(
                 $totalPastOutgoing = Transaction::whereIn('transaction_type', ['trading outflow', 'short trip outflow'])
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $past_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $past_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -744,8 +742,8 @@ $totalVolume = $formattedTransactions->sum('volume');
             'all' => number_format(
                 $totalCurrentOutgoing = Transaction::whereIn('transaction_type', ['trading outflow', 'short trip outflow'])
                     ->where('transaction_status', 'regular')
-                    ->whereYear('created_at', $current_year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('date', $current_year)
+                    ->whereMonth('date', $month)
                     ->sum('volume') ?: 0,
                 0, '.', ','
             ),
@@ -760,9 +758,6 @@ $totalVolume = $formattedTransactions->sum('volume');
                 : ($totalCurrentOutgoing != 0 ? '100%' : '0%'),
         ],
     ];
-
-
-
 
    $user = Auth::user();
    if ($user->type == 0) {
@@ -788,7 +783,9 @@ $totalVolume = $formattedTransactions->sum('volume');
             'endDate',
             'totalVolume',
             'formattedTransactions',
+            'washformattedTransactions',
             'washingTransactions',
+            'washtotalVolume',
             'intertradingTransactions',
             'table_twelve_data',
             'month_name', 'past_year', 'current_year',
@@ -799,7 +796,7 @@ $totalVolume = $formattedTransactions->sum('volume');
    } elseif ($user->type == 1) {
         // Passing data to the view
         return view('staff-pages.staff-report', compact(
-            'table_one_data',
+              'table_one_data',
             'table_three_data',
             'R2_peakDayDate',
             'R2_peakDay',
@@ -819,12 +816,12 @@ $totalVolume = $formattedTransactions->sum('volume');
             'endDate',
             'totalVolume',
             'formattedTransactions',
+            'washformattedTransactions',
             'washingTransactions',
+            'washtotalVolume',
             'intertradingTransactions',
             'table_twelve_data',
             'month_name', 'past_year', 'current_year',
-             
-            
         ));
    }
        

@@ -84,46 +84,55 @@
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('staff-trading-inflow.index')}}">
-          <i class="bi bi-grid"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Trading Inflow</span>
         </a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('staff-trading-outflow.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Trading Outflow</span>
         </a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('staff-short-trip-inflow-and-outflow.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Short Trip Inflow and Outflow</span>
         </a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('staff-special-record.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Special Records</span>
         </a>
       </li>
 
 
-
-      <li class="nav-heading">Pages</li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-report.index')}}">
-          <i class="bi bi-person"></i>
-          <span>Reports</span>
+ <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-journal-text"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
+        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{route('staff-summary-report.index')}}">
+              <i class="bi bi-circle"></i><span>Summary Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{route('staff-report.index')}}">
+              <i class="bi bi-circle"></i><span>Analytical Reports</span>
+            </a>
+          </li>
+        </ul>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('staff-record.index')}}">
-          <i class="bi bi-person"></i>
-          <span>Records</span>
+          <i class="bi bi-laptop"></i>
+          <span>System Records</span>
         </a>
       </li>
       
@@ -132,7 +141,7 @@
         <i class="bi bi-person"></i>
         <span>Profile</span>
     </a>
-</li><!-- End Profile Page Nav -->
+</li>
 
 
       <li class="nav-item">

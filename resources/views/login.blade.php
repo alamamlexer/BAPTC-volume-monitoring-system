@@ -57,16 +57,21 @@
                               @enderror
                           </div>
           
-                          {{-- <div class="col-12">
-                            <div class="form-check">
-                              <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
-                              <label class="form-check-label" for="rememberMe">Remember me</label>
-                            </div>
-                          </div> --}}
-                          <div class="col-12">
+                        
+                                                  <div class="mb-2">
                             <button class="btn btn-primary w-100" type="submit">Login</button>
-                          </div>
+
+                        </div>
+
+                        
                         </form>
+                        
+                        {{-- Forgot Password Link --}}
+              <div class="mt-3 d-flex justify-content-between">
+  <p class="small mb-0 text-start">Back to <a href="/" style="color: #012970;"><u>home</u></a></p>
+  <a href="{{ route('password.request') }}" class="small text-end" style="color: #012970;"><u>Forgot your password?</u></a>
+</div>
+                        
           
                             {{--  Submition status Modal  --}}
                             @if(session('success'))

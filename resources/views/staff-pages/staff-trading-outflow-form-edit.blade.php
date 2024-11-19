@@ -4,11 +4,10 @@
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Trading Outflow</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Trading Outflow</a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new trading outflow</a></li>
+             <li class="breadcrumb-item active">Edit trading outflow</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Trading Outflow Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3" action="{{ route('staff-trading-outflow.update', $trading_outflow->id) }}" method="POST">
                         @csrf
@@ -205,7 +204,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{$trading_outflow->volume}}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -214,7 +213,6 @@
                             </div>
                         </div>
 
-                        <p class="form-label">If there is no existing record, please fill the following:</p>
 
 
 
@@ -298,7 +296,6 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
                             <a href="{{ route('staff-trading-outflow.index') }}" class="btn btn-danger">Back</a>
                         </div>
 

@@ -12,14 +12,21 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-   public function farmers(): BelongsTo
+    public function farmers(): BelongsTo
     {
-        return $this->belongsTo(Farmer::class,'farmer_id');
+        return $this->belongsTo(Farmer::class, 'farmer_id');
     }
+
     public function staffs(): BelongsTo
     {
-        return $this->belongsTo(Staff::class,'staff_id');
+        return $this->belongsTo(Staff::class, 'staff_id');
     }
+    public function activationToken()
+{
+    return $this->hasOne(ActivationToken::class, 'email', 'email');
+}
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,10 +34,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'staff_id',
+        'email',  // Add email here
         'plate_number',
         'password',
         'username',
         'type',
+        'is_active',
     ];
 
     /**

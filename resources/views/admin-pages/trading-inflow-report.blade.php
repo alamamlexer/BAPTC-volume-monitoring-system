@@ -8,7 +8,7 @@
     <h1>Trading Inflow</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Trading Inflow</a></li>
+            <li class="breadcrumb-item active">Transactions involving the import of commodities from farmers or producers</li>
         </ol>
     </nav>
 </div>
@@ -37,7 +37,7 @@
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
         <div class="card info-card sales-card">
             <div class="card-body">
-                <h5 class="card-title">Vehicles </h5>
+                <h5 class="card-title">Daily Overall Vehicles </h5>
                 <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                         <i class="ri-car-fill"></i>
@@ -54,7 +54,7 @@
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
         <div class="card info-card revenue-card">
             <div class="card-body">
-                <h5 class="card-title">Volume (kg)</h5>
+                <h5 class="card-title">Daily Overall Volume (kg)</h5>
                 <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                         <i class="ri-scales-2-fill"></i>
@@ -72,7 +72,7 @@
     <div class="col-md-12">
         <div class="card mb-4"> <!-- Added margin bottom for spacing -->
             <div class="card-body">
-                <h5 class="card-title">Trading Inflow Chart</h5>
+                <h5 class="card-title">Trading Inflow Line Chart</h5>
                 <!-- Filter Form -->
                 <!-- Chart Container -->
                 <div id="areaChart" style="height: 350px;"></div>
@@ -90,7 +90,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Inflow Table</h5>
+                    <h5 class="card-title">Trading Inflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
                       <form method="GET" action="{{ route('trading-inflow.index') }}" class="mb-3">

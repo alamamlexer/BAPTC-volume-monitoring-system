@@ -3,140 +3,162 @@
 @section('content')
 <section class="section dashboard">
     <div class="pagetitle">
-        <h1>Dashboard</h1>
+        
     </div>
-    <div class="container">
-        <div class="row">
-            {{-- Inflow --}}
-            <div class="col-md-6"> 
-                <div class="card info-card revenue-card">
-                    <div class="card-body">
-                        <h5 class="card-title fs-4 fw-bold">Trading Inflow</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="card-title">Vehicles</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-car-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_trading_inflow_vehicle }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="card-title">Volume (kg)</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-scales-2-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_trading_inflow_volume }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6"> 
-                <div class="card info-card revenue-card">
-                    <div class="card-body">
-                        <h5 class="card-title fs-4 fw-bold">Short Trip Inflow</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="card-title">Vehicles</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-car-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_short_trip_inflow_vehicle }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="card-title">Volume (kg)</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-scales-2-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_short_trip_inflow_volume }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ 
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="text-center card-title fs-4 fw-bold">Daily Overall Transactions</h5>
 
-            {{-- Outflow --}}
-            <div class="col-md-6"> 
-                <div class="card info-card sales-card">
-                    <div class="card-body">
-                        <h5 class="card-title fs-4 fw-bold">Trading Outflow</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="card-title">Vehicles</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-car-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_trading_outflow_vehicle }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="card-title">Volume (kg)</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-scales-2-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_trading_outflow_volume }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6"> 
-                <div class="card info-card sales-card">
-                    <div class="card-body">
-                        <h5 class="card-title fs-4 fw-bold">Short Trip Outflow</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="card-title">Vehicles</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-car-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_short_trip_outflow_vehicle }}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="card-title">Volume (kg)</h5>
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="ri-scales-2-fill"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>{{ $today_short_trip_outflow_volume }}</h6>
+                    <!-- Start of 2x2 Grid Layout for Transaction Cards -->
+                    <div class="row">
+                        <!-- Trading Inflow Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card info-card revenue-card">
+                                <div class="card-body">
+                                    <h5 class="card-title fs-4 fw-bold">Trading Inflow</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Vehicles</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-car-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_trading_inflow_vehicle }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Volume (kg)</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-scales-2-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_trading_inflow_volume }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Short Trip Inflow Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card info-card revenue-card">
+                                <div class="card-body">
+                                    <h5 class="card-title fs-4 fw-bold">Short Trip Inflow</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Vehicles</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-car-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_short_trip_inflow_vehicle }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Volume (kg)</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-scales-2-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_short_trip_inflow_volume }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- Trading Outflow Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card info-card revenue-card">
+                                <div class="card-body">
+                                    <h5 class="card-title fs-4 fw-bold">Trading Outflow</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Vehicles</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-car-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_trading_outflow_vehicle }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Volume (kg)</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-scales-2-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_trading_outflow_volume }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+
+                        <!-- Short Trip Outflow Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card info-card revenue-card">
+                                <div class="card-body">
+                                    <h5 class="card-title fs-4 fw-bold">Short Trip Outflow</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Vehicles</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-car-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_short_trip_outflow_vehicle }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <h5 class="card-title">Volume (kg)</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="ri-scales-2-fill"></i>
+                                                </div>
+                                                <div class="ps-3 text-break">
+                                                    <h6>{{ $today_short_trip_outflow_volume }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
                     </div>
+                    <!-- End of 2x2 Grid Layout for Transaction Cards -->
+
                 </div>
             </div>
         </div>
-        </div>
+    </div>
+
+
         
         
 

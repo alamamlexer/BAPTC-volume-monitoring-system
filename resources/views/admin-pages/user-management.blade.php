@@ -1,13 +1,13 @@
 @extends('layouts.admin')
-@section('page_title','Users')
+@section('page_title','User Management')
 @section('content')
 
     <!-- Page Title -->
     <div class="pagetitle">
-      <h1>Users</h1>
+      <h1>User Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="/">User Management</a></li>
+          <li class="breadcrumb-item active">Create, deactivate, activate etc.</li>
         </ol>
       </nav>
     </div>
@@ -47,7 +47,7 @@
                       @if($user->is_active)
                           <form action="{{ route('user-management.deactivate', $user->id) }}" method="POST">
                               @csrf
-                              <button type="submit" class="btn btn-outline-warning">Deactivate</button>
+                              <button type="submit" class="btn btn-outline-danger">Deactivate</button>
                           </form>
                       @else
                           <form action="{{ route('user-management.activate', $user->id) }}" method="POST">

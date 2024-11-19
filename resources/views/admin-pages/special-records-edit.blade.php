@@ -1,14 +1,13 @@
 @extends('layouts.admin')
-@section('page_title', 'Edit Special Record Form')
+@section('page_title', 'Special Record Form')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Special Records</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Special Records</a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new special records</a></li>
+            <li class="breadcrumb-item active">Edit special record</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Edit Special Records Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3 " action="{{ route('special-records.update', $special_records) }}" method="POST">
                         @csrf
@@ -36,7 +35,7 @@
                         </div>
 
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
                                     placeholder="Date" value="{{($special_records->date) }}" required readonly>
@@ -47,7 +46,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
             <div class="form-control" required>
                 <fieldset>
                     <legend class="col-form-label col-sm-5 pt-0">Time</legend>
@@ -68,7 +67,7 @@
             </div>
         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-floating">
                                 <select class="form-select" id="transaction_type" name="transaction_type" value="{{($special_records->transaction_type) }}" required >
                                     <option value="dry" {{ old('transaction_type', $special_records->transaction_type) == 'dry' ? 'selected' : '' }}>Dry</option>
@@ -169,7 +168,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{$special_records->volume}}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -226,7 +225,6 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
                             <a href="{{ route('special-records.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>

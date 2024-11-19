@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountActivationMail;
+use App\Models\ActivationToken;
 class UserManagementController extends Controller
 {
     /**
@@ -60,12 +64,13 @@ public function deactivate($id)
 }
 
 
-    public function store(Request $request)
+public function store(Request $request)
 {
+     $author = Auth::user();
     $validatedData = $request->validate([
         'staff_name' => 'required|string|max:255|unique:staff,staff_name',
         'contact_number' => 'required|string|max:15',
-        'email' => 'required|string|unique:staff,email',
+        'email' => 'required|email|unique:staff,email', // Email is required and unique in the 'staff' table
         'password' => 'required|string|confirmed',
     ]);
 
@@ -74,33 +79,96 @@ public function deactivate($id)
         $staff = Staff::create([
             'staff_name' => $validatedData['staff_name'],
             'contact_number' => $validatedData['contact_number'],
-            'email' => $validatedData['email'],
+            'email' => $validatedData['email'],  // Ensure email is passed here correctly
+        ]);
+ 
+        // Generate a random temporary password
+        $tempPassword = Str::random(8); // 8-character random temporary password
+
+        // Create the User record and link it to the staff, set 'is_active' to false by default
+        $user = User::create([
+            'staff_id' => $staff->staff_id,
+            'username' => $staff->staff_name,
+            'password' => Hash::make($tempPassword), // Hash the temporary password
+            'type' => 1, // staff type
+            'is_active' => false, // Set to inactive by default
+            'email' => $staff->email, // Pass the email from the staff record to the user
         ]);
 
-        // Create the User record and link to the staff, set is_active to false
-            $user=User::create([
-            'staff_id' => $staff->staff_id, // Use the newly created staff_id
-            'username' => $staff->staff_name,
-            'password' => Hash::make($validatedData['password']),
-            'type' => '1', // 0=admin, 1=staff
-            'is_active' => true, // Set to inactive by default
-            
+        // Generate an activation token
+        $token = Str::random(60); // Generate a 60-character random string
+
+        // Save the activation token
+        ActivationToken::create([
+            'email' => $staff->email,
+            'token' => $token,
         ]);
-        $author = Auth::user();
-        
         Log::create([
-            'action_type'=>'create',
-            'transaction' => implode(', ', array_filter([
-                            isset($user->username) ? $user->username: null,
-                            ])),
-            'author'=> $author->username,
+        'action_type'=>'create',
+        'transaction' => implode(', ', array_filter([
+                        isset($user->username) ? "user: {$user->username}" : null,
+                        isset($user->contact_number) ? $user->contact_number: null,
+                        isset($user->email) ? $user->email: null,
+                        ])),
+        'author'=> $author->username,
         ]);
-        session()->flash('success', 'Account created successfully and is inactive by default.');
+        // Send the activation email with the temporary password and activation URL
+        Mail::to($staff->email)->send(new AccountActivationMail($staff, $token, $tempPassword));
+
+        session()->flash('success', 'Account created successfully and activation email sent.');
         return redirect()->route('user-management.index');
     } catch (\Exception $e) {
         session()->flash('error', 'Error creating staff: ' . $e->getMessage());
         return redirect()->back()->withInput();
     }
+}
+
+
+public function activateAccount($token)
+{
+     $author = Auth::user();
+    // Find the activation token in the database
+    $activationToken = ActivationToken::where('token', $token)->first();
+
+    // Check if the token exists
+    if (!$activationToken) {
+        return redirect()->route('login')->with('error', 'Invalid or expired token.');
+    }
+
+    // Find the staff member associated with the token's email
+    $staff = Staff::where('email', $activationToken->email)->first();
+
+    // Check if the staff exists
+    if (!$staff) {
+        return redirect()->route('login')->with('error', 'Staff member not found.');
+    }
+
+    // Activate the staff member if it's inactive
+    if ($staff->is_active === false) {
+        $staff->is_active = true;
+        $staff->save(); // Save the changes to the staff record
+    }
+
+    // Find the user associated with the staff member
+    $user = User::where('email', $staff->email)->first();
+
+    // Optionally, update the User model's is_active field
+    if ($user) {
+        $user->is_active = true;
+        $user->save(); // Save the changes to the user record
+    }
+        Log::create([
+            'action_type'=>'activate',
+            'transaction' => implode(', ', array_filter([
+                            isset($user->username) ? $user->username: null,
+                            ])),
+            'author'=> $author->username,
+        ]);
+    // Delete the activation token after it is used
+    $activationToken->delete();
+
+    // Redirect to the login page with a success message
+    return redirect()->route('login')->with('success', 'Your account has been activated successfully!');
 }
 
 
@@ -111,49 +179,5 @@ public function deactivate($id)
     {
         return view('admin-pages.user-inspector-assistant-create',);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        try{
-            $user=User::findOrFail($id);
-            $user->delete();
-            session()->flash('success', 'Account deleted successfully.');
-            return redirect()->route('user-management.index');
-        } catch (QueryException $error){
-        
-        if ($error->errorInfo[1]==1451){
-            session()->flash('error','Account was not deleted due to related records');
-            return redirect()->route('user-management.index');
-
-        }
-        }
-    }
-    
 }
+    

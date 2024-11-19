@@ -25,34 +25,37 @@ class SpecialRecordsController extends Controller
      */
     public function index(Request $request)
 {
+    // Default date range
     $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
     $endDate = $request->input('end_date', Carbon::now()->toDateString());
 
-    $transactionType = $request->input('transaction_filter');  // Match the key sent from the frontend
+    $transactionType = $request->input('transaction_filter');
 
-    // Eager-load commodity, facilitator, and staff relationships
+    // Eager-load relationships
     $query = Transaction::with(['commodity', 'facilitator', 'staff'])
-        ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
+    ->whereIn('transaction_type', ['dry', 'cold', 'washing', 'intertrading'])
         ->whereBetween('date', [$startDate, $endDate])
         ->orderBy('created_at', 'desc');
 
-    // Apply filters if provided
+    // Apply transaction type filter if provided
     if ($transactionType) {
-        $query->where('transaction_type', $transactionType);  // Apply the transaction filter
+        $query->where('transaction_type', $transactionType);
     }
-    if ($request->has('start_date') && $request->has('end_date')) {
-        $query->whereBetween('date', [$request->start_date, $request->end_date]);
-    }
+
+    // Apply commodity filter if provided
     if ($request->input('commodity_filter')) {
         $query->where('commodity_id', $request->input('commodity_filter'));
     }
+
+    // Apply municipality filter if provided
     if ($request->input('municipality_filter')) {
         $query->where('municipality', $request->input('municipality_filter'));
     }
 
-    // Fetch the paginated results
+    // Pagination
     $specialRecords = $query->paginate(5);
 
+    // Return the filtered data as a JSON response if it's an AJAX request
     if ($request->ajax()) {
         return response()->json([
             'data' => $specialRecords->items(),
@@ -62,38 +65,39 @@ class SpecialRecordsController extends Controller
         ]);
     }
 
+    // Get additional necessary data
     $transaction_types = ['dry', 'cold', 'washing', 'intertrading'];
     $commodities = Commodity::all();
     $municipalities = Transaction::distinct()->pluck('municipality');
     $staffs = Staff::all();
 
+    // Determine the user and render the appropriate view
     $user = Auth::user();
-    $userId = Auth::id();
+    if ($user->type == 0) {
+        return view('admin-pages.special-records-report', compact(
+            'startDate',
+            'endDate',
+            'specialRecords',
+            'transactionType',
+            'transaction_types',
+            'commodities',
+            'municipalities',
+            'staffs'
+        ));
+    } elseif ($user->type == 1) {
+        return view('staff-pages.staff-special-records-report', compact(
+            'startDate',
+            'endDate',
+            'specialRecords',
+            'transactionType',
+            'transaction_types',
+            'commodities',
+            'municipalities',
+            'staffs'
+        ));
+    }
+}
 
-    if ($user->type == 0){
-    return view('admin-pages.special-records-report', compact(
-        'startDate',
-        'endDate',
-        'specialRecords',
-        'transactionType',
-        'transaction_types',
-        'commodities',
-        'municipalities',
-        'staffs'
-    ));
-} elseif ($user->type == 1) {
-    return view('staff-pages.staff-special-records-report', compact(
-        'startDate',
-        'endDate',
-        'specialRecords',
-        'transactionType',
-        'transaction_types',
-        'commodities',
-        'municipalities',
-        'staffs'
-    ));
-}
-}
 
 
     /**
@@ -142,7 +146,6 @@ class SpecialRecordsController extends Controller
         'date' => 'required|date',
         'time' => 'required',
         'transaction_type' => 'required|string',
-        'staff_id' => 'required|exists:staff,staff_id',
         'commodity_name' => 'required|exists:commodities,commodity_name',
         'volume' => 'required|numeric',
         'barangay' => 'nullable|string',
@@ -152,10 +155,13 @@ class SpecialRecordsController extends Controller
         'facilitator_name' => 'nullable|string',
     ]);
 
+    // Get logged-in staff ID
+    $logged_in_staff_id = Auth::id(); // Automatically get the staff ID from the authenticated user
+
     // Initialize $location to null
     $location = null;
 
-    // Check and store location
+    // Check and store location if needed
     if (!empty($validatedData['barangay']) || !empty($validatedData['municipality']) || !empty($validatedData['province']) || !empty($validatedData['region'])) {
         $location = Location::firstOrCreate([
             'barangay' => $validatedData['barangay'] ?? null,
@@ -165,7 +171,7 @@ class SpecialRecordsController extends Controller
         ]);
     }
 
-    // Check and store facilitator
+    // Check and store facilitator if needed
     if (!empty($validatedData['facilitator_name'])) {
         $facilitator = Facilitator::firstOrCreate(['facilitator_name' => $validatedData['facilitator_name']]);
     }
@@ -179,7 +185,7 @@ class SpecialRecordsController extends Controller
         'time' => $validatedData['time'],
         'transaction_type' => $validatedData['transaction_type'],
         'transaction_status' => 'special status', // Set the status here
-        'staff_id' => $validatedData['staff_id'],
+        'staff_id' => $logged_in_staff_id, // Use logged-in staff ID directly
         'commodity_id' => $commodity->commodity_id,
         'volume' => $validatedData['volume'],
         // Only set location values if a location was created
@@ -189,32 +195,36 @@ class SpecialRecordsController extends Controller
         'region' => $location ? $location->region : null,
         'facilitator_id' => $facilitator->facilitator_id ?? null,
     ]);
-        $author = Auth::user();
 
-        Log::create([
-            'action_type'=>'create',
-            'transaction' => implode(', ', array_filter([
-                            isset($validatedData['transaction_type']) ? "{$validatedData['transaction_type']}" : null,
-                            isset($validatedData['transaction_status']) ? "{$validatedData['transaction_status']}" : null,
-                            isset($commodity->commodity_name) ? "{$commodity->commodity_name}" : null,
-                            isset($validatedData['volume']) ? "{$validatedData['volume']}" .' kg': null,
-                            isset($validatedData['barangay']) ? "{$validatedData['barangay']}" : null,
-                            isset($validatedData['municipality']) ? "{$validatedData['municipality']}" : null,
-                            isset($validatedData['province']) ? "{$validatedData['province']}" : null,
-                            isset($validatedData['region']) ? "{$validatedData['region']}" : null,
-                            isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
-                            ])),
-            'author'=> $author->username,
-        ]);
-        session()->flash('success', 'Special record added successfully!');
+    // Log the action
+    $author = Auth::user();
+    Log::create([
+        'action_type'=>'create',
+        'transaction' => implode(', ', array_filter([
+                        isset($validatedData['transaction_type']) ? "{$validatedData['transaction_type']}" : null,
+                        isset($validatedData['transaction_status']) ? "{$validatedData['transaction_status']}" : null,
+                        isset($commodity->commodity_name) ? "{$commodity->commodity_name}" : null,
+                        isset($validatedData['volume']) ? "{$validatedData['volume']}" .' kg' : null,
+                        isset($validatedData['barangay']) ? "{$validatedData['barangay']}" : null,
+                        isset($validatedData['municipality']) ? "{$validatedData['municipality']}" : null,
+                        isset($validatedData['province']) ? "{$validatedData['province']}" : null,
+                        isset($validatedData['region']) ? "{$validatedData['region']}" : null,
+                        isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
+                    ])),
+        'author'=> $author->username,
+    ]);
 
-        $user = Auth::user();
-        if ($user->type == 0) {
-            return redirect()->route('special-records.create');
-        } elseif ($user->type == 1) {
-            return redirect()->route('staff-special-record.create');
-        }
+    session()->flash('success', 'Special record added successfully!');
+
+    // Redirect based on user type
+    $user = Auth::user();
+    if ($user->type == 0) {
+        return redirect()->route('special-records.create');
+    } elseif ($user->type == 1) {
+        return redirect()->route('staff-special-record.create');
+    }
 }
+
 
 
 

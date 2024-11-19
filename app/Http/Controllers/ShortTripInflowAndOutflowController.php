@@ -38,8 +38,8 @@ class ShortTripInflowAndOutflowController extends Controller
             ->where('transaction_status', 'regular')
             ->whereBetween('date', [$startDate, $endDate])
             ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
-            
-       
+
+
         $staffId = $request->input('staff_id');
         $timeFilter = $request->input('time_filter');
         $commodityId = $request->input('commodity_filter');
@@ -68,17 +68,17 @@ class ShortTripInflowAndOutflowController extends Controller
         if ($municipality) {
             $query->where('municipality', $municipality);
         }
-        if ($typeFilter) { 
+        if ($typeFilter) {
             $query->where('transaction_type', $typeFilter);
         }
-        if ($typeFilter) { 
+        if ($typeFilter) {
             $query->where('transaction_type', $typeFilter);
         }
 
 
         // Fetch the paginated results
         $trading_inflows_graph = $query->get();
-        $trading_inflows_table = $query->paginate( 5);
+        $trading_inflows_table = $query->paginate(5);
 
         if ($request->ajax()) {
             return response()->json([
@@ -116,75 +116,119 @@ class ShortTripInflowAndOutflowController extends Controller
                 ];
             });
 
-        $volumes = [];
-        $totalVolumes = [];
+        // Separate volumes for inflow and outflow
+        $inflowVolumes = [];
+        $outflowVolumes = [];
+        $totalInflowVolumes = [];
+        $totalOutflowVolumes = [];
         $dates = [];
 
-        foreach ($trading_inflows_graph as $inflow) {
-            $date = Carbon::parse($inflow->date)->toDateString();
-            $commodity = $inflow->commodity->commodity_name;
+        // Process the trading inflows graph
+        foreach ($trading_inflows_graph as $transaction) {
+            $date = Carbon::parse($transaction->date)->toDateString();
+            $commodity = $transaction->commodity->commodity_name;
 
-            if (!isset($volumes[$commodity][$date])) {
-                $volumes[$commodity][$date] = 0;
-                $dates[] = $date;
+            // Inflow data
+            if ($transaction->transaction_type == 'short trip inflow') {
+                if (!isset($inflowVolumes[$commodity][$date])) {
+                    $inflowVolumes[$commodity][$date] = 0;
+                    $dates[] = $date;
+                }
+                $inflowVolumes[$commodity][$date] += $transaction->volume;
+
+                if (!isset($totalInflowVolumes[$date])) {
+                    $totalInflowVolumes[$date] = 0;
+                }
+                $totalInflowVolumes[$date] += $transaction->volume;
             }
 
-            $volumes[$commodity][$date] += $inflow->volume;
+            // Outflow data
+            if ($transaction->transaction_type == 'short trip outflow') {
+                if (!isset($outflowVolumes[$commodity][$date])) {
+                    $outflowVolumes[$commodity][$date] = 0;
+                    $dates[] = $date;
+                }
+                $outflowVolumes[$commodity][$date] += $transaction->volume;
 
-            if (!isset($totalVolumes[$date])) {
-                $totalVolumes[$date] = 0;
+                if (!isset($totalOutflowVolumes[$date])) {
+                    $totalOutflowVolumes[$date] = 0;
+                }
+                $totalOutflowVolumes[$date] += $transaction->volume;
             }
-            $totalVolumes[$date] += $inflow->volume;
         }
 
+        // Ensure date range is complete
         $dateRange = [];
         for ($date = Carbon::parse($startDate); $date->lessThanOrEqualTo(Carbon::parse($endDate)); $date->addDay()) {
             $dateRange[] = $date->toDateString();
         }
 
-        foreach ($volumes as $commodity => $data) {
+        // Fill in missing dates for both inflows and outflows
+        foreach ($inflowVolumes as $commodity => $data) {
             foreach ($dateRange as $date) {
                 if (!isset($data[$date])) {
                     $data[$date] = 0;
                 }
             }
             ksort($data);
-            $volumes[$commodity] = $data;
+            $inflowVolumes[$commodity] = $data;
         }
 
-        $chartData = [];
-        foreach ($volumes as $commodity => $data) {
-            $chartData[] = [
+        foreach ($outflowVolumes as $commodity => $data) {
+            foreach ($dateRange as $date) {
+                if (!isset($data[$date])) {
+                    $data[$date] = 0;
+                }
+            }
+            ksort($data);
+            $outflowVolumes[$commodity] = $data;
+        }
+
+        // Prepare chart data for inflows and outflows
+        $inflowChartData = [];
+        $outflowChartData = [];
+
+        foreach ($inflowVolumes as $commodity => $data) {
+            $inflowChartData[] = [
                 'name' => $commodity,
                 'data' => array_values($data),
             ];
         }
 
-        $totalVolumeData = array_values(array_map(function ($date) use ($totalVolumes) {
-            return $totalVolumes[$date] ?? 0;
+        foreach ($outflowVolumes as $commodity => $data) {
+            $outflowChartData[] = [
+                'name' => $commodity,
+                'data' => array_values($data),
+            ];
+        }
+
+        // Map total volume data for inflows and outflows
+        $inflowVolumeData = array_values(array_map(function ($date) use ($totalInflowVolumes) {
+            return $totalInflowVolumes[$date] ?? 0;
         }, $dateRange));
 
+        $outflowVolumeData = array_values(array_map(function ($date) use ($totalOutflowVolumes) {
+            return $totalOutflowVolumes[$date] ?? 0;
+        }, $dateRange));
+
+        // Merge dates and sort them
         $dates = array_unique(array_merge($dates, $dateRange));
         sort($dates);
 
-
-
-        //total vehicle today
+        // Calculate total vehicle and volume today
         $vehicle = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
-    ->where('transaction_status', 'regular')
-    ->whereDate('date', Carbon::today())
-    ->count('id');
-$today_vehicle = number_format($vehicle);
+            ->where('transaction_status', 'regular')
+            ->whereDate('date', Carbon::today())
+            ->count('id');
+        $today_vehicle = number_format($vehicle);
 
-
-        //total volume today
         $volume = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
             ->where('transaction_status', 'regular')
             ->whereDate('date', Carbon::today())
             ->sum('volume');
         $today_volume = number_format($volume, 2);
 
-
+        // User type check and return view
         $user = Auth::user();
         $userId = Auth::id();
         if ($user->type == 0) {
@@ -195,12 +239,14 @@ $today_vehicle = number_format($vehicle);
                 'trading_inflows_table',
                 'request',
                 'facilitators',
-                'chartData',
+                'inflowChartData',
+                'outflowChartData',
                 'dates',
                 'startDate',
                 'endDate',
                 'commodities',
-                'totalVolumeData',
+                'inflowVolumeData',
+                'outflowVolumeData',
                 'staffs',
                 'productionOrigins',
                 'municipalities',
@@ -214,12 +260,14 @@ $today_vehicle = number_format($vehicle);
                 'trading_inflows_table',
                 'request',
                 'facilitators',
-                'chartData',
+                'inflowChartData',
+                'outflowChartData',
                 'dates',
                 'startDate',
                 'endDate',
                 'commodities',
-                'totalVolumeData',
+                'inflowVolumeData',
+                'outflowVolumeData',
                 'staffs',
                 'productionOrigins',
                 'municipalities',
@@ -227,9 +275,6 @@ $today_vehicle = number_format($vehicle);
             ));
         }
     }
-
-
-
 
 
     /**
@@ -896,7 +941,7 @@ $today_vehicle = number_format($vehicle);
         
             Log::create([
             'action_type'=>'import',
-            'transaction' => $rows['transaction_type'],
+            'transaction' => $transaction_type,
             'author'=> $author->username,
         ]);
         // Insert all rows at once for efficiency

@@ -629,32 +629,43 @@ class SampleDataSeeder extends Seeder
         
         //User
         User::create([
-            'id' => '1',
-            'staff_id' => '1',
+            'id' => 1,
+            'staff_id' => 1,
             'username' => 'admin',
-            'password' => Hash::make('123'),
-            'type' => 0,
+            'password' => Hash::make('baptc-volume'),
+            'type' => 0, // admin
+            'is_active' => true, // Admin should always be active
         ]);
+
+        // Create Staff users (is_active will be set to false by default by the migration)
         User::create([
-            'id' => '2',
-            'staff_id' => '2',
+            'id' => 2,
+            'staff_id' => 2,
+            'email' => 'trixan@gmail.com',
             'username' => 'Lexer',
             'password' => Hash::make('123'),
-            'type' => 1,
+            'type' => 1, // staff
+            'is_active' => false, // Explicitly inactive
         ]);
+
         User::create([
-            'id' => '3',
-            'staff_id' => '3',
+            'id' => 3,
+            'staff_id' => 3,
+            'email' => 'kimjo@gmail.com',
             'username' => 'Kimjo',
             'password' => Hash::make('123'),
-            'type' => 1,
+            'type' => 1, // staff
+            'is_active' => false, // Explicitly inactive
         ]);
+
         User::create([
-            'id' => '4',
-            'staff_id' => '4',
+            'id' => 4,
+            'staff_id' => 4,
+            'email' => 'trixan@gmail.com',
             'username' => 'Trixan',
             'password' => Hash::make('123'),
-            'type' => 1,
+            'type' => 1, // staff
+            'is_active' => false, // Explicitly inactive
         ]);
 
         //Transaction

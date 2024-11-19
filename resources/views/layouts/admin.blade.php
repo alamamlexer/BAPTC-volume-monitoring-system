@@ -285,7 +285,7 @@
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
+ <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
@@ -297,58 +297,63 @@
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('trading-inflow.index')}}">
-          <i class="bi bi-grid"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Trading Inflow</span>
         </a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('trading-outflow.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Trading Outflow</span>
         </a>
       </li>
       
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('short-trip-inflow-and-outflow.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Short Trip Inflow and Outflow</span>
         </a>
       </li>
 
-      <li class="nav-item">
+    <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('special-records.index')}}">
-          <i class="bi bi-journal-text"></i>
+          <i class="bi bi-pencil-square"></i>
           <span>Special Records</span>
         </a>
       </li>
-
       
-
-        
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('report.index')}}">
-          <i class="bi bi-person"></i>
-          <span>Reports</span>
+    <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-journal-text"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
+        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{route('summary-report.index')}}">
+              <i class="bi bi-circle"></i><span>Summary Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{route('report.index')}}">
+              <i class="bi bi-circle"></i><span>Analytical Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="/transactions">
+              <i class="bi bi-circle"></i><span>Activity Log</span>
+            </a>
+          </li>
+        </ul>
       </li>
-      
+
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('record.index')}}">
-          <i class="bi bi-person"></i>
-          <span>Records</span>
+          <i class="bi bi-laptop"></i>
+          <span>System Records</span>
         </a>
       </li>
       
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('log.index')}}">
-          <i class="bi bi-person"></i>
-          <span>Logs</span>
-        </a>
-      </li>
-
+  
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('user-management.index')}}">
           <i class="bi bi-person"></i>
@@ -366,7 +371,7 @@
                 <span>Logout</span>
             </button>
         </form>
-    
+      
           </li><!-- End Login Page Nav -->
 
 

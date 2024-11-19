@@ -1,14 +1,13 @@
 @extends('layouts.staff')
-@section('page_title','Short Trip Trading Inflow Form')
+@section('page_title','Short Trip Form')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Short Trip</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Short Trip Trading </a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new short trip trading</a></li>
+            <li class="breadcrumb-item active">Edit short trip</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Trading Inflow Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3" action="{{ route('staff-short-trip-inflow-and-outflow.update', $short_trip_inflow_and_outflow->id) }}" method="POST">
                         @csrf
@@ -48,7 +47,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-floating">
                                 <input type="date" class="form-control" id="date" name="date"
                                     placeholder="Date" value="{{$short_trip_inflow_and_outflow->date}}" required>
@@ -59,7 +58,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-control" required>
                                 <fieldset>
                                     <legend class="col-form-label col-sm-5 pt-0">Time</legend>
@@ -80,7 +79,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-control">
                                 <fieldset>
                                     <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
@@ -102,7 +101,7 @@
                         </div>
 
 
-                        <div class="col-md-4 position-relative" data-col="6">
+                        <div class="col-md-3 position-relative" data-col="6">
                             <div class="form-floating">
                                 <input type="hidden" id="facilitator_id" name="facilitator_id" value="{{$short_trip_inflow_and_outflow->facilitator->facilitator_id?? ''}}">
                                 <input type="text" class="form-control filter-input" id="facilitator_name" name="facilitator_name"
@@ -192,7 +191,7 @@
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="origin" placeholder="Select or type origin..."
                                     autocomplete="off" data-dropdown="originDropdown" required value="{{$short_trip_inflow_and_outflow->barangay}}, {{$short_trip_inflow_and_outflow->municipality}}, {{$short_trip_inflow_and_outflow->province}}, {{$short_trip_inflow_and_outflow->region}}">
-                                <label for="origin">Origin</label>
+                                <label for="origin">Origin/Destination</label>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
                                     @foreach ($facilitator_location_vehicles as $location_vehicle)
@@ -221,7 +220,7 @@
                             </div>
                             <ul class="dropdown-list list-group position-absolute w-100"
                                 style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;"
-                                data-dropdown="commodityDropdown">
+                                data-dropdown="commodityDropdown">F
                                 <li class="no-records list-group-item" style="display: none; cursor: default;">Commodity
                                     does not exist in the records</li>
                                 @foreach ($commodities as $commodity)
@@ -232,7 +231,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{$short_trip_inflow_and_outflow->volume}}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -241,7 +240,7 @@
                             </div>
                         </div>
 
-                        <p class="form-label">If there is no existing record, please fill the following:</p>
+                          <p class="form-label">Please provide the following information for new plate numbers or origins:</p>
 
 
 
@@ -325,7 +324,7 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
+
                             <a href="{{ route('staff-short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                         </div>
 

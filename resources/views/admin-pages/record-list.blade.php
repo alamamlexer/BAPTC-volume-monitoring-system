@@ -1,13 +1,13 @@
 @extends('layouts.admin')
-@section('page_title', 'Records')
+@section('page_title', 'System Records')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Records</h1>
+    <h1>System Records</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Records</a></li>
+            <li class="breadcrumb-item active">Records used by the system for dropdowns, autofills, and labels</li>
         </ol>
     </nav>
 </div>
@@ -28,7 +28,7 @@
                                     <th class="text-start">No.</th>
                                     <th class="text-start">Code</th>
                                     <th class="text-start">Name</th>
-                                    <th class="text-start">Action</th>
+                                    <!--<th class="text-start">Action</th>-->
                                 </tr>
                             </thead>
                         </table>  
@@ -68,7 +68,7 @@
                             </div>
                             <div class="col-md-2">
                              <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
-                                <button type="reset" class="btn btn-secondary">Reset</button>
+                                <button type="reset" class="btn btn-secondary">Clear All</button>
                             </div>
                         </form>
                     </div>
@@ -87,7 +87,7 @@
                                 <tr>
                                     <th class="text-start">No.</th>
                                     <th class="text-start">Name</th>
-                                    <th class="text-start">Action</th>
+                                    <!--<th class="text-start">Action</th>-->
                                 </tr>
                             </thead>
                         </table>  
@@ -117,7 +117,6 @@
 
                             <div class="col-md-2">
                              <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
-                                <button type="reset" class="btn btn-secondary">Reset</button>
                             </div>
                         </form>
                     </div>
@@ -268,25 +267,7 @@ $(document).ready(function () {
         },
             { data: 'code', name: 'code' },
             { data: 'name', name: 'name' },
-            {
-            data: null,
-            name: 'action',
-            orderable: false,
-            searchable: false,
-            render: function(data, type, row) {
             
-                console.log(row); 
-                return `
-                    <form action="/record/${row.id}?type=facilitator" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
-                            <i class="bx bxs-trash-alt"></i> Delete
-                        </button>
-                    </form>
-                `;
-            }
-        }
         ],
         lengthMenu: [5, 10, 20],
         language: {
@@ -311,25 +292,7 @@ $(document).ready(function () {
             }
         },
         { data: 'name', name: 'name' },
-        {
-            data: null,
-            name: 'action',
-            orderable: false,
-            searchable: false,
-            render: function(data, type, row) {
-            
-                console.log(row); 
-                return `
-                    <form action="/record/${row.id}?type=commodity" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
-                            <i class="bx bxs-trash-alt"></i> Delete
-                        </button>
-                    </form>
-                `;
-            }
-        }
+        
     ],
     lengthMenu: [5, 10, 20],
     language: {

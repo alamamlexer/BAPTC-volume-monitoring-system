@@ -1,14 +1,13 @@
 @extends('layouts.admin')
-@section('page_title', 'Short Trip Trading Form')
+@section('page_title', 'Short Trip Form')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Short Trip</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Short Trip Trading </a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new short trip trading </a></li>
+            <li class="breadcrumb-item active">Add a new short trip</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Short Trip Trading Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
                         @csrf
@@ -35,13 +34,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-5" hidden>
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="transaction_type" name="transaction_type"
-                                    value="trading inflow">
-                                <label for="transaction_type"></label>
-                            </div>
-                        </div>
+
 
                         <div class="col-md-3">
                             <div class="form-floating">
@@ -177,7 +170,7 @@
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="origin" placeholder="Select or type origin..."
                                     autocomplete="off" data-dropdown="originDropdown" value="{{ old('origin') }}">
-                                <label for="origin">Origin</label>
+                                <label for="origin">Origin/Destination</label>
                                 <ul class="dropdown-list list-group position-absolute w-100"
                                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" data-dropdown="originDropdown">
                                     @foreach ($locations as $location)
@@ -220,7 +213,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="volume" name="volume"
+                                <input type="number" class="form-control" id="volume" name="volume"
                                     placeholder="Volume(kg)" value="{{ old('volume') }}" required>
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
@@ -229,7 +222,7 @@
                             </div>
                         </div>
 
-                        <p class="form-label">New Record:</p>
+                       <p class="form-label">Please provide the following information for new plate numbers or origins:</p>
 
                         <div class="col-md-2">
                             <div class="form-floating">
@@ -307,15 +300,15 @@
 
 
 
-
-
-                </div>
-
-                <div class="text-center">
+<div class="text-center">
                     <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
-                    <button type="reset" class="btn btn-secondary">Reset</button>
+                    <button type="reset" class="btn btn-secondary">Clear All</button>
                     <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                 </div>
+
+                </div>
+
+                
                 </form>
             </div>
         </div>
@@ -326,7 +319,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Inflow Table</h5>
+                    <h5 class="card-title">Added Transaction/s Table (Temporary)</h5>
 
                     <div class="row mb-3">
                         <div class="col-auto">
@@ -416,7 +409,7 @@
 
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
-                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin:</label>
+                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin/Destination:</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                 <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)

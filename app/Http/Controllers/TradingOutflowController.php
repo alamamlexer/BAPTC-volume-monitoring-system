@@ -919,7 +919,7 @@ class TradingOutflowController extends Controller
         
         Log::create([
         'action_type'=>'import',
-        'transaction' => $rows['transaction_type'],
+        'transaction' => $transaction_type,
         'author'=> $author->username,
     ]);
         return back()->with('success', 'Data imported successfully');

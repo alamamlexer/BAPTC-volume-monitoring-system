@@ -8,7 +8,7 @@
     <h1>Trading Outflow</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Trading Outflow</a></li>
+           <li class="breadcrumb-item active">Transactions involving export of commodities to markets</li>
         </ol>
     </nav>
 </div>
@@ -37,7 +37,7 @@
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
         <div class="card info-card sales-card">
             <div class="card-body">
-                <h5 class="card-title">Vehicles </h5>
+                <h5 class="card-title">Daily Overall Vehicles </h5>
                 <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                         <i class="ri-car-fill"></i>
@@ -54,7 +54,7 @@
     <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
         <div class="card info-card revenue-card">
             <div class="card-body">
-                <h5 class="card-title">Volume (kg)</h5>
+                <h5 class="card-title">Daily Overall Volume (kg)</h5>
                 <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                         <i class="ri-scales-2-fill"></i>
@@ -72,7 +72,7 @@
     <div class="col-md-12">
         <div class="card mb-4"> <!-- Added margin bottom for spacing -->
             <div class="card-body">
-                <h5 class="card-title">Trading Outflow Chart</h5>
+                <h5 class="card-title">Trading Outflow Line Chart</h5>
                 <!-- Filter Form -->
                 <!-- Chart Container -->
                 <div id="areaChart" style="height: 350px;"></div>
@@ -90,7 +90,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Outflow Table</h5>
+                    <h5 class="card-title">Trading Outflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
                       <form method="GET" action="{{ route('trading-outflow.index') }}" class="mb-3">
@@ -150,7 +150,7 @@
                                     
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
-                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
+                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin/Destination:</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                 <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)

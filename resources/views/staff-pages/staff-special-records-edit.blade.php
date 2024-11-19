@@ -1,14 +1,13 @@
 @extends('layouts.staff')
-@section('page_title', 'Edit Special Record Form')
+@section('page_title', 'Special Record Form')
 @section('content')
 
 <!-- Page Title -->
 <div class="pagetitle">
-    <h1>Form Layouts</h1>
+    <h1>Special Records</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Special Records</a></li>
-            <li class="breadcrumb-item active"><a href="/">Add a new special records</a></li>
+             <li class="breadcrumb-item active">Edit special record</li>
         </ol>
     </nav>
 </div>
@@ -21,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Edit Special Records Form</h5>
+                    <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
                     <form class="row g-3 " action="{{ route('staff-special-record.update', $special_records) }}" method="POST">
                         @csrf
@@ -178,7 +177,7 @@
                             </div>
                         </div>
 
-                        <p class="form-label">If there is no existing record, please fill the following:</p>
+                         <p class="form-label">Please provide the following information for new  origins:</p>
 
                         <div class="col-md-2">
                             <div class="form-floating">
@@ -226,7 +225,6 @@
 
                         <div class="text-center">
                             <button type="submit" id="submitButton" class="btn btn-primary">Update</button>
-                            <button type="reset" class="btn btn-secondary">Reset</button>
                             <a href="{{ route('staff-special-record.index') }}" class="btn btn-danger">Back</a>
                         </div>
                     </form>

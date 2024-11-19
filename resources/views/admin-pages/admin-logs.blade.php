@@ -1,14 +1,14 @@
 @extends('layouts.admin')
-@section('page_title', 'Short Trip')
+@section('page_title', 'Activity Logs')
 
 @section('content')
 
 
 <div class="pagetitle">
-    <h1>Logs</h1>
+    <h1>Activty Logs</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Logs</a></li>
+            <li class="breadcrumb-item active"><a href="/">Tracks the actions done by users</a></li>
         </ol>
     </nav>
 </div>
@@ -97,7 +97,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('log.index') }}",
+                url: "/transactions",
                 data: { type: 'location' } // Specify the type
             },
             columns: [

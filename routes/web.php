@@ -16,13 +16,17 @@ use App\Http\Controllers\FacilitatorController;
 use App\Http\Controllers\CommodityController;
 use App\Http\Controllers\StaffProfileController;  
 use App\Http\Controllers\LogController;  
+use App\Http\Controllers\SummaryReportsController;
+use App\Http\Controllers\PasswordResetController;
 
 
 Route::controller(AuthenticationController::class)->group(function(){
 
+    Route::get('account/activate/{token}', [UserManagementController::class, 'activateAccount'])->name('account.activate');
+
     Route::post('/register-save-farmer','register_save_farmer')->name('register_save_farmer');
     Route::post('/register-save-staff','register_save_staff')->name('register_save_staff');
-    
+
     Route::get('login')->name('login');
     Route::post('/login-action','login_action')->name('login_action');
     
@@ -36,11 +40,15 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
     Route::resource('admin',AdminDashboardController::class); 
     
-    Route::get('/log',[LogController::class,'index'])->name('log.index');
+    Route::resource('log',LogController::class);   
     
+ Route::get('/transactions', [LogController::class, 'index']);
+ 
     Route::resource('commodity',CommodityController::class); 
     
     Route::resource('facilitator',FacilitatorController::class); 
+    
+       Route::resource('summary-report',SummaryReportsController::class);
 
     Route::resource('special-records',SpecialRecordsController::class); 
     
@@ -67,10 +75,11 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
 
 Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
 
+    Route::get('/staff-summary-report',[SummaryReportsController::class,'index'])->name('staff-summary-report.index');
     Route::get('/staff-dashboard',[AdminDashboardController::class,'index'])->name('staff-dashboard');
     Route::get('/staff/profile/{id}', [StaffProfileController::class, 'show'])->name('staff.profile');
     Route::put('/staff/profile/{id}', [StaffProfileController::class, 'update'])->name('staff.profile.update');
-    
+    Route::resource('log',LogController::class); 
 
     // Trading Inflow Routes For Staff
     Route::get('/staff-trading-inflow',[TradingInflowController::class,'index'])->name('staff-trading-inflow.index');
@@ -118,6 +127,9 @@ Route::middleware(['revalidate_backhistory','user_access'])->group(function(){
     
 });
 
+Route::get('password/reset', [PasswordResetController::class, 'showRequestForm'])->name('password.request');
+Route::post('password/email', [PasswordResetController::class, 'sendTemporaryPassword'])->name('password.email');
+  
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/login', [HomeController::class, 'showLoginForm'])->name('login');
 

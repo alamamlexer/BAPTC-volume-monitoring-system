@@ -4,11 +4,10 @@
 
     <!-- Page Title -->
     <div class="pagetitle">
-        <h1>Form Layouts</h1>
+        <h1>Trading Inflow</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Trading Inflow</a></li>
-                <li class="breadcrumb-item active"><a href="/">Add a new trading inflow</a></li>
+                <li class="breadcrumb-item active">Add a new trading inflow</li>
             </ol>
         </nav>
     </div>
@@ -21,7 +20,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Trading Inflow Form</h5>
+                        <h5 class="card-title">Transaction Form</h5>
                         <!-- Floating Labels Form -->
                         <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
                             @csrf
@@ -196,7 +195,7 @@
                             
                             <div class="col-md-2">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="volume" name="volume"
+                                    <input type="number" class="form-control" id="volume" name="volume"
                                         placeholder="Volume(kg)" value="{{ old('volume') }}" required>
                                     <label for="volume">Volume(kg)</label>
                                     @if ($errors->has('volume'))
@@ -205,7 +204,7 @@
                                 </div>
                             </div>
                             
-                            <p class="form-label">New Record:</p>
+                                  <p class="form-label">Please provide the following information for new plate numbers or origins:</p>
                             
                             <div class="col-md-2">
                                 <div class="form-floating">
@@ -284,7 +283,7 @@
                             
                                  <div class="text-center">
                                 <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
-                                <button type="reset" class="btn btn-secondary">Reset</button>
+                                <button type="reset" class="btn btn-secondary">Clear All</button>
                                 <a href="{{ route('trading-inflow.index') }}" class="btn btn-danger">Back</a>
                             </div>       
 
@@ -302,16 +301,13 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Inflow Table</h5>                       
+                        <h5 class="card-title">Added Transaction/s Table (Temporary)</h5>                       
     
                         <div class="row mb-3">
                             <div class="col-auto">
                                 <form action="{{ route('trading-inflow.submit') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
-                                    {{-- <button type="submit" class="btn btn-success">
-                                        Submit 
-                                    </button> --}}
                                     <button type="submit" class="btn btn-success">
                                         Submit 
                                     </button>
@@ -511,55 +507,82 @@
                     }
                 });
             
-                // Filterable Dropdown Setup
-                function setupFilterableDropdown(inputSelector, dropdownSelector, autofillFields = {}, autofillCallback = null) {
-                    const input = document.querySelector(inputSelector);
-                    const dropdown = document.querySelector(dropdownSelector);
-                    const items = dropdown.querySelectorAll('.input-item');
-            
-                    input.addEventListener('input', function () {
-                        const searchValue = input.value.toLowerCase();
-                        let hasRecord = false;
-            
-                        items.forEach(item => {
-                            if (item.textContent.toLowerCase().includes(searchValue)) {
-                                item.style.display = 'block';
-                                hasRecord = true;
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        });
-            
-                        dropdown.querySelector('.no-records').style.display = hasRecord ? 'none' : 'block';
-                        dropdown.style.display = searchValue ? 'block' : 'none';
-                    });
-            
-                    items.forEach(item => {
-                        item.addEventListener('click', function () {
-                            input.value = item.textContent.trim(); // Set input value
-                            dropdown.style.display = 'none'; // Hide dropdown
-            
-                            // Autofill other fields
-                            for (const [fieldId, dataAttr] of Object.entries(autofillFields)) {
-                                const field = document.getElementById(fieldId);
-                                if (field) field.value = item.getAttribute(`data-${dataAttr}`) || '';
-                            }
-            
-                            // Execute additional autofill logic if provided (e.g., origin autofill)
-                            if (autofillCallback) autofillCallback(item);
-                        });
-                    });
-            
-                    input.addEventListener('blur', function () {
-                        setTimeout(() => dropdown.style.display = 'none', 300); // Allow time for clicks
-                    });
-            
-                    document.addEventListener('click', function (event) {
-                        if (!input.contains(event.target) && !dropdown.contains(event.target)) {
-                            dropdown.style.display = 'none';
-                        }
-                    });
-                }
+               // Debounce function to delay the filtering operation
+function debounce(fn, delay) {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, arguments), delay);
+    };
+}
+
+// Function to setup filterable dropdown with dynamic filtering and debouncing
+function setupFilterableDropdown(inputSelector, dropdownSelector, autofillFields = {}, autofillCallback = null) {
+    const input = document.querySelector(inputSelector);
+    const dropdown = document.querySelector(dropdownSelector);
+    const items = dropdown.querySelectorAll('.input-item');
+
+    // Filter items based on input
+    const filterItems = () => {
+        const searchValue = input.value.trim().toLowerCase();
+        let hasRecord = false;
+
+        items.forEach(item => {
+            const itemText = item.textContent.toLowerCase();
+            if (itemText.includes(searchValue)) {
+                item.style.display = 'block';
+                hasRecord = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Show or hide "No records" message
+        const noRecords = dropdown.querySelector('.no-records');
+        if (hasRecord) {
+            noRecords.style.display = 'none';
+        } else {
+            noRecords.style.display = 'block';
+        }
+
+        // Display the dropdown only if there's input
+        dropdown.style.display = searchValue ? 'block' : 'none';
+    };
+
+    // Apply debounce to delay filtering on user input
+    const debouncedFilter = debounce(filterItems, 0); // Delay of 300ms
+    input.addEventListener('input', debouncedFilter);
+
+    // Handle item selection
+    items.forEach(item => {
+        item.addEventListener('click', function () {
+            input.value = item.textContent.trim(); // Set input value from the selected item
+            dropdown.style.display = 'none'; // Hide the dropdown after selection
+
+            // Autofill other fields if a callback is provided
+            for (const [fieldId, dataAttr] of Object.entries(autofillFields)) {
+                const field = document.getElementById(fieldId);
+                if (field) field.value = item.getAttribute(`data-${dataAttr}`) || '';
+            }
+
+            // If callback is provided, execute it
+            if (autofillCallback) autofillCallback(item);
+        });
+    });
+
+    // Hide dropdown if the user clicks outside
+    input.addEventListener('blur', function () {
+        setTimeout(() => dropdown.style.display = 'none', 300); // Delay to allow clicks on dropdown
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+}
+
+
             
                 // Autofill Plate Number and Origin Fields from Selected Item
                 function autofillPlateAndOrigin(item) {

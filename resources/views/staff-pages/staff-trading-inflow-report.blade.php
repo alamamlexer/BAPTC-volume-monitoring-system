@@ -3,121 +3,137 @@
 
 @section('content')
 
+
 <div class="pagetitle">
     <h1>Trading Inflow</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="/">Trading Inflow</a></li>
+            <li class="breadcrumb-item active">Transactions involving the import of commodities from farmers or producers</li>
         </ol>
     </nav>
 </div>
 
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
 
 <section class="section dashboard">
-    <div class="row ">
-        <!-- Number of Vehicles -->
-        <div class="col-md-4 ">
-            <div class="card info-card sales-card">
-                <div class="card-body">
-                    <h5 class="card-title">Date and Time</h5>
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="ri-time-fill"></i>
-                        </div>
-                        <div> 
-                            <h6 id="current-date-time" class="ps-3 fs-3 fw-bold"></h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-4 ">
-            <div class="card info-card sales-card">
-                <div class="card-body">
-                    <h5 class="card-title">Vehicles</h5>
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="ri-car-fill"></i>
-                        </div>
-                        <div class="ps-3">
-                            <h6>{{$today_vehicle}}</h6>
-                        </div>
+  <div class="row ">
+    <!-- Number of Vehicles -->
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card sales-card">
+            <div class="card-body">
+                <h5 class="card-title">Date and Time</h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-time-fill"></i>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 ">
-            <div class="card info-card revenue-card">
-                <div class="card-body">
-                    <h5 class="card-title">Volume (kg)</h5>
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="ri-scales-2-fill"></i>
-                        </div>
-                        <div class="ps-3">
-                            <h6>{{$today_volume}}</h6>
-                        </div>
+                    <div> 
+                        <h6 id="current-date-time" class="ps-3 fs-3 fw-bold"></h6>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Trading Inflow Chart</h5>
-                    <div id="areaChart" style="height: 350px;"></div>
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card sales-card">
+            <div class="card-body">
+                <h5 class="card-title">Daily Overall Vehicles </h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-car-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                        <h6>{{$today_vehicle}}</h6>
+                    </div>
                 </div>
             </div>
         </div>
+    </div><!-- End Sales Card -->
+
+    <!-- Revenue Card -->
+    <div class="col-md-4 "> <!-- Margin bottom added for spacing -->
+        <div class="card info-card revenue-card">
+            <div class="card-body">
+                <h5 class="card-title">Daily Overall Volume (kg)</h5>
+                <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="ri-scales-2-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                        <h6>{{$today_volume}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- End Revenue Card -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4"> <!-- Added margin bottom for spacing -->
+            <div class="card-body">
+                <h5 class="card-title">Trading Inflow Line Chart</h5>
+                <!-- Filter Form -->
+                <!-- Chart Container -->
+                <div id="areaChart" style="height: 350px;"></div>
+            </div>
+        </div>
     </div>
+</div>
+
+
+    
+
+   
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Inflow Table</h5>
+                    <h5 class="card-title">Trading Inflow Table</h5>
+                    <!-- Filter Row -->
                     <div class="row mb-3">
-                        <form method="GET" action="{{ route('staff-trading-inflow.index') }}" class="mb-3">
-                            <div class="input-group">
-                                <div class="col-md-2">
-                                    <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
-                                </div>
-                                <button class="btn btn-primary" type="submit">Filter</button>
-                            </div>
-                        </form>
+                      <form method="GET" action="{{ route('staff-trading-inflow.index') }}" class="mb-3">
+                        <div class="input-group">
+                        <div class="col-md-2">
+                        <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
+                        </div>
+                        <div class="col-md-2">
+                        <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
+                        </div>
+                            <button class="btn btn-primary" type="submit">Filter</button>
+                      
+                        </div>
+                    </form>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" id="">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
+                                    
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
                                             <label for="timeFilter" style="margin-right: 10px;">Time</label>
-                                            <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="fetchFilteredData()">
+                                            <select name="time_filter" id="timeFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByTime()">
                                                 <option value="">All</option>
                                                 <option value="AM" {{ request('time_filter') == 'AM' ? 'selected' : '' }}>AM</option>
                                                 <option value="PM" {{ request('time_filter') == 'PM' ? 'selected' : '' }}>PM</option>
                                             </select>
                                         </div>
                                     </th>
+
+                                    
+                                    
+                                    
                                     <th scope="col">Plate Number</th>
                                     <th scope="col">Name</th>
+                                    
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
                                             <label for="commodityFilter" style="margin-right: 10px;">Commodity</label>
-                                            <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="fetchFilteredData()">
+                                            <select name="commodity_filter" id="commodityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByCommodity()">
                                                 <option value="">All</option>
                                                 @foreach ($commodities as $commodity)
                                                 <option value="{{ $commodity->commodity_id }}" {{ request('commodity_filter') == $commodity->commodity_id ? 'selected' : '' }}>
@@ -127,11 +143,15 @@
                                             </select>
                                         </div>
                                     </th>
+                                    
                                     <th scope="col">Volume</th>
+                                    
+                                    
+                                    
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
                                             <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
-                                            <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="fetchFilteredData()">
+                                            <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                 <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)
                                                 <option value="{{ $municipality }}" {{ request('municipality_filter') == $municipality ? 'selected' : '' }}>
@@ -141,15 +161,17 @@
                                             </select>
                                         </div>
                                     </th>
+                                    
                                     <th scope="col">
-                                        <div class="d-flex align-items-center">
+                                        <div style="display: flex; align-items: center;">
                                             <label for="facilitatorFilter" class="form-label" style="margin-right: 5px;"> Market Facilitator:</label>
                                         </div>
                                     </th>
+                                    
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
                                             <label for="staffFilter" style="margin-right: 10px;">TOA/TOI</label>
-                                            <select name="staff_filter" id="staffFilter" class="form-select" style="border: none; font-weight: bold;" onchange="fetchFilteredData()">
+                                            <select name="staff_filter" id="staffFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByStaff()">
                                                 <option value="">All Staff</option>
                                                 @foreach ($staffs as $staff)
                                                 <option value="{{ $staff->staff_id }}" {{ request('staff_id') == $staff->staff_id ? 'selected' : '' }}>
@@ -159,11 +181,12 @@
                                             </select>
                                         </div>
                                     </th>
+                                    
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="TableBody">
-                                <!-- Data will be populated here -->
+
                             </tbody>
                         </table>
                     </div>
@@ -172,54 +195,72 @@
                             <a href="{{ route('staff-trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
                         </div>
                     </div>
-                    <div id="paginationLinks"></div>
+                    
+                    <div id="paginationLinks">
+                            
+                    </div>           
+                    
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Success Modal -->
     @if(session('success'))
+    {{--  Success Modal --}}
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                    <p class="mt-3">{{ session('success') }}</p>
-                </div>
-            </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('success') }}</p>
+          </div>
         </div>
+      </div>
     </div>
-    @endif
-
-    @if(session('error'))
+  @endif
+  
+  @if(session('error'))
+    {{--   Error Modal  --}}
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
-                    <p class="mt-3">{{ session('error') }}</p>
-                </div>
-            </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+            <p class="mt-3">{{ session('error') }}</p>
+          </div>
         </div>
+      </div>
     </div>
-    @endif
+  @endif
 
-</section>
 
-<script>
-    const userId = {{ auth()->user()->id }}; // Ensure userId is defined
-
+<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetchFilteredData(); // Fetch data on page load
-        showCurrentDateTime(); // Display current date and time
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Set initial filter values based on URL parameters
+        if (urlParams.has('time_filter')) {
+            document.getElementById('timeFilter').value = urlParams.get('time_filter');
+        }
+        if (urlParams.has('staff_id')) {
+            document.getElementById('staffFilter').value = urlParams.get('staff_id');
+        }
+        if (urlParams.has('commodity_filter')) {
+            document.getElementById('commodityFilter').value = urlParams.get('commodity_filter');
+        }
+        if (urlParams.has('municipality_filter')) {
+            document.getElementById('municipalityFilter').value = urlParams.get('municipality_filter');
+        }
+
+        // Fetch filtered data based on current filter selections
+        fetchFilteredData();
     });
-
-    function showCurrentDateTime() {
-        const now = new Date();
-        document.getElementById('current-date-time').innerText = now.toLocaleString();
-    }
-
-    function fetchFilteredData(page = 1) {
+ function fetchFilteredData(page = 1) {
+        // Get selected filter values
         const timeFilter = document.getElementById('timeFilter').value;
         const staffFilter = document.getElementById('staffFilter').value;
         const commodityFilter = document.getElementById('commodityFilter').value;
@@ -227,7 +268,11 @@
         const startDate = document.querySelector('input[name="start_date"]').value;
         const endDate = document.querySelector('input[name="end_date"]').value;
 
-        const url = "{{ route('staff-trading-inflow.index') }}";
+
+        // Construct the AJAX URL
+        const url = "{{ route('staff-trading-inflow.index') }}"; // Make sure to replace this with your route
+
+        // Create query parameters
         const queryParams = new URLSearchParams({
             time_filter: timeFilter,
             staff_id: staffFilter,
@@ -235,9 +280,10 @@
             municipality_filter: municipalityFilter,
             start_date: startDate, 
             end_date: endDate,
-            page: page
+            page:page
         });
 
+        // Perform AJAX request
         fetch(url + '?' + queryParams.toString(), {
             method: 'GET',
             headers: {
@@ -246,30 +292,31 @@
         })
         .then(response => response.json())
         .then(data => {
+            // Update table body
             const tableBody = document.getElementById('TableBody');
             tableBody.innerHTML = '';
 
-            if (!Array.isArray(data.data) || data.data.length === 0) {
+            if (data.data.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
             } else {
-                data.data.forEach((transaction, index) => {
-                    let editButton = (userId === transaction.staff_id)
-                        ? `<a href="/staff-trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1"><i class="bx bxs-edit"></i> Edit</a>`
-                        : `<span class="text-muted">Unauthorized Access</span>`;
-
+                data.data.forEach((transaction,index) => {
                     tableBody.innerHTML += `
-                        <tr>
+                        <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
                             <td>${index + 1}</td>
                             <td>${transaction.date}</td>
                             <td>${transaction.time}</td>
                             <td>${transaction.plate_number ?? 'N/A'}</td>
                             <td>${transaction.name ?? 'N/A'}</td>
-                            <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
+                            <td>${transaction.commodity?.commodity_name ?? 'N/A' }</td>
                             <td>${transaction.volume}</td>
                             <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff.staff_name}</td>
-                            <td>${editButton}</td>
+                            <td>
+                                <a href="/staff-trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                    <i class="bx bxs-edit"></i> Edit
+                                </a>
+                            </td>
                         </tr>
                     `;
                 });
@@ -404,19 +451,6 @@
             },
             exporting: {
                 enabled: true,
-                buttons: {
-                    customDownloadButton: {
-                        text: 'Download PNG',
-                        useHTML: true,
-                        onclick: function() {
-                            // Trigger local export
-                            this.exportChartLocal({
-                                type: 'image/png',
-                                filename: 'trading_inflow_chart'
-                            });
-                        }
-                    }
-                }
             }
         });
     });
