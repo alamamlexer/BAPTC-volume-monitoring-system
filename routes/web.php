@@ -42,7 +42,7 @@ Route::middleware(['revalidate_backhistory','admin_access'])->group(function(){
     
     Route::resource('log',LogController::class);   
     
- Route::get('/transactions', [LogController::class, 'index']);
+    Route::get('/transactions', [LogController::class, 'index'])->name('transactions');
  
     Route::resource('commodity',CommodityController::class); 
     

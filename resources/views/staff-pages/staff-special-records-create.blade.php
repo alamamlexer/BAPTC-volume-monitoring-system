@@ -161,10 +161,10 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="number" class="form-control" id="volume" name="volume"
-                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required>
+                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required min="1" step="1">
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
-                                <span class="text-danger">{{ $errors->first('volume') }}</span>
+                                    <span class="text-danger">{{ $errors->first('volume') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -260,6 +260,18 @@
 
 
 
+    <script>
+            document.getElementById('volume').addEventListener('input', function (e) {
+        let volumeValue = e.target.value;
+        
+        // Check if the value is a whole number and >= 1
+        if (volumeValue < 1 || !Number.isInteger(Number(volumeValue))) {
+            e.target.setCustomValidity('Please enter a whole number greater than or equal to 1.');
+        } else {
+            e.target.setCustomValidity(''); // Valid input
+        }
+    });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Success and Error Message Modals

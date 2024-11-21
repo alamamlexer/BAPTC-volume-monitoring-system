@@ -25,15 +25,15 @@
   <link href="{{asset('assets/vendor/quill/quill.bubble.css')}}" rel="stylesheet">
   <link href="{{asset('assets/vendor/remixicon/remixicon.css')}}" rel="stylesheet">
   <link href="{{asset('assets/vendor/simple-datatables/style.css')}}" rel="stylesheet">
-  
+
   <link href="{{asset('/custom-scripts/datatables.min.css')}}" rel="stylesheet">
   <link href="{{asset('/custom-scripts/datatables.css')}}" rel="stylesheet">
- 
+
   <script src="{{asset('/custom-scripts/jquery-3.6.0.min.js')}}"></script>
 
-<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
-<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
-<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
+  <script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+  <script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+  <script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
 
   <!-- Template Main CSS File -->
   <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
@@ -46,6 +46,16 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+
+  <style>
+    /* Active Tab Styles */
+    .sidebar-nav .nav-item .nav-link.active {
+      background-color: darkblue;
+      /* Dark background color */
+      color: white;
+      /* Change text color */
+    }
+  </style>
 </head>
 
 <body>
@@ -76,82 +86,85 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-dashboard')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-dashboard') active @endif" href="{{route('staff-dashboard')}}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li>
-      
+
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-trading-inflow.index')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-trading-inflow.index' || Route::currentRouteName() == 'staff-trading-inflow.create' || Route::currentRouteName() == 'staff-trading-inflow.edit') active @endif" href="{{route('staff-trading-inflow.index')}}">
           <i class="bi bi-pencil-square"></i>
           <span>Trading Inflow</span>
         </a>
       </li>
-      
+
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-trading-outflow.index')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-trading-outflow.index' || Route::currentRouteName() == 'staff-trading-outflow.create' || Route::currentRouteName() == 'staff-trading-outflow.edit') active @endif" href="{{route('staff-trading-outflow.index')}}">
           <i class="bi bi-pencil-square"></i>
           <span>Trading Outflow</span>
         </a>
       </li>
-      
+
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-short-trip-inflow-and-outflow.index')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-short-trip-inflow-and-outflow.index' || Route::currentRouteName() == 'staff-short-trip-inflow-and-outflow.create' || Route::currentRouteName() == 'staff-short-trip-inflow-and-outflow.edit') active @endif" href="{{route('staff-short-trip-inflow-and-outflow.index')}}">
           <i class="bi bi-pencil-square"></i>
           <span>Short Trip Inflow and Outflow</span>
         </a>
       </li>
-      
+
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-special-record.index')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-special-record.index' || Route::currentRouteName() == 'staff-special-record.create' || Route::currentRouteName() == 'staff-special-record.edit') active @endif" href="{{route('staff-special-record.index')}}">
           <i class="bi bi-pencil-square"></i>
           <span>Special Records</span>
         </a>
       </li>
 
 
- <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-summary-report.index' || Route::currentRouteName() == 'staff-report.index') active @endif" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-journal-text"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="icons-nav" class="nav-content collapse @if(Route::currentRouteName() == 'staff-summary-report.index' || Route::currentRouteName() == 'staff-report.index') show @endif" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="{{route('staff-summary-report.index')}}">
+            <a href="{{route('staff-summary-report.index')}}" class="@if(Route::currentRouteName() == 'staff-summary-report.index') active @endif">
               <i class="bi bi-circle"></i><span>Summary Reports</span>
             </a>
           </li>
           <li>
-            <a href="{{route('staff-report.index')}}">
+            <a href="{{route('staff-report.index')}}" class="@if(Route::currentRouteName() == 'staff-report.index') active @endif">
               <i class="bi bi-circle"></i><span>Analytical Reports</span>
             </a>
           </li>
         </ul>
       </li>
-      
+
+
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{route('staff-record.index')}}">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff-record.index') active @endif" href="{{route('staff-record.index')}}">
           <i class="bi bi-laptop"></i>
           <span>System Records</span>
         </a>
       </li>
-      
-      <li class="nav-item">
-    <a class="nav-link collapsed" href="{{ route('staff.profile', ['id' => auth()->user()->id]) }}">
-        <i class="bi bi-person"></i>
-        <span>Profile</span>
-    </a>
-</li>
-
 
       <li class="nav-item">
-    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-        @csrf
-        <button type="submit" class="nav-link collapsed">
+        <a class="nav-link collapsed @if(Route::currentRouteName() == 'staff.profile' && Route::current()->parameter('id') == auth()->user()->id) active @endif" href="{{ route('staff.profile', ['id' => auth()->user()->id]) }}">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+
+
+
+      <li class="nav-item">
+        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+          @csrf
+          <button type="submit" class="nav-link collapsed">
             <i class="bi bi-box-arrow-in-right"></i>
             <span>Logout</span>
-        </button>
-    </form>
+          </button>
+        </form>
 
       </li><!-- End Login Page Nav -->
 
@@ -161,7 +174,7 @@
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
-  
+
     @yield('content')
 
   </main><!-- End #main -->

@@ -23,15 +23,15 @@
 
                     <!-- Filter Row for Date Range -->
                     <div class="row mb-3">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="date" name="start_date" id="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="date" name="end_date" id="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
                         </div>
-                        <div class="col-md-2 d-flex gap-2">
+                        <div class="col-md-3 d-flex gap-2 align-items-center">
                             <button type="button" id="applyFiltersBtn" class="btn btn-primary" onclick="fetchFilteredData()">Filter</button>
-                            <button type="button" id="resetFiltersBtn" class="btn btn-secondary" onclick="resetFilters()"> Select Current Month</button>
+                            <button type="button" id="resetFiltersBtn" class="btn btn-secondary" onclick="resetFilters()">Select Current Month</button>
                         </div>
                     </div>
 

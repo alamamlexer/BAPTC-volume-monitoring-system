@@ -213,37 +213,37 @@
         
         
         <!-- TABLE 4 -->
-        <div class="row">
-            <div class="col-lg-12">
-            <div class="card">
-            <div class="card-body">
-                <h5 class="card-title"><b>IV. MONITORED NUMBERS OF STAKEHOLDERS TRADED IN THE CENTER (FARMERS & BUYERS)</b></h5>
-              <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="col-md-4 text-center">PARTICULAR</th>
-                            <th class="col-md-4 text-center">NUMBER OF STAKEHOLDERS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        <tr>
-                            <td class="text-center">TRADER</td>
-                            <td class="text-center">{{ $traderCount }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">FARMER</td>
-                            <td class="text-center">{{ $farmerCount }}</td>
-                        </tr>
-                      
-                    </tbody>
-                </table>
-              </div>
-            </div>
-            </div>
-            </div>
-            </div>
+<div class="row">
+    <div class="col-lg-12">
+    <div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><b>IV. MONITORED NUMBERS OF STAKEHOLDERS TRADED IN THE CENTER (FARMERS & BUYERS)</b></h5>
+      <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-md-4 text-center">PARTICULAR</th>
+                    <th class="col-md-4 text-center">NUMBER OF STAKEHOLDERS</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td class="text-center">TRADER</td>
+                    <td class="text-center">{{ $traderCount }}</td>
+                </tr>
+                <tr>
+                    <td class="text-center">FARMER</td>
+                    <td class="text-center">{{ $farmerCount }}</td>
+                </tr>
+              
+            </tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+    </div>
+    </div>
             
         
         
@@ -312,76 +312,75 @@
             </div>
             </div>
             
-        <!-- Table 7-->
-            <!-- TABLE 7 -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><b>VII. DELIVERY VOLUME AND FREQUENCY PER MUNICIPALITY</b></h5>
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">NO</th>
-                                            <th class="text-center">MUNICIPALITY</th>
-                                            <th class="text-center">COMMODITY</th>
-                                            <th class="text-center">DELIVERY VOLUME (KG)</th>
-                                            <th class="text-center">DELIVERY FREQUENCY</th>
-                                            <th class="text-center">PERCENTAGE SHARE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $counter = 1; @endphp
-                                        @foreach($transactionsByMunicipality as $municipality => $commodities)
-                                        @foreach($commodities as $data)
-                                        @if ($loop->first)
-                                        <tr>
-                                            <td class="text-center">{{ $counter }}</td>
-                                            <td class="text-center" rowspan="{{ count($commodities) }}">{{ $municipality }}</td>
-                                            <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
-                                            <td class="text-center">{{ $data['total_volume'] }}</td>
-                                            <td class="text-center">{{ $data['delivery_frequency'] }}</td>
-                                        </tr>
-                                        @else
-                                        <tr>
-                                            <td class="text-center"></td>
-                                            <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
-                                            <td class="text-center">{{ $data['total_volume'] }}</td>
-                                            <td class="text-center">{{ $data['delivery_frequency'] }}</td>
-                                        </tr>
-                                        @endif
-                                        @endforeach
-        
-                                        <!-- Subtotal Row -->
-                                        <tr>
-                                            <td class="text-center"></td>
-                                            <td class="text-end" colspan="2"><strong>Subtotal</strong></td>
-                                            <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_volume'] }}</strong></td>
-                                            <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_frequency'] }}</strong></td>
-                                            <td class="text-center"><strong>{{ $grandTotalVolume > 0 ? number_format(($subtotals[$municipality]['subtotal_volume'] / $grandTotalVolume) * 100, 2) : '0.00' }}%</strong></td>
-                                        </tr>
-        
-                                        @php $counter++; @endphp
-                                        @endforeach
-        
-                                        <!-- Grand Total Row -->
-                                        <tr>
-                                            <td class="text-center fw-bold" colspan="3">GRAND TOTAL</td>
-                                            <td class="text-center fw-bold">{{ $overallVolume }}</td>
-                                            <td class="text-center fw-bold">{{ $overallTotalFrequency }}</td>
-                                            <td class="text-center fw-bold">
-                                                <strong>{{ number_format($totalGrandPercentage, 2) }}%</strong>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+       <!-- Table 7-->
+    <!-- TABLE 7 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><b>VII. DELIVERY VOLUME AND FREQUENCY PER MUNICIPALITY</b></h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">NO</th>
+                                    <th class="text-center">MUNICIPALITY</th>
+                                    <th class="text-center">COMMODITY</th>
+                                    <th class="text-center">DELIVERY VOLUME (KG)</th>
+                                    <th class="text-center">DELIVERY FREQUENCY</th>
+                                    <th class="text-center">PERCENTAGE SHARE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $counter = 1; @endphp
+                                @foreach($transactionsByMunicipality as $municipality => $commodities)
+                                @foreach($commodities as $data)
+                                @if ($loop->first)
+                                <tr>
+                                    <td class="text-center">{{ $counter }}</td>
+                                    <td class="text-center" rowspan="{{ count($commodities) }}">{{ $municipality }}</td>
+                                    <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
+                                    <td class="text-center">{{ $data['total_volume'] }}</td>
+                                    <td class="text-center">{{ $data['delivery_frequency'] }}</td>
+                                </tr>
+                                @else
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-center">{{ $data['commodity']->commodity_name }}</td>
+                                    <td class="text-center">{{ $data['total_volume'] }}</td>
+                                    <td class="text-center">{{ $data['delivery_frequency'] }}</td>
+                                </tr>
+                                @endif
+                                @endforeach
+
+                                <!-- Subtotal Row -->
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-end" colspan="2"><strong>Subtotal</strong></td>
+                                    <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_volume'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ $subtotals[$municipality]['subtotal_frequency'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ $grandTotalVolume > 0 ? number_format(($subtotals[$municipality]['subtotal_volume'] / $grandTotalVolume) * 100, 2) : '0.00' }}%</strong></td>
+                                </tr>
+
+                                @php $counter++; @endphp
+                                @endforeach
+
+                                <!-- Grand Total Row -->
+                                <tr>
+                                    <td class="text-center fw-bold" colspan="3">GRAND TOTAL</td>
+                                    <td class="text-center fw-bold">{{ $overallVolume }}</td>
+                                    <td class="text-center fw-bold">{{ $overallTotalFrequency }}</td>
+                                    <td class="text-center fw-bold">
+                                        <strong>{{ number_format($totalGrandPercentage, 2) }}%</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        
+        </div>
+    </div>
         
             
         

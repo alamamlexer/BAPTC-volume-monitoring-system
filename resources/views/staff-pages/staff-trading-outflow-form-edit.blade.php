@@ -205,17 +205,13 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="number" class="form-control" id="volume" name="volume"
-                                    placeholder="Volume(kg)" value="{{$trading_outflow->volume}}" required>
+                                    placeholder="Volume(kg)" value="{{ $trading_outflow->volume }}" required min="1" step="1">
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
-                                <span class="text-danger">{{ $errors->first('volume') }}</span>
+                                    <span class="text-danger">{{ $errors->first('volume') }}</span>
                                 @endif
                             </div>
                         </div>
-
-
-
-
 
 
                         <div class="col-md-2">
@@ -493,6 +489,23 @@
                                     '.filter-input[data-dropdown="facilitatorDropdown"]',
                                     '.dropdown-list[data-dropdown="facilitatorDropdown"]'
                                 );
+                            });
+                        </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const volumeInput = document.getElementById('volume');
+
+                                // Prevent the user from entering non-integer values
+                                volumeInput.addEventListener('input', function() {
+                                    let value = volumeInput.value;
+                                    
+                                    // Check if the value is a valid whole number and >= 1
+                                    if (value < 1 || !Number.isInteger(Number(value))) {
+                                        volumeInput.setCustomValidity("Volume must be a whole number and at least 1.");
+                                    } else {
+                                        volumeInput.setCustomValidity(""); // Reset the custom validity
+                                    }
+                                });
                             });
                         </script>
                     </form>

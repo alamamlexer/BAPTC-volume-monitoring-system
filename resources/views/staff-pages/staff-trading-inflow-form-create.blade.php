@@ -195,15 +195,17 @@
                             
                             
                             <div class="col-md-2">
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="volume" name="volume"
-                                        placeholder="Volume(kg)" value="{{ old('volume') }}" required>
-                                    <label for="volume">Volume(kg)</label>
-                                    @if ($errors->has('volume'))
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="volume" name="volume"
+                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required min="1" step="1">
+                                <label for="volume">Volume(kg)</label>
+                                @if ($errors->has('volume'))
                                     <span class="text-danger">{{ $errors->first('volume') }}</span>
                                 @endif
-                                </div>
                             </div>
+                        </div>
+
+                            
                             
                               <p class="form-label">Please provide the following information for new plate numbers or origins:</p>
                             
@@ -306,16 +308,6 @@
     
                         <div class="row mb-3">
                             <div class="col-auto">
-                                <form action="{{ route('staff-trading-inflow.submit') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
-                                    {{-- <button type="submit" class="btn btn-success">
-                                        Submit 
-                                    </button> --}}
-                                    <button type="submit" class="btn btn-success">
-                                        Submit 
-                                    </button>
-                                </form>
                                     
                                     <div class="row">
                                     <div class="col">
@@ -430,6 +422,17 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <form action="{{ route('staff-trading-inflow.submit') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="status" value="temporary"> <!-- You can set this if needed -->
+                                    {{-- <button type="submit" class="btn btn-success">
+                                        Submit 
+                                    </button> --}}
+                                    <button type="submit" class="btn btn-success">
+                                        Submit 
+                                    </button>
+                                </form>
                         
                         
                         <div  id="paginationLinks">
@@ -478,6 +481,19 @@
        
 
 
+    <script>
+            document.getElementById('volume').addEventListener('input', function (e) {
+        let volumeValue = e.target.value;
+        
+        // Check if the value is a whole number and >= 1
+        if (volumeValue < 1 || !Number.isInteger(Number(volumeValue))) {
+            e.target.setCustomValidity('Please enter a whole number greater than or equal to 1.');
+        } else {
+            e.target.setCustomValidity(''); // Valid input
+        }
+    });
+    </script>
+    
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // Success and Error Message Modals
@@ -768,8 +784,8 @@
                         <form action="/staff-trading-inflow/${transaction.id}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">
-                                <i class="bx bxs-trash-alt"></i> Delete
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to Cancel this record?')">
+                                <i class="bx bxs-trash-alt"></i> Cancel
                             </button>
                         </form>
                     `

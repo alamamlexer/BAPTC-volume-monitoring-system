@@ -66,31 +66,30 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2">
-                            <fieldset>
-                                <div class="row">
-                                    <div class="col-md3">
-                                        <div class="form-control" placeholder="In/Out">
-                                            <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_inflow" value="short trip inflow" {{ old('transaction_type') == 'short trip inflow' ? 'checked' : '' }} required>
-                                                <label class="form-check-label" for="short_trip_inflow">In</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_outflow" value="short trip outflow" {{ old('transaction_type') == 'short trip outflow' ? 'checked' : '' }} required>
-                                                <label class="form-check-label" for="short_trip_outflow">Out</label>
-                                            </div>
-                                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating">
+                                <fieldset class="form-control">
+                                    <legend class="col-form-label col-sm-5 pt-0">In/Out</legend>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_inflow" value="short trip inflow"
+                                            {{ old('transaction_type', $short_trip_inflow_and_outflow->transaction_type ?? '') == 'short trip inflow' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="short_trip_inflow">In</label>
                                     </div>
-                                </div>
-                            </fieldset>
-                            @if ($errors->has('transaction_type'))
-                            <span class="text-danger">{{ $errors->first('transaction_type') }}</span>
-                            @endif
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="transaction_type" id="short_trip_outflow" value="short trip outflow"
+                                            {{ old('transaction_type', $short_trip_inflow_and_outflow->transaction_type ?? '') == 'short trip outflow' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="short_trip_outflow">Out</label>
+                                    </div>
+                                </fieldset>
+                                <label for="time">ShortTrip In/Out</label>
+                                @if ($errors->has('transaction_type'))
+                                    <span class="text-danger">{{ $errors->first('transaction_type') }}</span>
+                                @endif
+                            </div>
                         </div>
 
 
-                        <div class="col-md-4 position-relative" data-col="6">
+                        <div class="col-md-3 position-relative" data-col="6">
                             <div class="form-floating">
                                 <input type="text" class="form-control filter-input" name="facilitator_name"
                                     placeholder="Select or type facilitator..." aria-label="Facilitator"
@@ -220,10 +219,10 @@
                         <div class="col-md-2">
                             <div class="form-floating">
                                 <input type="number" class="form-control" id="volume" name="volume"
-                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required>
+                                    placeholder="Volume(kg)" value="{{ old('volume') }}" required min="1" step="1">
                                 <label for="volume">Volume(kg)</label>
                                 @if ($errors->has('volume'))
-                                <span class="text-danger">{{ $errors->first('volume') }}</span>
+                                    <span class="text-danger">{{ $errors->first('volume') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -511,6 +510,18 @@
 
 
 
+    <script>
+        document.getElementById('volume').addEventListener('input', function (e) {
+            let volumeValue = e.target.value;
+            
+            // Check if the value is a whole number and >= 1
+            if (volumeValue < 1 || !Number.isInteger(Number(volumeValue))) {
+                e.target.setCustomValidity('Please enter a whole number greater than or equal to 1.');
+            } else {
+                e.target.setCustomValidity(''); // Valid input
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Success and Error Message Modals

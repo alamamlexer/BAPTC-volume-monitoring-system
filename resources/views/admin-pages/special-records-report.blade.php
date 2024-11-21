@@ -23,19 +23,17 @@
 
                     <!-- Filter Row for Date Range -->
                     <div class="row mb-3">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="date" name="start_date" id="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="date" name="end_date" id="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
                         </div>
-                        <div class="col-md-2 d-flex gap-2">
-    <button type="button" id="applyFiltersBtn" class="btn btn-primary" onclick="fetchFilteredData()">Filter</button>
-    <button type="button" id="resetFiltersBtn" class="btn btn-secondary" onclick="resetFilters()"> Select Current Month</button>
-</div>
+                        <div class="col-md-3 d-flex gap-2 align-items-center">
+                            <button type="button" id="applyFiltersBtn" class="btn btn-primary" onclick="fetchFilteredData()">Filter</button>
+                            <button type="button" id="resetFiltersBtn" class="btn btn-secondary" onclick="resetFilters()">Select Current Month</button>
+                        </div>
                     </div>
-
-
 
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -140,48 +138,48 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    // Call the function to fetch initial data when the page loads
-    fetchFilteredData();  
-});
-
-function fetchFilteredData(page = 1) {
-    // Get selected filter values
-    const transactionFilter = document.getElementById('transactionFilter').value;
-    const commodityFilter = document.getElementById('commodityFilter').value;
-    const municipalityFilter = document.getElementById('municipalityFilter').value;
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-
-    // Construct the AJAX URL with query parameters
-    const url = "{{ route('special-records.index') }}";
-
-    const queryParams = new URLSearchParams({
-        transaction_filter: transactionFilter,
-        commodity_filter: commodityFilter,
-        municipality_filter: municipalityFilter,
-        start_date: startDate,
-        end_date: endDate,
-        page: page  // Add the page parameter for pagination
+        // Call the function to fetch initial data when the page loads
+        fetchFilteredData();
     });
 
-    // Perform AJAX request to fetch filtered data
-    fetch(url + '?' + queryParams.toString(), {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Update the table with the filtered data
-        const tableBody = document.getElementById('TableBody');
-        tableBody.innerHTML = '';
+    function fetchFilteredData(page = 1) {
+        // Get selected filter values
+        const transactionFilter = document.getElementById('transactionFilter').value;
+        const commodityFilter = document.getElementById('commodityFilter').value;
+        const municipalityFilter = document.getElementById('municipalityFilter').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
 
-        if (data.data.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No records found.</td></tr>';
-        } else {
-            data.data.forEach((transaction, index) => {
-                tableBody.innerHTML += `
+        // Construct the AJAX URL with query parameters
+        const url = "{{ route('special-records.index') }}";
+
+        const queryParams = new URLSearchParams({
+            transaction_filter: transactionFilter,
+            commodity_filter: commodityFilter,
+            municipality_filter: municipalityFilter,
+            start_date: startDate,
+            end_date: endDate,
+            page: page // Add the page parameter for pagination
+        });
+
+        // Perform AJAX request to fetch filtered data
+        fetch(url + '?' + queryParams.toString(), {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the table with the filtered data
+                const tableBody = document.getElementById('TableBody');
+                tableBody.innerHTML = '';
+
+                if (data.data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No records found.</td></tr>';
+                } else {
+                    data.data.forEach((transaction, index) => {
+                        tableBody.innerHTML += `
                     <tr>
                         <td>${(data.current_page - 1) * 5 + (index + 1)}</td>
                         <td>${transaction.date || 'N/A'}</td>
@@ -200,71 +198,82 @@ function fetchFilteredData(page = 1) {
                         </td>
                     </tr>
                 `;
-            });
-        }
+                    });
+                }
 
-        // Update pagination links
-        updatePagination(data.current_page, data.last_page);
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function updatePagination(currentPage, lastPage) {
-    const paginationLinks = document.getElementById('paginationLinks');
-    const maxPagesToShow = 5;
-    let startPage, endPage;
-
-    // Determine the range of pages to show in pagination
-    if (lastPage <= maxPagesToShow) {
-        startPage = 1;
-        endPage = lastPage;
-    } else {
-        const halfMaxPages = Math.floor(maxPagesToShow / 2);
-        if (currentPage <= halfMaxPages) {
-            startPage = 1;
-            endPage = maxPagesToShow;
-        } else if (currentPage + halfMaxPages >= lastPage) {
-            startPage = lastPage - maxPagesToShow + 1;
-            endPage = lastPage;
-        } else {
-            startPage = currentPage - halfMaxPages;
-            endPage = currentPage + halfMaxPages;
-        }
+                // Update pagination links
+                updatePagination(data.current_page, data.last_page);
+            })
+            .catch(error => console.error('Error:', error));
     }
 
-    const paginationHtml = `
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1}); return false;">Previous</a>
-                </li>
-                ${Array.from({ length: endPage - startPage + 1 }, (_, i) => `
-                    <li class="page-item ${currentPage === (startPage + i) ? 'active' : ''}">
-                        <a class="page-link" href="#" onclick="fetchFilteredData(${startPage + i}); return false;">${startPage + i}</a>
-                    </li>
-                `).join('')}
-                <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1}); return false;">Next</a>
-                </li>
-            </ul>
-        </nav>
-    `;
-    paginationLinks.innerHTML = paginationHtml;
-}
+    function updatePagination(currentPage, lastPage) {
+        const paginationLinks = document.getElementById('paginationLinks');
+        const maxPagesToShow = 5;
+        let startPage, endPage;
 
-function resetFilters() {
-    // Reset date filters
-    document.getElementById('start_date').value = "{{ old('start_date', $startDate) }}";
-    document.getElementById('end_date').value = "{{ old('end_date', $endDate) }}";
+        // Determine the range of pages to show in pagination
+        if (lastPage <= maxPagesToShow) {
+            startPage = 1;
+            endPage = lastPage;
+        } else {
+            const halfMaxPages = Math.floor(maxPagesToShow / 2);
+            if (currentPage <= halfMaxPages) {
+                startPage = 1;
+                endPage = maxPagesToShow;
+            } else if (currentPage + halfMaxPages >= lastPage) {
+                startPage = lastPage - maxPagesToShow + 1;
+                endPage = lastPage;
+            } else {
+                startPage = currentPage - halfMaxPages;
+                endPage = currentPage + halfMaxPages;
+            }
+        }
 
-    // Reset other filters (e.g., transaction type, commodity, municipality)
-    document.getElementById('transactionFilter').value = "";
-    document.getElementById('commodityFilter').value = "";
-    document.getElementById('municipalityFilter').value = "";
+                    const paginationHtml = `
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous button -->
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage - 1}); return false;">Previous</a>
+                        </li>
 
-    // Trigger the fetch with default (empty) filters
-    fetchFilteredData();
-}
+                        <!-- Dynamic page number buttons -->
+                        ${Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                            const pageNumber = startPage + i;
+                            return `
+                                <li class="page-item ${currentPage === pageNumber ? 'active' : ''}">
+                                    <a class="page-link" href="#" onclick="fetchFilteredData(${pageNumber}); return false;">${pageNumber}</a>
+                                </li>
+                            `;
+                        }).join('')}
+
+                        <!-- Next button -->
+                        <li class="page-item ${currentPage === lastPage ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="fetchFilteredData(${currentPage + 1}); return false;">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            `;
+
+            paginationLinks.innerHTML = paginationHtml;
+
+
+    }
+
+    function resetFilters() {
+        // Reset date filters
+        document.getElementById('start_date').value = "{{ old('start_date', $startDate) }}";
+        document.getElementById('end_date').value = "{{ old('end_date', $endDate) }}";
+
+        // Reset other filters (e.g., transaction type, commodity, municipality)
+        document.getElementById('transactionFilter').value = "";
+        document.getElementById('commodityFilter').value = "";
+        document.getElementById('municipalityFilter').value = "";
+
+        // Trigger the fetch with default (empty) filters
+        fetchFilteredData();
+    }
 </script>
 
 @endsection

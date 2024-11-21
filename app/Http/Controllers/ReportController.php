@@ -839,10 +839,7 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'washtotalVolume',
             'intertradingTransactions',
             'table_twelve_data',
-            'month_name',
-            'past_year',
-            'current_year',
-            'totalwashingVolume' ,
+            'month_name', 'past_year', 'current_year',
             'overallVolume',
             'overallTotalFrequency',
             'totalstakeholder',
@@ -851,7 +848,5 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             
         ));
    }
-       
-        
         }
 }
