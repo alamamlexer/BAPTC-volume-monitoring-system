@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
-            $table->string('time');
-            $table->string('transaction_type'); 
-            $table->string('transaction_status'); 
-            $table->foreignId('staff_id')->constrained('staff','staff_id');  
-            $table->foreignId('commodity_id')->constrained('commodities','commodity_id'); 
-            $table->decimal('volume', 10, 2);
+            $table->date('date')->nullable();
+            $table->string('time')->nullable();
+            $table->string('transaction_type')->nullable();
+            $table->string('transaction_status')->nullable();
+            $table->foreignId('staff_id')->constrained('staff','staff_id')->nullable();
+            $table->foreignId('commodity_id')->constrained('commodities','commodity_id')->nullable();
+            $table->decimal('volume', 15, 2)->nullable();
             $table->string('plate_number')->nullable();
-            $table->foreignId('vehicle_type_id')->nullable()->constrained('vehicle_types','vehicle_type_id'); 
+            $table->foreignId('vehicle_type_id')->nullable()->constrained('vehicle_types','vehicle_type_id')->nullable();
             $table->string('name')->nullable();
-            $table->foreignId('facilitator_id')->nullable()->constrained('facilitators','facilitator_id'); 
+            $table->foreignId('facilitator_id')->nullable()->constrained('facilitators','facilitator_id')->nullable();
             $table->string('barangay')->nullable(); 
             $table->string('municipality')->nullable(); 
             $table->string('province')->nullable(); 

@@ -236,6 +236,8 @@
 
 
   <script>
+
+    const userId = {{ auth()->user()->id }}; // Ensure userId is defined
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         
@@ -287,33 +289,32 @@
                 'X-Requested-With': 'XMLHttpRequest',
             }
         })
-        .then(response => response.json())
+         .then(response => response.json())
         .then(data => {
-            // Update table body
             const tableBody = document.getElementById('TableBody');
             tableBody.innerHTML = '';
 
-            if (data.data.length === 0) {
+            if (!Array.isArray(data.data) || data.data.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No records added</td></tr>';
             } else {
-                data.data.forEach((transaction,index) => {
+                data.data.forEach((transaction, index) => {
+                    let editButton = (userId === transaction.staff_id)
+                        ? `<a href="/staff-trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1"><i class="bx bxs-edit"></i> Edit</a>`
+                        : `<span class="text-muted">Unauthorized Access</span>`;
+
                     tableBody.innerHTML += `
-                        <tr data-date="${transaction.date}" data-am-pm="${transaction.time}" data-attendant="${transaction.staff_id}" data-commodity="${transaction.commodity_id}" data-production-origin="${transaction.barangay}">
+                        <tr>
                             <td>${index + 1}</td>
                             <td>${transaction.date}</td>
                             <td>${transaction.time}</td>
                             <td>${transaction.plate_number ?? 'N/A'}</td>
                             <td>${transaction.name ?? 'N/A'}</td>
-                            <td>${transaction.commodity?.commodity_name ?? 'N/A' }</td>
+                            <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
                             <td>${transaction.volume}</td>
                             <td>${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}</td>
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff.staff_name}</td>
-                            <td>
-                                <a href="/staff-trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
-                                    <i class="bx bxs-edit"></i> Edit
-                                </a>
-                            </td>
+                            <td>${editButton}</td>
                         </tr>
                     `;
                 });

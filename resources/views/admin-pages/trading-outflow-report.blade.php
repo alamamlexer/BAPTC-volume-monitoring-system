@@ -389,7 +389,9 @@
     }
     
    </script>
-
+<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
@@ -447,21 +449,8 @@
                     }
                 }
             },
-            exporting: {
+           exporting: {
                 enabled: true,
-                buttons: {
-                    customDownloadButton: {
-                        text: 'Download PNG',
-                        useHTML: true,
-                        onclick: function() {
-                            // Trigger local export
-                            this.exportChartLocal({
-                                type: 'image/png',
-                                filename: 'trading_outflow_chart'
-                            });
-                        }
-                    }
-                }
             }
         });
     });

@@ -163,7 +163,7 @@
 
 
 
-                                    <th scope="col">
+                                    <th scope="col" hidden>
                                         <div class="d-flex align-items-center">
                                             <label for="municipalityFilter" style="margin-right: 10px;">Origin/Destination:</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
@@ -332,10 +332,7 @@
                             <td>${transaction.name ?? 'N/A'}</td>
                             <td>${transaction.commodity?.commodity_name ?? 'N/A'}</td>
                             <td>${transaction.volume}</td>
-                            <td>${transaction.barangay || transaction.municipality || transaction.province || transaction.region 
-                                 ? `${transaction.barangay}, ${transaction.municipality}, ${transaction.province}, ${transaction.region}`
-                                    : 'N/A'}
-                            </td>
+
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff?.staff_name ?? 'N/A'}</td>
                             <td>

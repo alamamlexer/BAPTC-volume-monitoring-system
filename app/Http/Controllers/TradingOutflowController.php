@@ -813,115 +813,161 @@ class TradingOutflowController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,xls',
         ]);
-
+    
         $file = $request->file('file');
-
-        // Load the Excel file
         $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
-        
-        // Initialize an array to store the rows
+        $worksheet = $spreadsheet->getSheetByName('TRUCKINGS');
+    
+        if (!$worksheet) {
+            return back()->with('error', 'Sheet for trading outflow not found!');
+        }
+    
         $rows = [];
-
-        foreach ($worksheet->getRowIterator(2) as $row) { // Start from row 2 to skip headers
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-
-            $data = [];
-            foreach ($cellIterator as $cell) {
-                $data[] = $cell->getValue(); // Collect each cell's value
+        $batchSize = 500; // Define batch size for inserts
+    
+        foreach ($worksheet->getRowIterator(8) as $row) {
+            $rowIndex = $row->getRowIndex(); // Current row index
+            $province = $worksheet->getCell("F{$rowIndex}")->getValue();
+    
+            // Fetch location details
+            // $location = $barangay 
+            //     ? Location::where('barangay', $barangay)->first() 
+            //     : null;
+    
+            $municipality = null;
+            $region = null;
+            $barangay = null;
+    
+            $excel_date = $worksheet->getCell("A{$rowIndex}")->getValue();
+            $date = is_numeric($excel_date) 
+                ? Date::excelToDateTimeObject($excel_date)->format('Y-m-d') 
+                : null;
+                if (!$date) {
+                    continue;
+                }
+            $time = $worksheet->getCell("B{$rowIndex}")->getValue();
+            $staff_name = $worksheet->getCell("G{$rowIndex}")->getValue();
+            // $commodity_name = $worksheet->getCell("N{$rowIndex}")->getValue();
+            $volume = $worksheet->getCell("E{$rowIndex}")->getValue();
+            $plate_number = $worksheet->getCell("C{$rowIndex}")->getValue();
+            // $vehicle_type_name = $worksheet->getCell("AI{$rowIndex}")->getValue();
+            $name = $worksheet->getCell("D{$rowIndex}")->getValue();
+            $facilitator_name = $worksheet->getCell("Q{$rowIndex}")->getValue();
+    
+    
+    if(!$time){
+            $time='';
             }
-
-            $excel_date = $worksheet->getCell("A" . $row->getRowIndex())->getValue();
-            $time = $worksheet->getCell("B" . $row->getRowIndex())->getValue();
-            $transaction_type = $worksheet->getCell("C" . $row->getRowIndex())->getValue();
-            $staff_name = $worksheet->getCell("E" . $row->getRowIndex())->getValue();
-            $commodity_name = $worksheet->getCell("F" . $row->getRowIndex())->getValue();
-            $volume = $worksheet->getCell("G" . $row->getRowIndex())->getValue();
-            $plate_number = $worksheet->getCell("H" . $row->getRowIndex())->getValue();
-            $vehicle_type_name = $worksheet->getCell("I" . $row->getRowIndex())->getValue();
-            $name = $worksheet->getCell("J" . $row->getRowIndex())->getValue();
-            $facilitator_name = $worksheet->getCell("K" . $row->getRowIndex())->getValue();
-            $barangay = $worksheet->getCell("L" . $row->getRowIndex())->getValue();
-            $municipality = $worksheet->getCell("M" . $row->getRowIndex())->getValue();
-            $province = $worksheet->getCell("N" . $row->getRowIndex())->getValue();
-            $region = $worksheet->getCell("O" . $row->getRowIndex())->getValue();
+            // Fetch or create related models
+            if ($staff_name) {
+                $staff = Staff::firstOrCreate(
+                    ['staff_name' => $staff_name], // Check for this condition
+                    ['staff_name' => $staff_name,
+                                'email' => "baptc.2015@gmail.com",
+                                'contact_number' => "09999999999",
+                                                            ]  // The values to use if a new record is created
+                );
             
-            
-            if (is_numeric($excel_date)) {
-                $date = Date::excelToDateTimeObject($excel_date)->format('Y-m-d');
+                // Now, you can directly get the staff_id
+                $staff_id = $staff->staff_id;
             } else {
-                // Handle non-numeric date values as needed (e.g., log or throw an error)
-                $date = null; // or some default value
+                $staff = Staff::firstOrCreate(
+                    ['staff_name' => "Unknown"], // Check for this condition
+                    ['staff_name' => "Unknown",
+                                'email' => "baptc.2015@gmail.com",
+                                'contact_number' => "09999999999",
+                                                            ]  // The values to use if a new record is created
+                );
             }
-            $staff = Staff::where('staff_name', $staff_name)->first();
-            if ($staff) {
-                $staff_id = $staff->staff_id; 
-            } else {
-                $staff_id = null; 
-            }
-            
-            $commodity = Commodity::where('commodity_name', $commodity_name)->first();
-            if ($commodity) {
-                $commodity_id = $commodity->commodity_id; 
-            } else {
-                $commodity_id = null; 
-            }
-          
-            if($plate_number){
-            $vehicle = Vehicle::where('plate_number', $plate_number)->first();
-            if ($vehicle) {
-                $vehicle_type_id = $vehicle->vehicle_type_id; 
-            } else {
-                $vehicle_type_id = null; 
-            }
-            }
-            else{
-            $vehicle_type_id = null; 
-            }
-            
-            
-            $facilitator = Facilitator::where('facilitator_name', $facilitator_name)->first();
-            if ($facilitator) {
-                $facilitator_id = $facilitator->facilitator_id; 
-            } else {
-                $facilitator_id = null; 
-            }
-          
-            // Map data to your model fields
+            $commodity = Commodity::firstOrCreate(
+                ['commodity_name' => "Sari-sari"], // Check for this condition
+                ['staff_name' => "Sari-sari",]  // The values to use if a new record is created
+            );
+                // if ($commodity_name) {
+                //     $commodity = Commodity::firstOrCreate(['commodity_name' => $commodity_name]);
+                //     $commodity_id = $commodity->commodity_id;
+                // } else {
+                //     // Handle case when commodity_name is missing
+                //     $commodity_id = null; // Or provide a default commodity ID if necessary
+                //     // Optionally log or skip this row
+                //     continue; // Skip inserting this row if $commodity_name is required
+                // }
+            $vehicle_type_id = $plate_number 
+                ? Vehicle::firstOrCreate(['plate_number' => $plate_number])->vehicle_type_id 
+                : null;
+    
+            $facilitator_id = $facilitator_name 
+                ? Facilitator::firstOrCreate(['facilitator_name' => $facilitator_name])->facilitator_id 
+                : null;
+                // if(!empty($vehicle)){
+        
+                //     if( !empty($location) && !empty($facilitator)){
+                //     $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                //         ->where('location_id', $location->location_id)
+                //         ->where('facilitator_id', $facilitator->facilitator_id)
+                //         ->first();
+                //     }
+                //         elseif(!$location && !empty($facilitator)){
+                //         $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                //             ->where('location_id', null)
+                //             ->where('facilitator_id', $facilitator->facilitator_id)
+                //             ->first();
+                //         }
+                //         else{
+                //             $facilitator_location_vehicles = FacilitatorLocationVehicle::where('vehicle_id', $vehicle->vehicle_id)
+                //                 ->where('location_id', $location->location_id)
+                //                 ->where('facilitator_id', null)
+                //                 ->first();
+                //             }
+                        
+                //     if (!$facilitator_location_vehicles){
+                //     $facilitator_location_vehicles = FacilitatorLocationVehicle::create([
+                //             'vehicle_id' => $vehicle->vehicle_id,
+                //             'location_id' => $location->location_id?? null,
+                //             'facilitator_id' => $facilitator->facilitator_id?? null,
+                //     ]);
+                //     }
+                // }
+            // Prepare the row for insertion
             $rows[] = [
                 'date' => $date,
                 'time' => $time,
-                'transaction_type' => $transaction_type,
-                'transaction_status' => "temporary",
+                'transaction_type' => "trading outflow",
+                'transaction_status' => "regular",
                 'staff_id' => $staff_id,
-                'commodity_id' => $commodity_id,
+                'commodity_id' =>$commodity->commodity_id,
                 'volume' => $volume,
                 'plate_number' => $plate_number,
                 'vehicle_type_id' => $vehicle_type_id,
                 'name' => $name,
                 'facilitator_id' => $facilitator_id,
-                'barangay' => $barangay,
-                'municipality' => $municipality,
+                'barangay' => 'N/A',
+                'municipality' => 'N/A',
                 'province' => $province,
-                'region' => $region,
-                'created_at' => now(), 
+                'region' => 'N/A',
+                'created_at' => now(),
                 'updated_at' => now(),
-
             ];
-            
+    
+            // Insert in batches
+            if (count($rows) >= $batchSize) {
+                Transaction::insert($rows);
+                $rows = []; // Reset rows for the next batch
+            }
         }
-        
-        // Insert all rows at once for efficiency
-        Transaction::insert($rows);
-
-        $author = Auth::user();
-        
+    
+        // Insert remaining rows
+        if (!empty($rows)) {
+            Transaction::insert($rows);
+        }
+    
+        // Log the import
         Log::create([
-        'action_type'=>'import',
-        'transaction' => $transaction_type,
-        'author'=> $author->username,
-    ]);
-        return back()->with('success', 'Data imported successfully');
+            'action_type' => 'import',
+            'transaction' => "trading outflow",
+            'author' => Auth::user()->username,
+        ]);
+    
+        return back()->with('success', 'Trading Outflow imported successfully!');
     }
 }

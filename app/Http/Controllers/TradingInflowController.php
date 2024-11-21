@@ -841,87 +841,98 @@ class TradingInflowController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,xls',
         ]);
-
+    
         $file = $request->file('file');
-
-        // Load the Excel file
         $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
-        
-        // Initialize an array to store the rows
+        $worksheet = $spreadsheet->getSheetByName('FARMERS');
+    
+        if (!$worksheet) {
+            return back()->with('error', 'Sheet for trading inflow not found!');
+        }
+    
         $rows = [];
-
-        foreach ($worksheet->getRowIterator(2) as $row) { // Start from row 2 to skip headers
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-
-            $data = [];
-            foreach ($cellIterator as $cell) {
-                $data[] = $cell->getValue(); // Collect each cell's value
-            }
-
-            $excel_date = $worksheet->getCell("A" . $row->getRowIndex())->getValue();
-            $time = $worksheet->getCell("B" . $row->getRowIndex())->getValue();
-            $transaction_type = $worksheet->getCell("C" . $row->getRowIndex())->getValue();
-            $staff_name = $worksheet->getCell("E" . $row->getRowIndex())->getValue();
-            $commodity_name = $worksheet->getCell("F" . $row->getRowIndex())->getValue();
-            $volume = $worksheet->getCell("G" . $row->getRowIndex())->getValue();
-            $plate_number = $worksheet->getCell("H" . $row->getRowIndex())->getValue();
-            $vehicle_type_name = $worksheet->getCell("I" . $row->getRowIndex())->getValue();
-            $name = $worksheet->getCell("J" . $row->getRowIndex())->getValue();
-            $facilitator_name = $worksheet->getCell("K" . $row->getRowIndex())->getValue();
-            $barangay = $worksheet->getCell("L" . $row->getRowIndex())->getValue();
-            $municipality = $worksheet->getCell("M" . $row->getRowIndex())->getValue();
-            $province = $worksheet->getCell("N" . $row->getRowIndex())->getValue();
-            $region = $worksheet->getCell("O" . $row->getRowIndex())->getValue();
+        $batchSize = 500; // Define batch size for inserts
+    
+        foreach ($worksheet->getRowIterator(6) as $row) {
+            $rowIndex = $row->getRowIndex(); // Current row index
+            $barangay = $worksheet->getCell("I{$rowIndex}")->getValue();
+    
+            // Fetch location details
+            $location = $barangay 
+                ? Location::where('barangay', $barangay)->first() 
+                : null;
+    
+            $municipality = $location->municipality ?? null;
+            $province = $location->province ?? null;
+            $region = $location->region ?? null;
+    
+            $excel_date = $worksheet->getCell("B{$rowIndex}")->getValue();
+            $date = is_numeric($excel_date) 
+                ? Date::excelToDateTimeObject($excel_date)->format('Y-m-d') 
+                : null;
+                if (!$date) {
+                    continue;
+                }
+            $time = $worksheet->getCell("C{$rowIndex}")->getValue();
+            $staff_name = $worksheet->getCell("AC{$rowIndex}")->getValue();
+            $commodity_name = $worksheet->getCell("N{$rowIndex}")->getValue();
+            $volume = $worksheet->getCell("O{$rowIndex}")->getValue();
+            $plate_number = $worksheet->getCell("E{$rowIndex}")->getValue();
+            $vehicle_type_name = $worksheet->getCell("AI{$rowIndex}")->getValue();
+            $name = $worksheet->getCell("G{$rowIndex}")->getValue();
+            $facilitator_name = $worksheet->getCell("Q{$rowIndex}")->getValue();
+    
             
-            
-            if (is_numeric($excel_date)) {
-                $date = Date::excelToDateTimeObject($excel_date)->format('Y-m-d');
-            } else {
-                // Handle non-numeric date values as needed (e.g., log or throw an error)
-                $date = null; // or some default value
-            }
-            $staff = Staff::where('staff_name', $staff_name)->first();
-            if ($staff) {
-                $staff_id = $staff->staff_id; 
-            } else {
-                $staff_id = null; 
-            }
-            
-            $commodity = Commodity::where('commodity_name', $commodity_name)->first();
-            if ($commodity) {
-                $commodity_id = $commodity->commodity_id; 
-            } else {
-                $commodity_id = null; 
-            }
-          
-            if($plate_number){
-            $vehicle = Vehicle::where('plate_number', $plate_number)->first();
-            if ($vehicle) {
-                $vehicle_type_id = $vehicle->vehicle_type_id; 
-            } else {
-                $vehicle_type_id = null; 
-            }
-            }
-            else{
-            $vehicle_type_id = null; 
+            if(!$time){
+            $time='';
             }
             
             
-            $facilitator = Facilitator::where('facilitator_name', $facilitator_name)->first();
-            if ($facilitator) {
-                $facilitator_id = $facilitator->facilitator_id; 
+            // Fetch or create related models
+            if ($staff_name) {
+                $staff = Staff::firstOrCreate(
+                    ['staff_name' => $staff_name], // Check for this condition
+                    ['staff_name' => $staff_name,
+                                'email' => "baptc.2015@gmail.com",
+                                'contact_number' => "09999999999",
+                                                            ]  // The values to use if a new record is created
+                );
+            
+                // Now, you can directly get the staff_id
+                $staff_id = $staff->staff_id;
             } else {
-                $facilitator_id = null; 
+                $staff = Staff::firstOrCreate(
+                    ['staff_name' => "Unknown"], // Check for this condition
+                    ['staff_name' => "Unknown",
+                                'email' => "baptc.2015@gmail.com",
+                                'contact_number' => "09999999999",
+                                                            ]  // The values to use if a new record is created
+                );
             }
-          
-            // Map data to your model fields
+    
+                if ($commodity_name) {
+                    $commodity = Commodity::firstOrCreate(['commodity_name' => $commodity_name]);
+                    $commodity_id = $commodity->commodity_id;
+                } else {
+                    // Handle case when commodity_name is missing
+                    $commodity_id = null; // Or provide a default commodity ID if necessary
+                    // Optionally log or skip this row
+                    continue; // Skip inserting this row if $commodity_name is required
+                }
+            $vehicle_type_id = $plate_number 
+                ? Vehicle::firstOrCreate(['plate_number' => $plate_number])->vehicle_type_id 
+                : null;
+    
+            $facilitator_id = $facilitator_name 
+                ? Facilitator::firstOrCreate(['facilitator_name' => $facilitator_name])->facilitator_id 
+                : null;
+    
+            // Prepare the row for insertion
             $rows[] = [
                 'date' => $date,
                 'time' => $time,
-                'transaction_type' => $transaction_type,
-                'transaction_status' => "temporary",
+                'transaction_type' => "trading inflow",
+                'transaction_status' => "regular",
                 'staff_id' => $staff_id,
                 'commodity_id' => $commodity_id,
                 'volume' => $volume,
@@ -933,25 +944,29 @@ class TradingInflowController extends Controller
                 'municipality' => $municipality,
                 'province' => $province,
                 'region' => $region,
-                'created_at' => now(), 
+                'created_at' => now(),
                 'updated_at' => now(),
-
             ];
-            
+    
+            // Insert in batches
+            if (count($rows) >= $batchSize) {
+                Transaction::insert($rows);
+                $rows = []; // Reset rows for the next batch
+            }
         }
-        
-        // Insert all rows at once for efficiency
-        Transaction::insert($rows);
-        
-            $author = Auth::user();
-        
-            Log::create([
-            'action_type'=>'import',
-            'transaction' => $transaction_type,
-            'author'=> $author->username,
+    
+        // Insert remaining rows
+        if (!empty($rows)) {
+            Transaction::insert($rows);
+        }
+    
+        // Log the import
+        Log::create([
+            'action_type' => 'import',
+            'transaction' => "trading inflow",
+            'author' => Auth::user()->username,
         ]);
     
-
-        return back()->with('success', 'Data imported successfully');
+        return back()->with('success', 'Data imported successfully!');
     }
 }

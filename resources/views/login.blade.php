@@ -48,14 +48,17 @@
                           </div>
           
                           <div class="col-md-12">
-                            <div class="form-floating">
-                              <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="{{ old('password') }}" required>
-                              <label for="password">Password</label>
-                              </div>
-                              @error('password')
-                                  <span class="text-danger md-3">{{$message}}</span>
-                              @enderror
-                          </div>
+                            <div class="form-floating position-relative">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="{{ old('password') }}" required>
+                                <label for="password">Password</label>
+                                
+                                <!-- Eye icon for toggle -->
+                                <i class="bi bi-eye-slash position-absolute" id="togglePassword" style="cursor: pointer; right: 15px; top: 50%; transform: translateY(-50%);"></i>
+                            </div>
+                            @error('password')
+                                <span class="text-danger md-3">{{$message}}</span>
+                            @enderror
+                        </div>
           
                         
                                                   <div class="mb-2">
@@ -123,7 +126,21 @@
                             @endif
                             });
                             </script>
-                            
+                            <script>
+                              // Toggle password visibility
+                              const togglePassword = document.getElementById('togglePassword');
+                              const passwordField = document.getElementById('password');
+                          
+                              togglePassword.addEventListener('click', function () {
+                                  // Toggle the type between password and text
+                                  const type = passwordField.type === 'password' ? 'text' : 'password';
+                                  passwordField.type = type;
+                          
+                                  // Toggle the eye icon (change between eye and eye-slash)
+                                  this.classList.toggle('bi-eye');
+                                  this.classList.toggle('bi-eye-slash');
+                              });
+                          </script>
                       </div>
                     </div>
                   </div>

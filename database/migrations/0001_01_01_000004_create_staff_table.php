@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->id('staff_id');
             $table->string('staff_name')->unique();
-            $table->string('email')->unique(); // Ensure email is unique and not nullable
-            $table->string('contact_number')->unique();
+            $table->string('email'); // Ensure email is unique and not nullable
+            $table->string('contact_number');
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

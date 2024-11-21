@@ -252,9 +252,20 @@ class ReportController extends Controller
                 'short_trip_in_count' => number_format($dailyAvgCountShIn, 0, '.', ','), 
                 'short_trip_out_count' => number_format($dailyAvgCountShOu, 0, '.', ','), 
             ];
-        
+        //table 4
+        $totalstakeholder = Transaction::whereIn('transaction_type', ['trading inflow', 'trading outflow'])
+        ->where('transaction_status', 'regular')
+        ->whereBetween('date', [$startDate, $endDate])
+        ->get();
+    
+    // Count how many traders (trading inflow) and farmers (trading outflow) there are
+    $traderCount = $totalstakeholder->where('transaction_type', 'trading outflow')->count();  // traders are 'trading inflow'
+    $farmerCount = $totalstakeholder->where('transaction_type', 'trading inflow')->count();  // farmers are 'trading outflow'
+    
+
+   
+
         //table 6
-        
         // Fetch commodities along with their transactions
 $commodities = Commodity::with(['transactions' => function ($query) use ($startDate, $endDate) {
     // Filter transactions by date range in the query
@@ -340,6 +351,7 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
 
         // Prepare the grand total percentage
         $overallVolume = $allTransactions->sum('volume');
+        $overallTotalFrequency = $allTransactions->count();
         $totalGrandPercentage = $overallVolume > 0 ? ($grandTotalVolume / $overallVolume) * 100 : 0;
 
 
@@ -789,6 +801,12 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'intertradingTransactions',
             'table_twelve_data',
             'month_name', 'past_year', 'current_year',
+            'overallVolume',
+            'overallTotalFrequency',
+            'totalstakeholder',
+            'traderCount',
+            'farmerCount',
+           
             
            
             
@@ -796,7 +814,7 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
    } elseif ($user->type == 1) {
         // Passing data to the view
         return view('staff-pages.staff-report', compact(
-              'table_one_data',
+            'table_one_data',
             'table_three_data',
             'R2_peakDayDate',
             'R2_peakDay',
@@ -821,7 +839,16 @@ $commodities = Commodity::with(['transactions' => function ($query) use ($startD
             'washtotalVolume',
             'intertradingTransactions',
             'table_twelve_data',
-            'month_name', 'past_year', 'current_year',
+            'month_name',
+            'past_year',
+            'current_year',
+            'totalwashingVolume' ,
+            'overallVolume',
+            'overallTotalFrequency',
+            'totalstakeholder',
+            'traderCount',
+            'farmerCount',
+            
         ));
    }
        
