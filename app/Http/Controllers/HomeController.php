@@ -45,11 +45,45 @@ class HomeController extends Controller
             'vehicle_count' => $group->count(),
         ];
     });
+    
+    $short_trip_outflows = Transaction::where('transaction_type', 'short trip outflow')
+        ->whereDate('date', Carbon::today())
+        ->when($municipality, function ($query, $municipality) {
+            return $query->where('municipality', $municipality);
+        })
+        ->with(['vehicle_type'])
+        ->get();
+
+    // Group outflows by municipality and count the number of vehicles per municipality
+    $grouped_short_outflows = $short_trip_outflows->groupBy('municipality')->map(function ($group) {
+        return [
+            'municipality' => $group->first()->municipality,
+            'vehicle_count' => $group->count(),
+        ];
+    });
+    
+    $short_trip_inflows = Transaction::where('transaction_type', 'short trip inflow')
+        ->whereDate('date', Carbon::today())
+        ->when($municipality, function ($query, $municipality) {
+            return $query->where('municipality', $municipality);
+        })
+        ->with(['vehicle_type'])
+        ->get();
+
+    // Group outflows by municipality and count the number of vehicles per municipality
+    $grouped_short_inflows = $short_trip_inflows->groupBy('municipality')->map(function ($group) {
+        return [
+            'municipality' => $group->first()->municipality,
+            'vehicle_count' => $group->count(),
+        ];
+    });
 
     // Pass the grouped data to the view
     return view('index', [
         'grouped_inflows' => $grouped_inflows,
         'grouped_outflows' => $grouped_outflows,
+        'grouped_short_inflows' => $grouped_short_inflows,
+        'grouped_short_outflows' => $grouped_short_outflows,
     ]);
     }
 

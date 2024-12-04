@@ -52,6 +52,7 @@ class PasswordResetController extends Controller
                             isset($user->email) ? $user->email: null,
                             ])),
             'author'=> $user->username,
+            'user_id'=> $user->id,
         ]);
 
         // Send an email to the user with the temporary password

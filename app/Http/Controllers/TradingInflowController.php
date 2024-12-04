@@ -18,7 +18,7 @@ use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Validation\ValidationException;
 
 class TradingInflowController extends Controller
 {
@@ -38,7 +38,8 @@ class TradingInflowController extends Controller
         $query = Transaction::where('transaction_type', 'trading inflow')
             ->where('transaction_status', 'regular')
             ->whereBetween('date', [$startDate, $endDate])
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
+            ->orderBy('date', 'desc');
             
        
         $staffId = $request->input('staff_id');
@@ -236,10 +237,11 @@ class TradingInflowController extends Controller
         $currentDate = Carbon::today()->toDateString();
       
         $temporary_transaction = Transaction::where('transaction_status', 'temporary')
-            ->where('transaction_type', 'trading inflow')
-            ->whereDate('created_at', $currentDate)
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
-    
+    ->where('transaction_type', 'trading inflow')
+    ->whereDate('created_at', $currentDate)
+    ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
+    ->orderBy('created_at', 'desc'); // Orders by the 'created_at' field from latest to oldest
+   
         // Fetch all commodities
 
         $staffId = $request->input('staff_id');
@@ -339,6 +341,8 @@ class TradingInflowController extends Controller
      */
     public function store(Request $request)
     {
+    
+        
         $validatedData = $request->validate([
             'transaction_status' => 'required',
             'transaction_type' => 'required',
@@ -451,7 +455,7 @@ class TradingInflowController extends Controller
         $commodity = Commodity::where('commodity_name', $validatedData['commodity_name'])->first();
 
         //Store the transaction
-        $test=Transaction::create([
+        $newTransaction =Transaction::create([
             'date' => $validatedData['date'],
             'time' => $validatedData['time'],
             'transaction_type' => $validatedData['transaction_type'],
@@ -469,7 +473,9 @@ class TradingInflowController extends Controller
             'region' => $location->region,
         ]);
         
-        session()->flash('success', 'Trading inflow added successfully!');
+       
+        
+        // session()->flash('success', 'Trading inflow added successfully!');
         
         
         $user = Auth::user();
@@ -491,14 +497,21 @@ class TradingInflowController extends Controller
                             isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
         ]);
 
-    
-    if ($user->type == 0) {
-        return redirect()->route('trading-inflow.create');
-    } elseif ($user->type == 1) {
-        return redirect()->route('staff-trading-inflow.create');
-    }
+        return response()->json([
+            'success' => true,
+            'message' => 'Trading inflow added successfully!',
+        ]);
+        
+        
+ 
+    // if ($user->type == 0) {
+    //     return redirect()->route('trading-inflow.create');
+    // } elseif ($user->type == 1) {
+    //     return redirect()->route('staff-trading-inflow.create');
+    // }
 }
 
     /**
@@ -751,6 +764,7 @@ class TradingInflowController extends Controller
                             isset($trading_inflow->facilitator->facilitator_name) ? $trading_inflow->facilitator->facilitator_name: null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
         ]);
             } else {
                 session()->flash('error', 'You are not authorized to delete this transaction.');
@@ -800,6 +814,7 @@ class TradingInflowController extends Controller
             'action_type'=>'submit',
             'transaction' => 'trading inflow',
             'author'=> $author->username,
+            'user_id'=> $author->id,
         ]);
         
                 session()->flash('success', 'Trading inflow submitted!');
@@ -820,6 +835,7 @@ class TradingInflowController extends Controller
                 'action_type'=>'submit',
                 'transaction' => 'trading inflow',
                 'author'=> $author->username,
+                'user_id'=> $author->id,
             ]);
         
                 session()->flash('success', 'Trading inflow submitted!');
@@ -838,10 +854,16 @@ class TradingInflowController extends Controller
     }
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-        ]);
-    
+       
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls',
+            ]);
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Wrong file type');
+        }
+        
         $file = $request->file('file');
         $spreadsheet = IOFactory::load($file->getPathname());
         $worksheet = $spreadsheet->getSheetByName('FARMERS');
@@ -947,17 +969,26 @@ class TradingInflowController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-    
-            // Insert in batches
-            if (count($rows) >= $batchSize) {
-                Transaction::insert($rows);
-                $rows = []; // Reset rows for the next batch
+            try {
+                if (count($rows) >= $batchSize) {
+                    Transaction::insert($rows);
+                    $rows = []; // Reset rows for the next batch
+                }
+                
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Check data for blank fields');
             }
+            // Insert in batches
+            
         }
-    
-        // Insert remaining rows
+        try {
+           // Insert remaining rows
         if (!empty($rows)) {
             Transaction::insert($rows);
+        }
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Check data for blank fields');
         }
     
         // Log the import
@@ -965,6 +996,7 @@ class TradingInflowController extends Controller
             'action_type' => 'import',
             'transaction' => "trading inflow",
             'author' => Auth::user()->username,
+            'user_id' => Auth::user()->id,
         ]);
     
         return back()->with('success', 'Data imported successfully!');

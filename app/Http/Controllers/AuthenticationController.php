@@ -64,14 +64,17 @@ class AuthenticationController extends Controller
             if (Auth::user()->type == 0) {
             
                 $author = Auth::user();
-        
+          
                 Log::create([
                     'action_type'=>'login',
                     'transaction' => implode(', ', array_filter([
                                     'user type: admin',
                                     ])),
                     'author'=> $author->username,
+                    'user_id'=> $author->id,
+                    
                 ]);
+                
                 return redirect()->route('admin.index'); 
             } elseif (Auth::user()->type == 1) {
                 $author = Auth::user();
@@ -82,6 +85,8 @@ class AuthenticationController extends Controller
                                     'user type: staff',
                                     ])),
                     'author'=> $author->username,
+                    'user_id'=> $author->id,
+                   
                 ]);
                 return redirect()->route('staff-dashboard');
             }
@@ -108,6 +113,8 @@ class AuthenticationController extends Controller
                                     null,
                                     ])),
                     'author'=> $author->username,
+                    'user_id'=> $author->id,
+                  
                 ]);
         Auth::logout();
         $request->session()->invalidate();

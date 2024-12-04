@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
+                    <form id="myForm" class="row g-3 " action="{{ route('trading-inflow.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
@@ -291,6 +291,11 @@
                         </div>
 
 
+                
+                        <div id="success_response" class="text-center alert alert-success fade d-inline-block" role="alert" style="display: none;"></div>
+                        <div id="error_response" class="text-center alert alert-danger fade d-inline-block" role="alert" style="display: none;"></div>
+
+
                 </div>
 
 
@@ -455,9 +460,9 @@
             </div>
         </div>
     </div>
-    @endif
+@endif
 
-    @if (session('error'))
+@if (session('error'))
     <!-- Error Modal -->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel"
         aria-hidden="true">
@@ -470,7 +475,7 @@
             </div>
         </div>
     </div>
-    @endif
+@endif
 
 
 
@@ -531,69 +536,69 @@
 
             // Function to setup filterable dropdown with dynamic filtering and debouncing
             function setupFilterableDropdown(inputSelector, dropdownSelector, autofillFields = {}, autofillCallback = null) {
-                const input = document.querySelector(inputSelector);
-                const dropdown = document.querySelector(dropdownSelector);
-                const items = dropdown.querySelectorAll('.input-item');
+    const input = document.querySelector(inputSelector);
+    const dropdown = document.querySelector(dropdownSelector);
+    const items = dropdown.querySelectorAll('.input-item');
 
-                // Filter items based on input
-                const filterItems = () => {
-                    const searchValue = input.value.trim().toLowerCase();
-                    let hasRecord = false;
+    // Filter items based on input
+    const filterItems = () => {
+        const searchValue = input.value.trim().toLowerCase();
+        let hasRecord = false;
 
-                    items.forEach(item => {
-                        const itemText = item.textContent.toLowerCase();
-                        if (itemText.includes(searchValue)) {
-                            item.style.display = 'block';
-                            hasRecord = true;
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-
-                    // Show or hide "No records" message
-                    const noRecords = dropdown.querySelector('.no-records');
-                    if (hasRecord) {
-                        noRecords.style.display = 'none';
-                    } else {
-                        noRecords.style.display = 'block';
-                    }
-
-                    // Display the dropdown only if there's input
-                    dropdown.style.display = searchValue ? 'block' : 'none';
-                };
-
-                // Apply debounce to delay filtering on user input
-                const debouncedFilter = debounce(filterItems, 0); // Delay of 300ms
-                input.addEventListener('input', debouncedFilter);
-
-                // Handle item selection
-                items.forEach(item => {
-                    item.addEventListener('click', function() {
-                        input.value = item.textContent.trim(); // Set input value from the selected item
-                        dropdown.style.display = 'none'; // Hide the dropdown after selection
-
-                        // Autofill other fields if a callback is provided
-                        for (const [fieldId, dataAttr] of Object.entries(autofillFields)) {
-                            const field = document.getElementById(fieldId);
-                            if (field) field.value = item.getAttribute(`data-${dataAttr}`) || '';
-                        }
-
-                        // If callback is provided, execute it
-                        if (autofillCallback) autofillCallback(item);
-                    });
-                });
-
-                // Hide dropdown if the user clicks outside
-                input.addEventListener('blur', function() {
-                    setTimeout(() => dropdown.style.display = 'none', 300); // Delay to allow clicks on dropdown
-                });
-
-                document.addEventListener('click', function(event) {
-                    if (!input.contains(event.target) && !dropdown.contains(event.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                });
+        items.forEach(item => {
+            const itemText = item.textContent.toLowerCase();
+            if (itemText.includes(searchValue)) {
+                item.style.display = 'block';
+                hasRecord = true;
+            } else {
+                item.style.display = 'none';
             }
+        });
+
+        // Show or hide "No records" message
+        const noRecords = dropdown.querySelector('.no-records');
+        if (hasRecord) {
+            noRecords.style.display = 'none';
+        } else {
+            noRecords.style.display = 'block';
+        }
+
+        // Display the dropdown only if there's input
+        dropdown.style.display = searchValue ? 'block' : 'none';
+    };
+
+    // Apply immediate filtering on input
+    input.addEventListener('input', filterItems);
+
+    // Handle item selection
+    items.forEach(item => {
+        item.addEventListener('click', function() {
+            input.value = item.textContent.trim(); // Set input value from the selected item
+            dropdown.style.display = 'none'; // Hide the dropdown after selection
+
+            // Autofill other fields if a callback is provided
+            for (const [fieldId, dataAttr] of Object.entries(autofillFields)) {
+                const field = document.getElementById(fieldId);
+                if (field) field.value = item.getAttribute(`data-${dataAttr}`) || '';
+            }
+
+            // If callback is provided, execute it
+            if (autofillCallback) autofillCallback(item);
+        });
+    });
+
+    // Hide dropdown if the user clicks outside
+    input.addEventListener('blur', function() {
+        setTimeout(() => dropdown.style.display = 'none', 300); // Delay to allow clicks on dropdown
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+}
+
 
 
 
@@ -753,7 +758,7 @@
             fetchFilteredData();
         });
 
-        function fetchFilteredData(page = 1) {
+    function fetchFilteredData(page = 1) {
             // Get selected filter values
             const timeFilter = document.getElementById('timeFilter').value;
             const staffFilter = document.getElementById('staffFilter').value;
@@ -767,10 +772,13 @@
             const queryParams = new URLSearchParams({
                 time_filter: timeFilter,
                 staff_id: staffFilter,
-                commodity_filter: commodityFilter,
+                commodity_filter: commodityFilter,    
                 municipality_filter: municipalityFilter,
                 page: page
             });
+
+
+
 
             // Perform AJAX request
             fetch(url + '?' + queryParams.toString(), {
@@ -886,6 +894,67 @@
         function filterByMunicipality() {
             fetchFilteredData();
         }
+    </script>
+    
+    <script>
+    document.getElementById('myForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the page from reloading
+    
+        // Gather the form data
+        let formData = new FormData(this);
+    
+        // Send the form data via AJAX
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest', // Tells Laravel it's an AJAX request
+            },
+        })
+            .then((response) => response.json()) // Convert the response to JSON
+            .then((data) => {
+                if(data.message == 'Trading inflow added successfully!'){
+                 const responseDiv = document.getElementById('success_response');
+        responseDiv.textContent = data.message; // Update the message
+        responseDiv.style.display = 'block'; // Make it visible
+
+        // Use Bootstrap's 'fade' class to fade the message out
+        responseDiv.classList.add('show'); // Bootstrap class to show the alert
+
+        // After 2 seconds, fade out the response message
+        setTimeout(() => {
+            responseDiv.classList.remove('show'); // Remove the 'show' class to fade out
+        }, 2000); // Fade out after 2 seconds
+        
+        fetchFilteredData(1);
+        
+        this.reset();
+                }else{
+                 
+                 const responseDiv = document.getElementById('error_response');
+        responseDiv.textContent = data.message; // Update the message
+        responseDiv.style.display = 'block'; // Make it visible
+
+        // Use Bootstrap's 'fade' class to fade the message out
+        responseDiv.classList.add('show'); // Bootstrap class to show the alert
+
+        // After 2 seconds, fade out the response message
+        setTimeout(() => {
+            responseDiv.classList.remove('show'); // Remove the 'show' class to fade out
+        }, 2000); // Fade out after 2 seconds
+        
+                
+                }
+               
+            
+        
+            })
+            .catch((error) => {
+                // If something goes wrong
+                console.error(error);
+                document.getElementById('response').textContent = 'An error occurred.';
+            });
+    });
     </script>
 </section>
 

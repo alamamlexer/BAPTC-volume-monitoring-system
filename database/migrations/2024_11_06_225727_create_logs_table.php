@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('logs', function (Blueprint $table) {
-            $table->id();
+            $table->id('log_id');
             $table->string('action_type');
             $table->string('transaction');
             $table->string('author');
+            $table->string( 'user_id');
             $table->timestamps();
         });
     }

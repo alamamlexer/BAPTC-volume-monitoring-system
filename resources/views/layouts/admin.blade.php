@@ -41,7 +41,7 @@
   <style>
     /* Active Tab Styles */
     .sidebar-nav .nav-item .nav-link.active {
-      background-color: darkblue;
+      background-color: #012970;
       /* Dark background color */
       color: white;
       /* Change text color */

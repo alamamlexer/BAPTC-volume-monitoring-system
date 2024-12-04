@@ -37,7 +37,8 @@ class ShortTripInflowAndOutflowController extends Controller
         $query = Transaction::whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
             ->where('transaction_status', 'regular')
             ->whereBetween('date', [$startDate, $endDate])
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
+            ->orderBy('date', 'desc');
 
 
         $staffId = $request->input('staff_id');
@@ -291,8 +292,8 @@ class ShortTripInflowAndOutflowController extends Controller
         $temporary_transaction = Transaction::where('transaction_status', 'temporary')
             ->whereIn('transaction_type', ['short trip inflow', 'short trip outflow'])
             ->whereDate('created_at', $currentDate)
-            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator']);
-    
+            ->with(['staff', 'commodity', 'vehicle_type', 'facilitator'])
+            ->orderBy('created_at', 'desc'); 
         // Get filter inputs
         $staffId = $request->input('staff_id');
         $timeFilter = $request->input('time_filter');
@@ -334,11 +335,11 @@ class ShortTripInflowAndOutflowController extends Controller
             ->get()
             ->map(function ($location) {
                 return [
-                    'barangay' => $location->barangay,
-                    'municipality' => $location->municipality,
+                    // 'barangay' => $location->barangay,
+                    // 'municipality' => $location->municipality,
                     'province' => $location->province,
-                    'region' => $location->region,
-                    'full_address' => "{$location->barangay}, {$location->municipality}, {$location->province}, {$location->region}"
+                    // 'region' => $location->region,
+                    'full_address' => "{$location->province}"
                 ];
             });
         $municipalities = Transaction::distinct()->pluck('municipality');
@@ -521,16 +522,22 @@ class ShortTripInflowAndOutflowController extends Controller
                             isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
+            
         ]);
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Trading inflow added successfully!',
+        ]);
+        
 
-
-        $user = Auth::user();
-        if ($user->type == 0) {
-            return redirect()->route('short-trip-inflow-and-outflow.create');
-        } elseif ($user->type == 1) {
-            return redirect()->route('staff-short-trip-inflow-and-outflow.create');
-        }
+        // $user = Auth::user();
+        // if ($user->type == 0) {
+        //     return redirect()->route('short-trip-inflow-and-outflow.create');
+        // } elseif ($user->type == 1) {
+        //     return redirect()->route('staff-short-trip-inflow-and-outflow.create');
+        // }
     }
     /**
      * Display the specified resource.
@@ -720,6 +727,7 @@ class ShortTripInflowAndOutflowController extends Controller
             isset($facilitator->facilitator_name) ? $facilitator->facilitator_name : null,
         ])),
         'author' => $author->username,
+        'user_id'=> $author->id,
     ]);
 
         if ($short_trip_inflow_and_outflow->transaction_status === 'temporary') {
@@ -774,6 +782,8 @@ class ShortTripInflowAndOutflowController extends Controller
                             isset($trading_inflow->facilitator->facilitator_name) ? $trading_inflow->facilitator->facilitator_name: null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
+            
         ]);
             } else {
                 session()->flash('error', 'You are not authorized to delete this transaction.');
@@ -820,6 +830,8 @@ class ShortTripInflowAndOutflowController extends Controller
             'action_type'=>'submit',
             'transaction' => 'short trip',
             'author'=> $author->username,
+            'user_id'=> $author->id,
+            
         ]);
             session()->flash('success', 'Short Trip submitted!');
         } else {
@@ -835,9 +847,14 @@ class ShortTripInflowAndOutflowController extends Controller
     }
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls',
+            ]);
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Wrong file type');
+        }
     
         $file = $request->file('file');
         $spreadsheet = IOFactory::load($file->getPathname());
@@ -947,24 +964,35 @@ class ShortTripInflowAndOutflowController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-    
-            // Insert in batches
-            if (count($rows) >= $batchSize) {
-                Transaction::insert($rows);
-                $rows = []; // Reset rows for the next batch
+            try {
+                if (count($rows) >= $batchSize) {
+                    Transaction::insert($rows);
+                    $rows = []; // Reset rows for the next batch
+                }
+                
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Check data for blank fields');
             }
+            // Insert in batches
+            
         }
-    
-        // Insert remaining rows
+        try {
+           // Insert remaining rows
         if (!empty($rows)) {
             Transaction::insert($rows);
         }
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Check data for blank fields');
+        }
+        
     
         // Log the import
         Log::create([
             'action_type' => 'import',
             'transaction' => "short trip",
             'author' => Auth::user()->username,
+            'user_id' => Auth::user()->id,
         ]);
     
         return back()->with('success', 'Data imported successfully!');

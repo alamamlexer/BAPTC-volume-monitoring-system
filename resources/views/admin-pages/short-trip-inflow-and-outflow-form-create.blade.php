@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Transaction Form</h5>
                     <!-- Floating Labels Form -->
-                    <form class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
+                    <form id="myForm" class="row g-3 " action="{{ route('short-trip-inflow-and-outflow.store') }}" method="POST">
                         @csrf
 
                         {{-- input for transaction_status = "trading"  --}}
@@ -305,7 +305,9 @@
                     <button type="reset" class="btn btn-secondary">Clear All</button>
                     <a href="{{ route('short-trip-inflow-and-outflow.index') }}" class="btn btn-danger">Back</a>
                 </div>
-
+                
+                <div id="success_response" class="text-center alert alert-success fade d-inline-block" role="alert" style="display: none;"></div>
+                <div id="error_response" class="text-center alert alert-danger fade d-inline-block" role="alert" style="display: none;"></div>
                 </div>
 
                 
@@ -898,6 +900,66 @@
             fetchFilteredData();
         }
     </script>
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the page from reloading
+        
+            // Gather the form data
+            let formData = new FormData(this);
+        
+            // Send the form data via AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', // Tells Laravel it's an AJAX request
+                },
+            })
+                .then((response) => response.json()) // Convert the response to JSON
+                .then((data) => {
+                    if(data.message == 'Trading inflow added successfully!'){
+                     const responseDiv = document.getElementById('success_response');
+            responseDiv.textContent = data.message; // Update the message
+            responseDiv.style.display = 'block'; // Make it visible
+    
+            // Use Bootstrap's 'fade' class to fade the message out
+            responseDiv.classList.add('show'); // Bootstrap class to show the alert
+    
+            // After 2 seconds, fade out the response message
+            setTimeout(() => {
+                responseDiv.classList.remove('show'); // Remove the 'show' class to fade out
+            }, 2000); // Fade out after 2 seconds
+            
+            fetchFilteredData(1);
+            
+            this.reset();
+                    }else{
+                     
+                     const responseDiv = document.getElementById('error_response');
+            responseDiv.textContent = data.message; // Update the message
+            responseDiv.style.display = 'block'; // Make it visible
+    
+            // Use Bootstrap's 'fade' class to fade the message out
+            responseDiv.classList.add('show'); // Bootstrap class to show the alert
+    
+            // After 2 seconds, fade out the response message
+            setTimeout(() => {
+                responseDiv.classList.remove('show'); // Remove the 'show' class to fade out
+            }, 2000); // Fade out after 2 seconds
+            
+                    
+                    }
+                   
+                
+            
+                })
+                .catch((error) => {
+                    // If something goes wrong
+                    console.error(error);
+                    document.getElementById('response').textContent = 'An error occurred.';
+                });
+        });
+        </script>
 </section>
 
 @endsection

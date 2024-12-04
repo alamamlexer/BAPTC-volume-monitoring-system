@@ -39,6 +39,7 @@ class LogController extends Controller
                     'action_type' => $log->action_type, 
                     'transaction' => $log->transaction, 
                     'author' => $log->author, 
+                    'user_id' => $log->user_id, 
                 ];
             }
     

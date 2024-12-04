@@ -29,6 +29,7 @@
                                 <th class="text-start">Action Type</th>
                                 <th class="text-start">Transaction</th>
                                 <th class="text-start">Author</th>
+                                <th class="text-start">Author ID</th>
                             </tr>
                         </thead>
                     </table>  
@@ -112,6 +113,7 @@
                 { data: 'action_type', name: 'action_type' },
                 { data: 'transaction', name: 'transaction' },
                 { data: 'author', name: 'author' },
+                { data: 'user_id', name: 'user_id' },
             ],
             lengthMenu: [5, 10, 20],
             language: {

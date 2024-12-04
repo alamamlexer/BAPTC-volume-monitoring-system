@@ -41,6 +41,8 @@ class UserManagementController extends Controller
                             isset($user->username) ? $user->username: null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
+            
         ]);
     return redirect()->route('user-management.index');
 }
@@ -58,6 +60,8 @@ public function deactivate($id)
                         isset($user->username) ? $user->username: null,
                         ])),
         'author'=> $author->username,
+        'user_id'=> $author->id,
+        
     ]);
     session()->flash('success', 'User deactivated successfully.');
     return redirect()->route('user-management.index');
@@ -111,6 +115,8 @@ public function store(Request $request)
                         isset($user->email) ? $user->email: null,
                         ])),
         'author'=> $author->username,
+        'user_id'=> $author->id,
+        
         ]);
         // Send the activation email with the temporary password and activation URL
         Mail::to($staff->email)->send(new AccountActivationMail($staff, $token, $tempPassword));
@@ -163,6 +169,8 @@ public function activateAccount($token)
                             isset($user->username) ? $user->username: null,
                             ])),
             'author'=> $author->username,
+            'user_id'=> $author->id,
+            
         ]);
     // Delete the activation token after it is used
     $activationToken->delete();

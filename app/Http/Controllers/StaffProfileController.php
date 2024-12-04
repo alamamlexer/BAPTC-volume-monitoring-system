@@ -62,6 +62,7 @@ $test = Log::create([
     'action_type' => 'update',
     'transaction' => 'profile' ,
     'author' => $author->username,
+    'user_id'=> $author->id,
 ]);
 
 

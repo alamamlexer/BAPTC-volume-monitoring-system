@@ -19,6 +19,7 @@ class Log extends Model
         'transaction',
         'transaction_status',
         'author',
+        'user_id',
     ];
 
 }

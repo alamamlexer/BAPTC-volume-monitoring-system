@@ -93,66 +93,145 @@
       </div>
 
       <div class="icon-boxes position-relative" data-aos="fade-up" data-aos-delay="200">
-        <div class="container position-relative">
-          <div class="row gy-4 mt-5">
+    <div class="container position-relative">
+        <div class="row gy-4 mt-5">
 
+            <!-- Trading Inflows -->
             <div class="col-xl-6 col-md-6">
-              <div class="icon-box">
-                <div class="col-md-12">
-                  <h1>Trading Inflows</h1>
-                  <table>
-                      <thead>
-                          <tr>
-                              <th>Address</th>
-                              <th>Number of Cars</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          @foreach ($grouped_inflows as $inflow)
-                              <tr>
-                                  <td>{{ $inflow['municipality'] }}</td>
-                                  <td>{{ $inflow['vehicle_count'] }}</td>
-                              </tr>
-                          @endforeach
-                      </tbody>
-                  </table>
-              </div>
-              
-              </div>
-            </div><!--End Icon Box -->
-
-
-
-            <div class="col-xl-6 col-md-6">
-              <div class="icon-box">     
-                  <div class="col-md-12">
-                    <h1>Trading Outflows</h1>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Number of Cars</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($grouped_outflows as $outflow)
+                <div class="icon-box">
+                    <div class="col-md-12">
+                        <h1>Trading Inflows</h1>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>{{ $outflow['municipality'] }}</td>
-                                    <td>{{ $outflow['vehicle_count'] }}</td>
+                                    <th>Address</th>
+                                    <th>Number of Cars</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @if ($grouped_inflows->isEmpty())
+                                    <tr>
+                                        <td colspan="2">No Records</td>
+                                    </tr>
+                                @else
+                                    @foreach ($grouped_inflows as $inflow)
+                                        <tr>
+                                            <td>{{ $inflow['municipality'] }}</td>
+                                            <td>{{ $inflow['vehicle_count'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
 
-              </div>
-            </div><!--End Icon Box -->
+            <!-- Trading Outflows -->
+            <div class="col-xl-6 col-md-6">
+                <div class="icon-box">
+                    <div class="col-md-12">
+                        <h1>Trading Outflows</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Number of Cars</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($grouped_outflows->isEmpty())
+                                    <tr>
+                                        <td colspan="2">No Records</td>
+                                    </tr>
+                                @else
+                                    @foreach ($grouped_outflows as $outflow)
+                                        <tr>
+                                            <td>{{ $outflow['municipality'] }}</td>
+                                            <td>{{ $outflow['vehicle_count'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-
-
-          </div>
         </div>
-      </div>
+    </div>
+</div>
+
+<div class="icon-boxes position-relative" data-aos="fade-up" data-aos-delay="200">
+    <div class="container position-relative">
+        <div class="row gy-4 mt-5">
+
+            <!-- Short Trip Inflows -->
+            <div class="col-xl-6 col-md-6">
+                <div class="icon-box">
+                    <div class="col-md-12">
+                        <h1>Short Trip Inflows</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Number of Cars</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($grouped_short_inflows->isEmpty())
+                                    <tr>
+                                        <td colspan="2">No Records</td>
+                                    </tr>
+                                @else
+                                    @foreach ($grouped_short_inflows as $inflow)
+                                        <tr>
+                                            <td>{{ $inflow['municipality'] }}</td>
+                                            <td>{{ $inflow['vehicle_count'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Short Trip Outflows -->
+            <div class="col-xl-6 col-md-6">
+                <div class="icon-box">
+                    <div class="col-md-12">
+                        <h1>Short Trip Outflows</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Number of Cars</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($grouped_short_outflows->isEmpty())
+                                    <tr>
+                                        <td colspan="2">No Records</td>
+                                    </tr>
+                                @else
+                                    @foreach ($grouped_short_outflows as $outflow)
+                                        <tr>
+                                            <td>{{ $outflow['municipality'] }}</td>
+                                            <td>{{ $outflow['vehicle_count'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
     </section><!-- /Hero Section -->
     <div class="row">

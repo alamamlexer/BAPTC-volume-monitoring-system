@@ -20,6 +20,7 @@
             <div class="input-group">
                 <select name="range_type" class="form-control" id="range_type" onchange="this.form.submit()">
                     <option value="daily" {{ $rangeType == 'daily' ? 'selected' : '' }}>Daily</option>
+                    <option value="custom" {{ $rangeType == 'custom' ? 'selected' : '' }}>Custom Range</option>
                     <option value="monthly" {{ $rangeType == 'monthly' ? 'selected' : '' }}>Monthly</option>
                     <option value="quarterly" {{ $rangeType == 'quarterly' ? 'selected' : '' }}>Quarterly</option>
                     <option value="yearly" {{ $rangeType == 'yearly' ? 'selected' : '' }}>Yearly</option>
@@ -27,13 +28,30 @@
 
                 <div id="date-fields">
                     @if($rangeType == 'monthly')
-                    <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
-                    <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}">
+                        <!-- Dropdown for months -->
+                        <select name="month" class="form-control">
+                            <option value="">Select Month</option>
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ old('month', $selectedMonth) == $i ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($i)->format('F') }} <!-- Full month name -->
+                                </option>
+                            @endfor
+                        </select>
                     @elseif($rangeType == 'daily')
-                    <input type="date" name="date" class="form-control" value="{{ old('date', $startDate) }}">
+                        <!-- Daily date input -->
+                        <input type="date" name="date" class="form-control" value="{{ old('date', $startDate) }}">
+                    @elseif($rangeType == 'custom')
+                        <!-- Custom date range inputs (start and end date) -->
+                        <div class="d-flex">
+                            <!-- Start Date -->
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}" placeholder="Start Date">
+                            <span class="mx-2">to</span>
+                            <!-- End Date -->
+                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $endDate) }}" placeholder="End Date">
+                        </div>
                     @elseif($rangeType == 'yearly' || $rangeType == 'quarterly')
-                    <!-- Display Year input for both yearly and quarterly range types -->
-                    <input type="number" name="year" class="form-control" value="{{ old('year', $selectedYear ?? $currentYear) }}" min="2000" max="2100">
+                        <!-- Year input for yearly and quarterly ranges -->
+                        <input type="number" name="year" class="form-control" value="{{ old('year', $selectedYear ?? $currentYear) }}" min="2000" max="2100">
                     @endif
                 </div>
 

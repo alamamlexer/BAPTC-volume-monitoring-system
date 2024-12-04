@@ -212,6 +212,7 @@ class SpecialRecordsController extends Controller
                         isset($facilitator->facilitator_name) ? "{$facilitator->facilitator_name}" : null,
                     ])),
         'author'=> $author->username,
+        'user_id'=> $author->id,
     ]);
 
     session()->flash('success', 'Special record added successfully!');
