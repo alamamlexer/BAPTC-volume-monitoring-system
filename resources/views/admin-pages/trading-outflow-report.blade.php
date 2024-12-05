@@ -1,19 +1,19 @@
 @extends('layouts.admin')
-@section('page_title', 'Trading Outflow')
+@section('page_title', 'Trading Inflow')
 
 @section('content')
 
 
 <div class="pagetitle">
-    <h1>Trading Outflow</h1>
+    <h1>Trading Inflow</h1>
     <nav>
         <ol class="breadcrumb">
-           <li class="breadcrumb-item active">Transactions involving export of commodities to markets</li>
+            <li class="breadcrumb-item active">Transactions involving the import of commodities from farmers or producers</li>
         </ol>
     </nav>
 </div>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
 <section class="section dashboard">
 
   <div class="row ">
@@ -72,7 +72,7 @@
     <div class="col-md-12">
         <div class="card mb-4"> <!-- Added margin bottom for spacing -->
             <div class="card-body">
-                <h5 class="card-title">Trading Outflow Line Chart</h5>
+                <h5 class="card-title">Trading Inflow Line Chart</h5>
                 <!-- Filter Form -->
                 <!-- Chart Container -->
                 <div id="areaChart" style="height: 350px;"></div>
@@ -90,10 +90,10 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Trading Outflow Table</h5>
+                    <h5 class="card-title">Trading Inflow Table</h5>
                     <!-- Filter Row -->
                     <div class="row mb-3">
-                      <form method="GET" action="{{ route('trading-outflow.index') }}" class="mb-3">
+                      <form method="GET" action="{{ route('trading-inflow.index') }}" class="mb-3">
                         <div class="input-group">
                         <div class="col-md-2">
                         <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $startDate) }}">
@@ -150,7 +150,7 @@
                                     
                                     <th scope="col">
                                         <div class="d-flex align-items-center">
-                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin/Destination:</label>
+                                            <label for="municipalityFilter" style="margin-right: 10px;">Origin</label>
                                             <select name="municipality_filter" id="municipalityFilter" class="form-select" style="border: none; font-weight: bold;" onchange="filterByMunicipality()">
                                                 <option value="">All</option>
                                                 @foreach ($municipalities as $municipality)
@@ -192,7 +192,7 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-10">
-                            <a href="{{ route('trading-outflow.create') }}" class="btn btn-primary">Add New Trading Outflow</a>
+                            <a href="{{ route('trading-inflow.create') }}" class="btn btn-primary">Add New Trading Inflow</a>
                         </div>
                     </div>
                     
@@ -235,7 +235,9 @@
   @endif
 
 
-
+<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
+<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -268,7 +270,7 @@
 
 
         // Construct the AJAX URL
-        const url = "{{ route('trading-outflow.index') }}"; // Make sure to replace this with your route
+        const url = "{{ route('trading-inflow.index') }}"; // Make sure to replace this with your route
 
         // Create query parameters
         const queryParams = new URLSearchParams({
@@ -311,7 +313,7 @@
                             <td>${transaction.facilitator?.facilitator_name ?? 'N/A'}</td>
                             <td>${transaction.staff.staff_name}</td>
                             <td>
-                                <a href="/trading-outflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
+                                <a href="/trading-inflow/${transaction.id}/edit" class="btn btn-outline-primary m-1">
                                     <i class="bx bxs-edit"></i> Edit
                                 </a>
                             </td>
@@ -389,9 +391,7 @@
     }
     
    </script>
-<script src="{{asset('/custom-scripts/exporting.js')}}"></script>
-<script src="{{asset('/custom-scripts/offline-exporting.js')}}"></script>
-<script src="{{asset('/custom-scripts/highcharts.js')}}"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const totalVolumeData = @json($totalVolumeData);
@@ -406,7 +406,7 @@
             data: totalVolumeData
         }, ...series];
 
-        // Initialize Trading Outflow Chart
+        // Initialize Trading Inflow Chart
         Highcharts.chart('areaChart', {
             chart: {
                 type: 'line',
@@ -417,7 +417,7 @@
                 }
             },
             title: {
-                text: 'Volume of Trading Outflows by Commodity'
+                text: 'Volume of Trading Inflows by Commodity'
             },
             xAxis: {
                 type: 'datetime',
@@ -449,7 +449,7 @@
                     }
                 }
             },
-           exporting: {
+            exporting: {
                 enabled: true,
             }
         });

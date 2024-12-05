@@ -62,6 +62,8 @@
 </div>
 
 
+
+
 <!-- Table: Commodities for Daily and Monthly Views -->
 @if($rangeType != 'yearly' && $rangeType != 'quarterly')
 <div class="row">
@@ -81,17 +83,25 @@
                         </thead>
                         <tbody>
                             @foreach ($inflow_volumes as $commodity)
-                            <tr>
-                                <td class="text-center">{{ $commodity['rank'] }}</td>
-                                <td class="text-center">{{ $commodity['commodity_name'] }}</td>
-                                <td class="text-center">{{ number_format($commodity['total_volume'], 2) }}</td>
-                                <td class="text-center">{{ number_format($commodity['percentage_share'], 2) }}%</td>
-                            </tr>
+                            @if ($commodity['total_volume'] > 0)
+                                <tr>
+                                    <td class="text-center">{{ $commodity['rank'] }}</td>
+                                    <td class="text-center">{{ $commodity['commodity_name'] }}</td>
+                                    <td class="text-center">{{ number_format($commodity['total_volume'], 2) }}</td>
+                                    <td class="text-center">{{ number_format($commodity['percentage_share'], 2) }}%</td>
+                                </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
                                 <td class="text-center fw-bold">{{ number_format($grandTotalVolume, 2) }}</td>
-                                <td class="text-center fw-bold">100%</td>
+                                <td class="text-center fw-bold">
+                                    @if ($grandTotalVolume > 0)
+                                        100%
+                                        @else
+                                        0.00%
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,17 +121,25 @@
                         </thead>
                         <tbody>
                             @foreach ($shortTripInflowVolumes as $commodity)
+                            @if ($commodity['short_trip_inflow_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
                                 <td class="text-center">{{ number_format($commodity['short_trip_inflow_volume'], 2) }}</td>
                                 <td class="text-center">{{ number_format(($commodity['short_trip_inflow_volume'] / $grandTotalShortTripInflow) * 100, 2) }}%</td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
                                 <td class="text-center fw-bold">{{ number_format($grandTotalShortTripInflow, 2) }}</td>
-                                <td class="text-center fw-bold">100%</td>
+                                <td class="text-center fw-bold">
+                                    @if ($grandTotalShortTripInflow > 0)
+                                        100%
+                                        @else
+                                        0.00%
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -141,7 +159,7 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title"><b>Commodity Volume Report (Quarterly)</b></h5>
+                <h5 class="card-title"><b>Trading Inflow Volume Report (Quarterly)</b></h5>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -158,6 +176,7 @@
                         </thead>
                         <tbody>
                             @foreach ($inflow_volumes as $commodity)
+                            @if ($commodity['total_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -174,6 +193,7 @@
                                     @endif
                                 </td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -182,7 +202,13 @@
                                 <td class="text-center fw-bold">{{ number_format($quarterlyGrandTotals['Q3'] ?? 0, 2) }}</td>
                                 <td class="text-center fw-bold">{{ number_format($quarterlyGrandTotals['Q4'] ?? 0, 2) }}</td>
                                 <td class="text-center fw-bold">{{ number_format($grandTotalVolume, 2) }}</td>
-                                <td class="text-center fw-bold">100%</td>
+                                <td class="text-center fw-bold">
+                                    @if ($grandTotalShortTripInflow > 0)
+                                        100%
+                                        @else
+                                        0.00%
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -212,6 +238,7 @@
                         </thead>
                         <tbody>
                             @foreach ($shortTripInflowVolumes as $commodity)
+                            @if ($commodity['short_trip_inflow_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -221,6 +248,7 @@
                                 <td class="text-center">{{ number_format($commodity['quarterly_short_trip_inflow_volumes'][4] ?? 0, 2) }}</td>
                                 <td class="text-center">{{ number_format($commodity['short_trip_inflow_volume'], 2) }}</td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -249,7 +277,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title"><b>Commodity Volume Report (Yearly)</b></h5>
+                    <h5 class="card-title"><b>Trading Inflow Report (Yearly)</b></h5>
 
                     <!-- Regular Trading Inflow Table (Yearly) -->
                     <div class="table-responsive">
@@ -267,6 +295,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($inflow_volumes as $commodity)
+                                @if ($commodity['total_volume'] > 0)
                                 <tr>
                                     <td class="text-center">{{ $commodity['rank'] }}</td>
                                     <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -276,6 +305,7 @@
                                     <td class="text-center">{{ number_format($commodity['total_volume'], 2) }}</td>
                                     <td class="text-center">{{ number_format($commodity['percentage_share'], 2) }}%</td>
                                 </tr>
+                                @endif
                                 @endforeach
 
                                 <!-- Grand Total Row -->
@@ -285,7 +315,13 @@
                                         <td class="text-center fw-bold">{{ number_format($monthlyGrandTotals[$month] ?? 0, 2) }}</td>
                                     @endforeach
                                     <td class="text-center fw-bold">{{ number_format($grandTotalVolume, 2) }}</td>
-                                    <td class="text-center fw-bold">100%</td>
+                                    <td class="text-center fw-bold">
+                                        @if ($grandTotalVolume > 0)
+                                            100%
+                                            @else
+                                            0.00%
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -308,6 +344,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($shortTripInflowVolumes as $commodity)
+                                @if ($commodity['total_volume'] > 0)
                                 <tr>
                                     <td class="text-center">{{ $commodity['rank'] }}</td>
                                     <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -317,6 +354,7 @@
                                     <td class="text-center">{{ number_format($commodity['short_trip_inflow_volume'], 2) }}</td>
                                     <td class="text-center">{{ number_format(($commodity['short_trip_inflow_volume'] / $grandTotalShortTripInflow) * 100, 2) }}%</td>
                                 </tr>
+                                @endif
                                 @endforeach
                                 <tr>
                                     <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -324,7 +362,13 @@
                                         <td class="text-center fw-bold">{{ number_format($monthlyShortTripGrandTotals[$month] ?? 0, 2) }}</td>
                                     @endforeach
                                     <td class="text-center fw-bold">{{ number_format($grandTotalShortTripInflow, 2) }}</td>
-                                    <td class="text-center fw-bold">100%</td>
+                                    <td class="text-center fw-bold">
+                                        @if ($grandTotalShortTripInflow > 0)
+                                            100%
+                                            @else
+                                            0.00%
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -355,17 +399,25 @@
                         </thead>
                         <tbody>
                             @foreach ($outflow_volumes as $commodity)
+                            @if ($commodity['outtotal_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
                                 <td class="text-center">{{ number_format($commodity['outtotal_volume'], 2) }}</td>
                                 <td class="text-center">{{ number_format($commodity['outpercentage_share'], 2) }}%</td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
                                 <td class="text-center fw-bold">{{ number_format($grandOutTotalVolume, 2) }}</td>
-                                <td class="text-center fw-bold">100%</td>
+                                <td class="text-center fw-bold">
+                                    @if ($grandOutTotalVolume > 0)
+                                        100%
+                                        @else
+                                        0.00%
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -385,17 +437,25 @@
                         </thead>
                         <tbody>
                             @foreach ($shortTripOutflowVolumes as $commodity)
+                            @if ($commodity['short_trip_outflow_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
                                 <td class="text-center">{{ number_format($commodity['short_trip_outflow_volume'], 2) }}</td>
                                 <td class="text-center">{{ number_format(($commodity['short_trip_outflow_volume'] / $grandTotalShortTripOutflow) * 100, 2) }}%</td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
                                 <td class="text-center fw-bold">{{ number_format($grandTotalShortTripOutflow, 2) }}</td>
-                                <td class="text-center fw-bold">100%</td>
+                                <td class="text-center fw-bold">
+                                    @if ($grandOutTotalVolume > 0)
+                                        100%
+                                        @else
+                                        0.00%
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -413,7 +473,7 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title"><b>Commodity Volume Report (Quarterly)</b></h5>
+                <h5 class="card-title"><b>Trading Outflow Volume Report (Quarterly)</b></h5>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -430,6 +490,7 @@
                         </thead>
                         <tbody>
                             @foreach ($outflow_volumes as $commodity)
+                            @if($commodity['outtotal_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -446,6 +507,7 @@
                                     @endif
                                 </td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -482,7 +544,9 @@
                             </tr>
                         </thead>
                         <tbody>
+                        
                             @foreach ($shortTripOutflowVolumes as $commodity)
+                            @if($commodity['short_trip_outflow_volume'] > 0)
                             <tr>
                                 <td class="text-center">{{ $commodity['rank'] }}</td>
                                 <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -492,6 +556,7 @@
                                 <td class="text-center">{{ number_format($commodity['quarterly_short_trip_outflow_volumes'][4] ?? 0, 2) }}</td>
                                 <td class="text-center">{{ number_format($commodity['short_trip_outflow_volume'], 2) }}</td>
                             </tr>
+                            @endif
                             @endforeach
                             <tr>
                                 <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -520,7 +585,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title"><b>Commodity Volume Report (Yearly)</b></h5>
+                    <h5 class="card-title"><b>Trading Outflow Report (Yearly)</b></h5>
 
                     <!-- Regular Trading Outflow Table (Yearly) -->
                     <div class="table-responsive">
@@ -538,6 +603,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($outflow_volumes as $commodity)
+                                @if($commodity['outtotal_volume'] > 0)
                                 <tr>
                                     <td class="text-center">{{ $commodity['rank'] }}</td>
                                     <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -547,6 +613,7 @@
                                     <td class="text-center">{{ number_format($commodity['outtotal_volume'], 2) }}</td>
                                     <td class="text-center">{{ number_format($commodity['outpercentage_share'], 2) }}%</td>
                                 </tr>
+                                @endif
                                 @endforeach
 
                                 <!-- Grand Total Row -->
@@ -556,7 +623,13 @@
                                         <td class="text-center fw-bold">{{ number_format($monthlyOutGrandTotals[$month] ?? 0, 2) }}</td>
                                     @endforeach
                                     <td class="text-center fw-bold">{{ number_format($grandOutTotalVolume, 2) }}</td>
-                                    <td class="text-center fw-bold">100%</td>
+                                    <td class="text-center fw-bold">
+                                        @if ($grandOutTotalVolume > 0)
+                                            100%
+                                            @else
+                                            0.00%
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -579,6 +652,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($shortTripOutflowVolumes as $commodity)
+                                @if($commodity['short_trip_outflow_volume'] > 0)
                                 <tr>
                                     <td class="text-center">{{ $commodity['rank'] }}</td>
                                     <td class="text-center">{{ $commodity['commodity_name'] }}</td>
@@ -588,6 +662,7 @@
                                     <td class="text-center">{{ number_format($commodity['short_trip_outflow_volume'], 2) }}</td>
                                     <td class="text-center">{{ number_format(($commodity['short_trip_outflow_volume'] / $grandTotalShortTripOutflow) * 100, 2) }}%</td>
                                 </tr>
+                                @endif
                                 @endforeach
                                 <tr>
                                     <td class="text-center fw-bold" colspan="2">GRAND TOTAL</td>
@@ -595,7 +670,13 @@
                                         <td class="text-center fw-bold">{{ number_format($monthlyShortTripOutGrandTotals[$month] ?? 0, 2) }}</td>
                                     @endforeach
                                     <td class="text-center fw-bold">{{ number_format($grandTotalShortTripOutflow, 2) }}</td>
-                                    <td class="text-center fw-bold">100%</td>
+                                    <td class="text-center fw-bold">
+                                        @if ($grandOutTotalVolume > 0)
+                                            100%
+                                            @else
+                                            0.00%
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
